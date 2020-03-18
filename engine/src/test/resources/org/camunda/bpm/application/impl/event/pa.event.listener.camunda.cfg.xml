@@ -28,6 +28,7 @@
     <property name="processEnginePlugins">
       <list>
         <bean class="org.camunda.bpm.application.impl.event.ProcessApplicationEventListenerPlugin" />
+        <bean class="com.camunda.bpm.consulting.snippet.engine_plugin_on_demand_call_activity.OnDemandCallActivityProcessEnginePlugin" />
       </list>
     </property>
 

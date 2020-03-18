@@ -38,6 +38,11 @@
     <property name="historyCleanupBatchWindowStartTime" value="16:00" />
     <property name="historyCleanupDegreeOfParallelism" value="1" />
 
+    <property name="processEnginePlugins">
+      <list>
+        <bean class="com.camunda.bpm.consulting.snippet.engine_plugin_on_demand_call_activity.OnDemandCallActivityProcessEnginePlugin" />
+      </list>
+    </property>
   </bean>
 
 </beans>

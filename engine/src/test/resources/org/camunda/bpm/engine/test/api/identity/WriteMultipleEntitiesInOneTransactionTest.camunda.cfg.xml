@@ -25,6 +25,7 @@
     <property name="processEnginePlugins">
       <list>
         <bean class="org.camunda.bpm.engine.test.api.identity.plugin.TestDbIdentityServiceProviderPlugin" />
+        <bean class="com.camunda.bpm.consulting.snippet.engine_plugin_on_demand_call_activity.OnDemandCallActivityProcessEnginePlugin" />
       </list>
   </property>
     

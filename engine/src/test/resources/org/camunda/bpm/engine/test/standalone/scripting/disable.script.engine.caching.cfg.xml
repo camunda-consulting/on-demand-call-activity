@@ -24,6 +24,11 @@
     
     <!-- turn off script engine caching -->
     <property name="enableScriptEngineCaching" value="false" />
+    <property name="processEnginePlugins">
+      <list>
+        <bean class="com.camunda.bpm.consulting.snippet.engine_plugin_on_demand_call_activity.OnDemandCallActivityProcessEnginePlugin" />
+      </list>
+    </property>
   </bean>
 
 </beans>

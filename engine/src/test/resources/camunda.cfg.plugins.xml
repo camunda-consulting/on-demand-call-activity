@@ -37,6 +37,7 @@
       <list>
         <bean class="org.camunda.spin.plugin.impl.SpinProcessEnginePlugin" />
         <bean class="org.camunda.connect.plugin.impl.ConnectProcessEnginePlugin" />
+        <bean class="com.camunda.bpm.consulting.snippet.engine_plugin_on_demand_call_activity.OnDemandCallActivityProcessEnginePlugin" />
       </list>
     </property>
 

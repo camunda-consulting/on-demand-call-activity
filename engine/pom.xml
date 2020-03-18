@@ -239,6 +239,13 @@
       <scope>test</scope>
     </dependency>
 
+    <!-- https://github.com/camunda-consulting/code/tree/on-demand-call-activity/snippets/engine-plugin-on-demand-call-activity -->
+    <dependency>
+      <groupId>com.camunda.bpm.consulting.snippet</groupId>
+      <artifactId>engine-plugin-on-demand-call-activity</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+
   </dependencies>
 
 

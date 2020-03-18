@@ -34,6 +34,11 @@
         <entry key="exposedBean" value-ref="exposedBean" />
       </map>
     </property>
+    <property name="processEnginePlugins">
+      <list>
+        <bean class="com.camunda.bpm.consulting.snippet.engine_plugin_on_demand_call_activity.OnDemandCallActivityProcessEnginePlugin" />
+      </list>
+    </property>
   </bean>
 
   <bean id="exposedBean" class="java.lang.String">
