@@ -53,6 +53,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.management.Metrics;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Attachment;
@@ -207,7 +208,7 @@ public class HistoryCleanupRemovalTimeTest {
   protected final BpmnModelInstance CALLING_PROCESS = Bpmn.createExecutableProcess(CALLING_PROCESS_KEY)
     .camundaHistoryTimeToLive(5)
     .startEvent()
-      .callActivity()
+      .callActivity("onDemandCallActivity")
         .calledElement(PROCESS_KEY)
     .endEvent().done();
   
@@ -628,14 +629,21 @@ public class HistoryCleanupRemovalTimeTest {
 
     ClockUtil.setCurrentTime(END_DATE);
 
-    String taskId = historyService.createHistoricTaskInstanceQuery().singleResult().getId();
+    /*String taskId = historyService.createHistoricTaskInstanceQuery().singleResult().getId();
 
-    taskService.complete(taskId);
+    taskService.complete(taskId);*/
+
+    //Signal to call activity behavior to finish process instance...
+
+    Execution callActivityExecution = runtimeService.createExecutionQuery().activityId("onDemandCallActivity").singleResult();
+
+    runtimeService.signal(callActivityExecution.getId());
 
     List<HistoricVariableInstance> historicVariableInstances = historyService.createHistoricVariableInstanceQuery().list();
 
     // assume
-    assertThat(historicVariableInstances.size(), is(1));
+    // OnDemandCallActivity generates two more variables...
+    assertThat(historicVariableInstances.size(), is(1 + 2));
 
     ClockUtil.setCurrentTime(addDays(END_DATE, 5));
 

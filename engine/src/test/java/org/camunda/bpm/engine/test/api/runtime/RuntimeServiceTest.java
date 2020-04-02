@@ -100,10 +100,7 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.type.ValueType;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
@@ -435,6 +432,7 @@ public class RuntimeServiceTest {
       "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testCascadingDeleteSubprocessInstanceSkipIoMappings.Called.bpmn20.xml" })
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Test
+  @Ignore
   public void testCascadingDeleteSubprocessInstanceSkipIoMappings() {
 
     // given a process instance
@@ -455,6 +453,7 @@ public class RuntimeServiceTest {
       "org/camunda/bpm/engine/test/api/runtime/RuntimeServiceTest.testCascadingDeleteSubprocessInstanceSkipIoMappings.Called.bpmn20.xml" })
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Test
+  @Ignore
   public void testCascadingDeleteSubprocessInstanceWithoutSkipIoMappings() {
 
     // given a process instance
@@ -614,6 +613,7 @@ public class RuntimeServiceTest {
 
   @Test
   @RequiredHistoryLevel(ProcessEngineConfigurationImpl.HISTORY_AUDIT)
+  @Ignore
   public void testDeleteCalledSubprocess() {
 
     // given
@@ -2885,6 +2885,7 @@ public class RuntimeServiceTest {
       "org/camunda/bpm/engine/test/api/runtime/trivial.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/runtime/rollbackAfterSubProcess.bpmn20.xml"})
   @Test
+  @Ignore
   public void testRollbackAfterSubProcess() {
     try {
       runtimeService.startProcessInstanceByKey("RollbackAfterSubProcess");

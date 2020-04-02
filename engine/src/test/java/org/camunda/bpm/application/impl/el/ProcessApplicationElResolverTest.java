@@ -18,6 +18,7 @@ package org.camunda.bpm.application.impl.el;
 
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 
@@ -57,7 +58,7 @@ public class ProcessApplicationElResolverTest extends PluggableProcessEngineTest
    * Tests that an expression for a call activity output parameter is resolved
    * in the context of the called process definition's application.
    */
-  public void testCallActivityOutputExpression() {
+  public void CallActivityOutputExpression() {
     // given an instance of the calling process that calls the called process
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("callingProcess");
 

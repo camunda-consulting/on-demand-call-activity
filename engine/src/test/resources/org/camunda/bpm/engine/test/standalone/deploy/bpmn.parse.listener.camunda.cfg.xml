@@ -34,8 +34,9 @@
     
     <property name="processEnginePlugins">
       <list>
-        <bean class="com.camunda.bpm.consulting.snippet.engine_plugin_on_demand_call_activity.OnDemandCallActivityProcessEnginePlugin" />
-      </list>
+                <bean class="com.camunda.bpm.consulting.snippet.engine_plugin_on_demand_call_activity.test.NullCallActivityProcessEnginePlugin" />
+                <bean class="com.camunda.bpm.consulting.snippet.engine_plugin_on_demand_call_activity.OnDemandCallActivityProcessEnginePlugin" />
+            </list>
     </property>
   </bean>
 

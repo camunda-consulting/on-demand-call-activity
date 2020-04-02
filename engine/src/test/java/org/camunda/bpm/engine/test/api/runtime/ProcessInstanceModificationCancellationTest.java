@@ -1575,7 +1575,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
 
     List<ProcessInstance> instanceList = runtimeService.createProcessInstanceQuery().list();
     assertNotNull(instanceList);
-    assertEquals(2, instanceList.size());
+    assertEquals(1, instanceList.size());
 
     ActivityInstance tree = runtimeService.getActivityInstance(taskInSubProcess.getProcessInstanceId());
     // when

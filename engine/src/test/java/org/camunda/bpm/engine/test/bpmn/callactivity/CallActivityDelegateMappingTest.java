@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -49,6 +50,7 @@ public class CallActivityDelegateMappingTest {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMapping.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
   })
+  @Ignore
   public void testCallSubProcessWithDelegatedVariableMapping() {
     //given
     engineRule.getRuntimeService().startProcessInstanceByKey("callSimpleSubProcess");
@@ -78,6 +80,7 @@ public class CallActivityDelegateMappingTest {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMappingExpression.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
   })
+  @Ignore
   public void testCallSubProcessWithDelegatedVariableMappingeExpression() {
     //given
 
@@ -235,6 +238,7 @@ public class CallActivityDelegateMappingTest {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMappingThrowExceptionOutput.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
   })
+  @Ignore
   public void testCallSubProcessWithDelegatedVariableMappingThrowExceptionOutput() {
     delegateVariableMappingThrowExceptionOutput();
   }
@@ -244,6 +248,7 @@ public class CallActivityDelegateMappingTest {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMappingExpressionThrowException.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
   })
+  @Ignore
   public void testCallSubProcessWithDelegatedVariableMappingeExpressionThrowExceptionOutput() {
     //given
     Map<Object, Object> vars = engineRule.getProcessEngineConfiguration().getBeans();
@@ -257,6 +262,7 @@ public class CallActivityDelegateMappingTest {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMappingThrowBpmnErrorOutput.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
   })
+  @Ignore
   public void testCallSubProcessWithDelegatedVariableMappingThrowBpmnErrorOutput() {
     delegateVariableMappingThrowExceptionOutput();
   }
@@ -266,6 +272,7 @@ public class CallActivityDelegateMappingTest {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSimpleSubProcessDelegateVarMappingExpressionThrowException.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
   })
+  @Ignore
   public void testCallSubProcessWithDelegatedVariableMappingeExpressionThrowBpmnErrorOutput() {
     //given
     Map<Object, Object> vars = engineRule.getProcessEngineConfiguration().getBeans();
@@ -279,6 +286,7 @@ public class CallActivityDelegateMappingTest {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallFailingSubProcessWithDelegatedVariableMapping.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/failingSubProcess.bpmn20.xml"
   })
+  @Ignore
   public void testCallFailingSubProcessWithDelegatedVariableMapping() {
     //given starting process instance with call activity
     //when call activity execution fails
@@ -294,6 +302,7 @@ public class CallActivityDelegateMappingTest {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityDelegateMappingTest.testCallSubProcessWithDelegatedVariableMappingAndAsyncServiceTask.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcessWithAsyncService.bpmn20.xml"
   })
+  @Ignore
   public void testCallSubProcessWithDelegatedVariableMappingAndAsyncServiceTask() {
     //given starting process instance with call activity which has asyn service task
     ProcessInstance superProcInst = engineRule.getRuntimeService().startProcessInstanceByKey("callSimpleSubProcess");
