@@ -47,6 +47,7 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -143,6 +144,7 @@ public class BatchSetRemovalTimeTest {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
   })
+  @Ignore
   public void shouldNotSetRemovalTimeInHierarchy_DmnDisabled() {
     // given
     testRule.getProcessEngineConfiguration()
@@ -607,6 +609,7 @@ public class BatchSetRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldNotSetRemovalTimeInHierarchy_BaseTimeNone() {
     // given
     testRule.getProcessEngineConfiguration()
@@ -640,6 +643,7 @@ public class BatchSetRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldClearRemovalTimeInHierarchy_BaseTimeNone() {
     // given
     testRule.process().ttl(5).call().serviceTask().deploy().start();
@@ -968,6 +972,7 @@ public class BatchSetRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldSetRemovalTimeInHierarchy_BaseTimeStart() {
     // given
     testRule.getProcessEngineConfiguration()
@@ -1192,6 +1197,7 @@ public class BatchSetRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldNotSetRemovalTimeInHierarchy_BaseTimeEnd() {
     // given
     testRule.getProcessEngineConfiguration()
@@ -1225,6 +1231,7 @@ public class BatchSetRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldClearRemovalTimeInHierarchy_BaseTimeEnd() {
     // given
     testRule.process().call().ttl(5).userTask().deploy().start();
@@ -1378,6 +1385,7 @@ public class BatchSetRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldSetRemovalTimeInHierarchy_BaseTimeEnd() {
     // given
     testRule.getProcessEngineConfiguration()
@@ -1568,6 +1576,7 @@ public class BatchSetRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldSetRemovalTimeInHierarchy_Null() {
     // given
     testRule.getProcessEngineConfiguration()
@@ -1747,6 +1756,7 @@ public class BatchSetRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldSetRemovalTimeInHierarchy_Absolute() {
     // given
     testRule.getProcessEngineConfiguration()
@@ -1821,6 +1831,7 @@ public class BatchSetRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldSetRemovalTimeInHierarchy_ByChildInstance() {
     // given
     String rootProcessInstance = testRule.process().call().ttl(5).userTask().deploy().start();
@@ -1893,6 +1904,7 @@ public class BatchSetRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldSetRemovalTime_ByIds() {
     // given
     testRule.process().call().userTask().deploy().start();
@@ -2282,6 +2294,7 @@ public class BatchSetRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldSetRemovalTime_BothQueryAndIdsDefined() {
     // given
     String rootProcessInstanceId = testRule.process().call().userTask().deploy().start();

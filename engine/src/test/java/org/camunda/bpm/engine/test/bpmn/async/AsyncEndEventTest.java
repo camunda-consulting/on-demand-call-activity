@@ -109,6 +109,7 @@ public class AsyncEndEventTest extends PluggableProcessEngineTestCase {
       "org/camunda/bpm/engine/test/bpmn/async/AsyncEndEventTest.testCallActivity-super.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/async/AsyncEndEventTest.testCallActivity-sub.bpmn20.xml"
   })
+  // Ignored because assertions demand a call activity
   public void ignore_testCallActivity() {
     runtimeService.startProcessInstanceByKey("super");
 

@@ -49,6 +49,7 @@ import org.camunda.bpm.engine.test.dmn.businessruletask.TestPojo;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -65,6 +66,15 @@ import static org.hamcrest.core.IsNull.nullValue;
 /**
  * @author Tassilo Weidner
  */
+
+/*
+
+Only tests operations on a child process instance,
+i.e. using getRootProcessInstance() => makes no sense to test if there is no child
+
+For this round of testing we are interested in operations on the parent that could fail due to the missing child
+
+*/
 public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
 
   protected final String CALLED_PROCESS_KEY = "calledProcess";
@@ -231,6 +241,7 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveHistoricProcessInstance() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -252,6 +263,7 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveHistoricActivityInstance() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -273,6 +285,7 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveHistoricTaskInstance() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -314,6 +327,7 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveHistoricVariableInstance() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -335,6 +349,7 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveHistoricDetailByVariableInstanceUpdate() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -384,6 +399,7 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveIncident() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -446,6 +462,7 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveExternalTaskLog() {
     // given
     testRule.deploy(Bpmn.createExecutableProcess("calledProcess")
@@ -472,6 +489,7 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveJobLog() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -522,6 +540,7 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveUserOperationLog_SetJobRetries() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -550,6 +569,7 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveUserOperationLog_SetExternalTaskRetries() {
     // given
     testRule.deploy(Bpmn.createExecutableProcess("calledProcess")
@@ -580,6 +600,7 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveUserOperationLog_ClaimTask() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -603,6 +624,7 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveUserOperationLog_CreateAttachment() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -626,6 +648,7 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveIdentityLink_AddCandidateUser() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -669,6 +692,7 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveCommentByProcessInstanceId() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -695,6 +719,7 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveCommentByTaskId() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -718,6 +743,7 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldNotResolveCommentByWrongTaskIdAndProcessInstanceId() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -744,6 +770,7 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveCommentByTaskIdAndWrongProcessInstanceId() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -805,6 +832,7 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveAttachmentByProcessInstanceId() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -831,6 +859,7 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveAttachmentByTaskId() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -854,6 +883,7 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldNotResolveAttachmentByWrongTaskIdAndProcessInstanceId() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -880,6 +910,7 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveAttachmentByTaskIdAndWrongProcessInstanceId() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -924,6 +955,7 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveByteArray_CreateAttachmentByTask() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -947,6 +979,7 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveByteArray_CreateAttachmentByProcessInstance() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -973,6 +1006,7 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveByteArray_SetVariable() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -1022,6 +1056,7 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveByteArray_JobLog() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -1055,6 +1090,7 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveByteArray_ExternalTaskLog() {
     // given
     testRule.deploy(Bpmn.createExecutableProcess("calledProcess")

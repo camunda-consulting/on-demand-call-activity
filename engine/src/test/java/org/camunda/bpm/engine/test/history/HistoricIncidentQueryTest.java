@@ -46,6 +46,7 @@ import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.hamcrest.CoreMatchers;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -330,6 +331,8 @@ public class HistoricIncidentQueryTest {
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/history/HistoricIncidentQueryTest.testQueryByCauseIncidentId.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml"})
+  @Ignore
+  // Ignored because the failing delegate is inside the call activity
   public void testQueryByCauseIncidentId() {
     startProcessInstance("process");
 
@@ -365,6 +368,8 @@ public class HistoricIncidentQueryTest {
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/history/HistoricIncidentQueryTest.testQueryByCauseIncidentId.bpmn20.xml",
   "org/camunda/bpm/engine/test/api/runtime/oneFailingServiceProcess.bpmn20.xml"})
+  @Ignore
+  // Ignored because the failing delegate is inside the call activity
   public void testQueryByRootCauseIncidentId() {
     startProcessInstance("process");
 

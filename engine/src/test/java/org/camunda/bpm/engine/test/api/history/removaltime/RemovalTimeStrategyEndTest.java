@@ -54,6 +54,7 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -249,6 +250,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveHistoricProcessInstance() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -284,6 +286,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveHistoricActivityInstance() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -319,6 +322,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveHistoricTaskInstance() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -350,6 +354,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveVariableInstance() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -385,6 +390,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveHistoricDetailByVariableInstanceUpdate() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -426,6 +432,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveHistoricDetailByFormProperty() {
     // given
     DeploymentWithDefinitions deployment = testRule.deploy(CALLING_PROCESS);
@@ -461,6 +468,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveIncident() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -512,6 +520,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
    * See https://app.camunda.com/jira/browse/CAM-9505
    */
   @Test
+  @Ignore
   public void shouldResolveIncidentWithPreservedCreateTime() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -581,6 +590,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveExternalTaskLog() {
     // given
     testRule.deploy(Bpmn.createExecutableProcess("calledProcess")
@@ -627,6 +637,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
    * See https://app.camunda.com/jira/browse/CAM-9505
    */
   @Test
+  @Ignore
   public void shouldResolveExternalTaskLogWithTimestampPreserved() {
     // given
     testRule.deploy(Bpmn.createExecutableProcess("calledProcess")
@@ -661,6 +672,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveJobLog() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -708,6 +720,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
    * See https://app.camunda.com/jira/browse/CAM-9505
    */
   @Test
+  @Ignore
   public void shouldResolveJobLogWithTimestampPreserved() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -742,6 +755,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveUserOperationLog_SetJobRetries() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -786,6 +800,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveUserOperationLog_SetExternalTaskRetries() {
     // given
     testRule.deploy(Bpmn.createExecutableProcess("calledProcess")
@@ -834,6 +849,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveUserOperationLog_ClaimTask() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -869,6 +885,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveUserOperationLog_CreateAttachment() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -909,6 +926,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
    * See https://app.camunda.com/jira/browse/CAM-9505
    */
   @Test
+  @Ignore
   public void shouldResolveUserOperationLogWithTimestampPreserved() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -937,6 +955,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveIdentityLink_AddCandidateUser() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -973,6 +992,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
    * See https://app.camunda.com/jira/browse/CAM-9505
    */
   @Test
+  @Ignore
   public void shouldResolveIdentityLinkWithTimePreserved() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -1021,6 +1041,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveCommentByProcessInstanceId() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -1059,6 +1080,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveCommentByTaskId() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -1092,6 +1114,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldNotResolveCommentByWrongTaskIdAndProcessInstanceId() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -1123,6 +1146,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveCommentByTaskIdAndWrongProcessInstanceId() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -1156,6 +1180,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveAttachmentByProcessInstanceId() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -1194,6 +1219,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveAttachmentByTaskId() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -1227,6 +1253,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldNotResolveAttachmentByWrongTaskIdAndProcessInstanceId() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -1258,6 +1285,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveAttachmentByTaskIdAndWrongProcessInstanceId() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -1293,6 +1321,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveByteArray_CreateAttachmentByTask() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -1326,6 +1355,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveByteArray_CreateAttachmentByProcessInstance() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -1364,6 +1394,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveByteArray_SetVariable() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -1399,6 +1430,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveByteArray_UpdateVariable() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -1439,6 +1471,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveByteArray_JobLog() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -1490,6 +1523,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveByteArray_ExternalTaskLog() {
     // given
     testRule.deploy(Bpmn.createExecutableProcess("calledProcess")

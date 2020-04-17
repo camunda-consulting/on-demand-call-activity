@@ -54,6 +54,7 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -899,6 +900,7 @@ public class ExecutionListenerTest {
   }
 
   @Test
+  @Ignore
   public void testThrowBpmnErrorInStartListenerOfStartEventAndCallActivity() {
     // given
     BpmnModelInstance subprocess = Bpmn.createExecutableProcess("subprocess")

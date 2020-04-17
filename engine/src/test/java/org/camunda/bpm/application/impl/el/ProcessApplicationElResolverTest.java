@@ -63,8 +63,8 @@ public class ProcessApplicationElResolverTest extends PluggableProcessEngineTest
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("callingProcess");
 
     // when the called process is completed
-    Task calledProcessTask = taskService.createTaskQuery().singleResult();
-    taskService.complete(calledProcessTask.getId());
+    /*Task calledProcessTask = taskService.createTaskQuery().singleResult();
+    taskService.complete(calledProcessTask.getId());*/
 
     // then the output mapping should have successfully resolved the expression
     String outVariable = (String) runtimeService.getVariable(instance.getId(), "outVar");
@@ -75,13 +75,17 @@ public class ProcessApplicationElResolverTest extends PluggableProcessEngineTest
    * Tests that an expression on an outgoing flow leaving a call activity
    * is resolved in the context of the calling process definition's application.
    */
+  //Adjusted to signal to a null call activity rather than completing a task inside of it
   public void testCallActivityConditionalOutgoingFlow() {
     // given an instance of the calling process that calls the called process
     runtimeService.startProcessInstanceByKey("callingProcessConditionalFlow");
 
     // when the called process is completed
-    Task calledProcessTask = taskService.createTaskQuery().singleResult();
-    taskService.complete(calledProcessTask.getId());
+    /*Task calledProcessTask = taskService.createTaskQuery().singleResult();
+    taskService.complete(calledProcessTask.getId());*/
+
+    Execution callActivityExecution = runtimeService.createExecutionQuery().activityId("callSubProcess").singleResult();
+    runtimeService.signal(callActivityExecution.getId());
 
     // then the conditional flow expression was resolved in the context of the calling process application, so
     // the following task has been reached successfully

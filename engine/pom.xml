@@ -38,10 +38,6 @@
           <groupId>de.odysseus.juel</groupId>
           <artifactId>juel-spi</artifactId>
         </exclusion>
-        <exclusion>
-          <groupId>de.odysseus.juel</groupId>
-          <artifactId>juel-impl</artifactId>
-        </exclusion>
       </exclusions>
     </dependency>
 

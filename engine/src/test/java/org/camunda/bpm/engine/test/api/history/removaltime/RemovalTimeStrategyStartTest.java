@@ -56,6 +56,7 @@ import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -367,6 +368,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveHistoricProcessInstance() {
     // given
     ClockUtil.setCurrentTime(START_DATE);
@@ -392,6 +394,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveHistoricActivityInstance() {
     // given
     ClockUtil.setCurrentTime(START_DATE);
@@ -417,6 +420,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveHistoricTaskInstance() {
     // given
     ClockUtil.setCurrentTime(START_DATE);
@@ -462,6 +466,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveVariableInstance() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -486,6 +491,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveHistoricDetailByVariableInstanceUpdate() {
     // given
     ClockUtil.setCurrentTime(START_DATE);
@@ -543,6 +549,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveIncident() {
     // given
     ClockUtil.setCurrentTime(START_DATE);
@@ -613,6 +620,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveExternalTaskLog() {
     // given
     ClockUtil.setCurrentTime(START_DATE);
@@ -644,6 +652,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveJobLog() {
     // given
     ClockUtil.setCurrentTime(START_DATE);
@@ -700,6 +709,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveUserOperationLog_SetJobRetries() {
     // given
     ClockUtil.setCurrentTime(START_DATE);
@@ -732,6 +742,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveUserOperationLog_SetExternalTaskRetries() {
     // given
     ClockUtil.setCurrentTime(START_DATE);
@@ -767,6 +778,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveUserOperationLog_ClaimTask() {
     // given
     ClockUtil.setCurrentTime(START_DATE);
@@ -794,6 +806,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveUserOperationLog_CreateAttachment() {
     // given
     ClockUtil.setCurrentTime(START_DATE);
@@ -821,6 +834,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveIdentityLink_AddCandidateUser() {
     // given
     ClockUtil.setCurrentTime(START_DATE);
@@ -870,6 +884,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveCommentByProcessInstanceId() {
     // given
     ClockUtil.setCurrentTime(START_DATE);
@@ -900,6 +915,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveCommentByTaskId() {
     // given
     ClockUtil.setCurrentTime(START_DATE);
@@ -927,6 +943,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldNotResolveCommentByWrongTaskIdAndProcessInstanceId() {
     // given
     ClockUtil.setCurrentTime(START_DATE);
@@ -955,6 +972,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveCommentByTaskIdAndWrongProcessInstanceId() {
     // given
     ClockUtil.setCurrentTime(START_DATE);
@@ -1020,6 +1038,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveAttachmentByProcessInstanceId() {
     // given
     ClockUtil.setCurrentTime(START_DATE);
@@ -1050,6 +1069,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveAttachmentByTaskId() {
     // given
     ClockUtil.setCurrentTime(START_DATE);
@@ -1077,6 +1097,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldNotResolveAttachmentByWrongTaskIdAndProcessInstanceId() {
     // given
     testRule.deploy(CALLING_PROCESS);
@@ -1103,6 +1124,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveAttachmentByTaskIdAndWrongProcessInstanceId() {
     // given
     ClockUtil.setCurrentTime(START_DATE);
@@ -1151,6 +1173,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveByteArray_CreateAttachmentByTask() {
     // given
     ClockUtil.setCurrentTime(START_DATE);
@@ -1178,6 +1201,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveByteArray_CreateAttachmentByProcessInstance() {
     // given
     ClockUtil.setCurrentTime(START_DATE);
@@ -1208,6 +1232,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveByteArray_SetVariable() {
     // given
     ClockUtil.setCurrentTime(START_DATE);
@@ -1235,6 +1260,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveByteArray_UpdateVariable() {
     // given
     ClockUtil.setCurrentTime(START_DATE);
@@ -1265,6 +1291,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveByteArray_JobLog() {
     // given
     ClockUtil.setCurrentTime(START_DATE);
@@ -1302,6 +1329,7 @@ public class RemovalTimeStrategyStartTest extends AbstractRemovalTimeTest {
   }
 
   @Test
+  @Ignore
   public void shouldResolveByteArray_ExternalTaskLog() {
     // given
     ClockUtil.setCurrentTime(START_DATE);

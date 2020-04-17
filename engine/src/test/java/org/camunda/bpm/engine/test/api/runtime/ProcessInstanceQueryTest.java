@@ -367,6 +367,7 @@ public class ProcessInstanceQueryTest {
                            "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"})
   @Test
   @Ignore
+  // Ignored because it depends on na call activity for the assertions.
   public void testQueryBySubProcessInstanceId() {
     ProcessInstance superProcessInstance = runtimeService.startProcessInstanceByKey("subProcessQueryTest");
 
@@ -387,6 +388,7 @@ public class ProcessInstanceQueryTest {
                            "org/camunda/bpm/engine/test/api/runtime/nestedSubProcess.bpmn20.xml",
                            "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"})
   @Ignore
+  // Ignored because it depends on na call activity for the assertions.
   public void testQueryBySuperProcessInstanceIdNested() {
     ProcessInstance superProcessInstance = runtimeService.startProcessInstanceByKey("nestedSubProcessQueryTest");
 
@@ -403,6 +405,7 @@ public class ProcessInstanceQueryTest {
           "org/camunda/bpm/engine/test/api/runtime/nestedSubProcess.bpmn20.xml",
           "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"})
   @Ignore
+  // Ignored because it depends on na call activity for the assertions.
   public void testQueryBySubProcessInstanceIdNested() {
     ProcessInstance superProcessInstance = runtimeService.startProcessInstanceByKey("nestedSubProcessQueryTest");
 

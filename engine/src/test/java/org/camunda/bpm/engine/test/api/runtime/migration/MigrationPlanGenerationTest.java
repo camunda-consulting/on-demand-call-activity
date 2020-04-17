@@ -45,6 +45,7 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -627,6 +628,7 @@ public class MigrationPlanGenerationTest {
   }
 
   @Test
+  @Ignore
   public void testMapCallActivitiesToBpmnTest() {
     assertGeneratedMigrationPlan(CallActivityModels.oneBpmnCallActivityProcess("foo"), CallActivityModels.oneBpmnCallActivityProcess("foo"))
       .hasInstructions(
@@ -643,6 +645,7 @@ public class MigrationPlanGenerationTest {
   }
 
   @Test
+  @Ignore
   public void testMapCallActivitiesFromBpmnToCmmnTest() {
     assertGeneratedMigrationPlan(CallActivityModels.oneBpmnCallActivityProcess("foo"), CallActivityModels.oneCmmnCallActivityProcess("foo"))
       .hasInstructions(
@@ -651,6 +654,7 @@ public class MigrationPlanGenerationTest {
   }
 
   @Test
+  @Ignore
   public void testMapCallActivitiesFromCmmnToBpmnTest() {
     assertGeneratedMigrationPlan(CallActivityModels.oneCmmnCallActivityProcess("foo"), CallActivityModels.oneBpmnCallActivityProcess("foo"))
       .hasInstructions(

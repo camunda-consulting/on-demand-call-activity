@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -274,8 +275,12 @@ public class TerminateEndEventTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateInCallActivity.bpmn",
     "org/camunda/bpm/engine/test/bpmn/event/end/TerminateEndEventTest.subProcessTerminate.bpmn"
   })
+  // Adjusted to run the execution before the task check.
   public void testTerminateInCallActivity() throws Exception {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
+
+    Execution callActivityExecution = runtimeService.createExecutionQuery().activityId("CallActivity_1").singleResult();
+    runtimeService.signal(callActivityExecution.getId());
 
     // should terminate the called process and continue the parent
     long executionEntities = runtimeService.createExecutionQuery().count();
@@ -294,6 +299,11 @@ public class TerminateEndEventTest extends PluggableProcessEngineTestCase {
   public void testTerminateInCallActivityMulitInstance() throws Exception {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
 
+    List<Execution> callActivityExecutions = runtimeService.createExecutionQuery().activityId("CallActivity_1").list();
+    for(Execution execution : callActivityExecutions){
+      runtimeService.signal(execution.getId());
+    }
+
     // should terminate the called process and continue the parent
     long executionEntities = runtimeService.createExecutionQuery().count();
     assertEquals(1, executionEntities);
@@ -308,8 +318,12 @@ public class TerminateEndEventTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateInCallActivityConcurrent.bpmn",
     "org/camunda/bpm/engine/test/bpmn/event/end/TerminateEndEventTest.subProcessConcurrentTerminate.bpmn"
   })
+  // Adjusted to run the execution before the task check.
   public void testTerminateInCallActivityConcurrent() throws Exception {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
+
+    Execution callActivityExecution = runtimeService.createExecutionQuery().activityId("CallActivity_1").singleResult();
+    runtimeService.signal(callActivityExecution.getId());
 
     // should terminate the called process and continue the parent
     long executionEntities = runtimeService.createExecutionQuery().count();
@@ -327,6 +341,11 @@ public class TerminateEndEventTest extends PluggableProcessEngineTestCase {
   })
   public void testTerminateInCallActivityConcurrentMulitInstance() throws Exception {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
+
+    List<Execution> callActivityExecutions = runtimeService.createExecutionQuery().activityId("CallActivity_1").list();
+    for(Execution execution : callActivityExecutions){
+      runtimeService.signal(execution.getId());
+    }
 
     // should terminate the called process and continue the parent
     long executionEntities = runtimeService.createExecutionQuery().count();

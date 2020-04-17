@@ -29,10 +29,7 @@ import org.camunda.bpm.engine.test.api.runtime.migration.models.CallActivityMode
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.RuleChain;
 
 /**
@@ -60,6 +57,7 @@ public class MigrationCallActivityTest {
   }
 
   @Test
+  @Ignore
   public void testCallBpmnProcessSimpleMigration() {
     // given
     BpmnModelInstance model = CallActivityModels.oneBpmnCallActivityProcess("oneTaskProcess");
@@ -143,6 +141,7 @@ public class MigrationCallActivityTest {
   }
 
   @Test
+  @Ignore
   public void testCallBpmnProcessAddParentScope() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(
@@ -182,6 +181,7 @@ public class MigrationCallActivityTest {
   }
 
   @Test
+  @Ignore
   public void testCallBpmnProcessParallelMultiInstance() {
     // given
     BpmnModelInstance model = modify(CallActivityModels.oneBpmnCallActivityProcess("oneTaskProcess"))
@@ -301,6 +301,7 @@ public class MigrationCallActivityTest {
   }
 
   @Test
+  @Ignore
   public void testCallBpmnProcessParallelMultiInstanceRemoveMiBody() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(
@@ -412,6 +413,7 @@ public class MigrationCallActivityTest {
   }
 
   @Test
+  @Ignore
   public void testCallBpmnProcessSequentialMultiInstanceRemoveMiBody() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(
@@ -523,6 +525,7 @@ public class MigrationCallActivityTest {
   }
 
   @Test
+  @Ignore
   public void testCallBpmnProcessReconfigureCallActivity() {
     // given
     BpmnModelInstance model = CallActivityModels.oneBpmnCallActivityProcess("oneTaskProcess");

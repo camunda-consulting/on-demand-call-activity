@@ -336,7 +336,8 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensateEventTest.testCallActivityCompensationHandler.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/event/compensate/CompensationHandler.bpmn20.xml" })
-  public void testCallActivityCompensationHandler() {
+  // Ignored since it tests a compensation with a call activity.
+  public void ignore_testCallActivityCompensationHandler() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
 

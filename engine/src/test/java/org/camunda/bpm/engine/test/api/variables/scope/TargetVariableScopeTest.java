@@ -176,6 +176,7 @@ public class TargetVariableScopeTest {
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/variables/scope/doer.bpmn"})
   @Ignore
+  // Ignored because the call activity is expected to fail, but in this test we have no call activity
   public void testWithDelegateVariableMappingAndChildScope () {
     BpmnModelInstance instance = Bpmn.createExecutableProcess("process1")
         .startEvent()

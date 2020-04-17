@@ -56,6 +56,7 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -103,6 +104,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
   }
 
   @Test
+  @Ignore
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
   })
@@ -193,6 +195,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
   })
+  @Ignore
   public void shouldSetRemovalTimeToStandaloneDecision_ChildDecisionInstance() {
     // given
     decisionService.evaluateDecisionByKey("dish-decision")
@@ -234,6 +237,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
   })
+  @Ignore
   public void shouldSetRemovalTime_DecisionInputInstance() {
     // given
     testRule.process()
@@ -382,6 +386,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
   })
+  @Ignore
   public void shouldSetRemovalTime_DecisionOutputInstance() {
     // given
     testRule.process()
@@ -525,6 +530,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
   }
 
   @Test
+  @Ignore
   public void shouldSetRemovalTime_ProcessInstance() {
     // given
     testRule.process().call().userTask().deploy().start();
@@ -555,6 +561,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
   }
 
   @Test
+  @Ignore
   public void shouldSetRemovalTime_ActivityInstance() {
     // given
     testRule.process().call().userTask().deploy().start();
@@ -588,6 +595,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
   }
 
   @Test
+  @Ignore
   public void shouldSetRemovalTime_TaskInstance() {
     // given
     testRule.process().call().userTask().deploy().start();
@@ -617,6 +625,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
   }
 
   @Test
+  @Ignore
   public void shouldSetRemovalTime_VariableInstance() {
     // given
     testRule.process().call().userTask().deploy()
@@ -649,6 +658,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
   }
 
   @Test
+  @Ignore
   public void shouldSetRemovalTime_Detail() {
     // given
     testRule.process().call().userTask().deploy()
@@ -681,6 +691,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
   }
 
   @Test
+  @Ignore
   public void shouldSetRemovalTime_ExternalTaskLog() {
     // given
     testRule.process().call().externalTask().deploy().start();
@@ -710,6 +721,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
   }
 
   @Test
+  @Ignore
   public void shouldSetRemovalTime_JobLog() {
     // given
     testRule.process().call().async().userTask().deploy().start();
@@ -743,6 +755,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
   }
 
   @Test
+  @Ignore
   public void shouldSetRemovalTime_Incident() {
     // given
     String rootProcessInstanceId = testRule.process().call().async().userTask().deploy().start();
@@ -818,6 +831,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
   }
 
   @Test
+  @Ignore
   public void shouldSetRemovalTime_IdentityLinkLog() {
     // given
     testRule.process().call().userTask().deploy().start();
@@ -847,6 +861,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
   }
 
   @Test
+  @Ignore
   public void shouldSetRemovalTime_CommentByTaskId() {
     // given
     testRule.process().call().userTask().deploy().start();
@@ -885,6 +900,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
   }
 
   @Test
+  @Ignore
   public void shouldSetRemovalTime_CommentByProcessInstanceId() {
     // given
     String processInstanceId = testRule.process().call().userTask().deploy().start();
@@ -916,6 +932,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
   }
 
   @Test
+  @Ignore
   public void shouldSetRemovalTime_AttachmentByTaskId() {
     // given
     testRule.process().call().userTask().deploy().start();
@@ -951,6 +968,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
   }
 
   @Test
+  @Ignore
   public void shouldSetRemovalTime_AttachmentByProcessInstanceId() {
     // given
     String processInstanceId = testRule.process().call().userTask().deploy().start();
@@ -981,6 +999,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
   }
 
   @Test
+  @Ignore
   public void shouldSetRemovalTime_ByteArray_AttachmentByTaskId() {
     // given
     testRule.process().call().userTask().deploy().start();
@@ -1052,6 +1071,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
   }
 
   @Test
+  @Ignore
   public void shouldSetRemovalTime_ByteArray_Variable() {
     // given
     testRule.process().call().userTask().deploy()
@@ -1090,6 +1110,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
   }
 
   @Test
+  @Ignore
   public void shouldSetRemovalTime_ByteArray_JobLog() {
     // given
     testRule.process().call().async().scriptTask().deploy().start();
@@ -1132,6 +1153,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
   }
 
   @Test
+  @Ignore
   public void shouldSetRemovalTime_ByteArray_ExternalTaskLog() {
     // given
     testRule.process().call().externalTask().deploy().start();
@@ -1179,6 +1201,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml"
   })
+  @Ignore
   public void shouldSetRemovalTime_ByteArray_DecisionInputInstance() {
     // given
     testRule.process()
@@ -1316,6 +1339,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml"
   })
+  @Ignore
   public void shouldSetRemovalTime_ByteArray_DecisionOutputInstance() {
     // given
     testRule.process()

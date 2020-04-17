@@ -28,10 +28,7 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.RuleChain;
 
 import java.util.Collections;
@@ -97,6 +94,7 @@ public class HistoryCleanupSchedulerBatchesTest extends AbstractHistoryCleanupSc
   protected final Date END_DATE = new Date(1363608000000L);
 
   @Test
+  @Ignore
   public void shouldScheduleToNow() {
     // given
     engineConfiguration.setBatchOperationHistoryTimeToLive("P5D");
@@ -139,6 +137,7 @@ public class HistoryCleanupSchedulerBatchesTest extends AbstractHistoryCleanupSc
   }
 
   @Test
+  @Ignore
   public void shouldScheduleToLater() {
     // given
     engineConfiguration.setBatchOperationHistoryTimeToLive("P5D");

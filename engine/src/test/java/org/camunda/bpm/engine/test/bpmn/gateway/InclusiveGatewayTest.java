@@ -458,31 +458,37 @@ public class InclusiveGatewayTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources={"org/camunda/bpm/engine/test/bpmn/gateway/InclusiveGatewayTest.testJoinAfterCall.bpmn20.xml",
                     "org/camunda/bpm/engine/test/bpmn/gateway/InclusiveGatewayTest.testJoinAfterCallSubProcess.bpmn20.xml"})
+  //Adjusted the test to handle call activity execution rather than the human task inside of it
   public void testJoinAfterCall() {
     // Test case to test act-1026
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("InclusiveGatewayAfterCall");
     assertNotNull(processInstance.getId());
-    assertEquals(3, taskService.createTaskQuery().count());
+    assertEquals(2, taskService.createTaskQuery().count());
 
     // now complete task A and check number of remaining tasks.
     // inclusive gateway should wait for the "Task B" and "Task C"
     Task taskA = taskService.createTaskQuery().taskName("Task A").singleResult();
     assertNotNull(taskA);
     taskService.complete(taskA.getId());
-    assertEquals(2, taskService.createTaskQuery().count());
+    assertEquals(1, taskService.createTaskQuery().count());
 
     // now complete task B and check number of remaining tasks
     // inclusive gateway should wait for "Task C"
     Task taskB = taskService.createTaskQuery().taskName("Task B").singleResult();
     assertNotNull(taskB);
     taskService.complete(taskB.getId());
-    assertEquals(1, taskService.createTaskQuery().count());
+    assertEquals(0, taskService.createTaskQuery().count());
 
     // now complete task C. Gateway activates and "Task C" remains
-    Task taskC = taskService.createTaskQuery().taskName("Task C").singleResult();
+    /*Task taskC = taskService.createTaskQuery().taskName("Task C").singleResult();
     assertNotNull(taskC);
     taskService.complete(taskC.getId());
-    assertEquals(1, taskService.createTaskQuery().count());
+    assertEquals(1, taskService.createTaskQuery().count());*/
+
+    Execution callActivityExecution = runtimeService.createExecutionQuery()
+            .activityId("callActivity").singleResult();
+
+    runtimeService.signal(callActivityExecution.getId());
 
     // check that remaining task is in fact task D
     Task taskD = taskService.createTaskQuery().taskName("Task D").singleResult();

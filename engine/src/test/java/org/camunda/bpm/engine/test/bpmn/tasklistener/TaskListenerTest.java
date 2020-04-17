@@ -60,6 +60,7 @@ import org.camunda.commons.utils.IoUtil;
 import org.joda.time.LocalDateTime;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -130,6 +131,8 @@ public class TaskListenerTest extends AbstractTaskListenerTest {
   }
 
   @Test
+  @Ignore
+  // Ignored because the demanded listener is inside a call activity.
   public void testCompleteTaskInCreateEventListenerWithFollowingCallActivity() {
     final BpmnModelInstance subProcess = Bpmn.createExecutableProcess("subProc")
                                              .startEvent()
@@ -217,6 +220,8 @@ public class TaskListenerTest extends AbstractTaskListenerTest {
   }
 
   @Test
+  @Ignore
+  // Ignored because the demanded listener is inside a call activity.
   public void testActivityInstanceIdOnDeleteInCalledProcess() {
     // given
     RecorderTaskListener.clear();
@@ -252,6 +257,8 @@ public class TaskListenerTest extends AbstractTaskListenerTest {
   }
 
   @Test
+  @Ignore
+  // Ignored because the listener is inside a call activity
   public void testVariableAccessOnDeleteInCalledProcess() {
     // given
     VariablesCollectingListener.reset();

@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -57,6 +58,8 @@ public class ErrorEndEventTest {
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/error/testPropagateOutputVariablesWhileThrowError.bpmn20.xml",
                             "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventTest.errorParent.bpmn20.xml" })
+  @Ignore
+  // Ignored since the error is generated inside the call activity.
   public void testPropagateOutputVariablesWhileThrowError() {
     // given
     Map<String,Object> variables = new HashMap<String, Object>();

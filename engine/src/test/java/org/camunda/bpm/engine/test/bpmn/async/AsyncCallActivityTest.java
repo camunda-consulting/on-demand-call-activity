@@ -33,6 +33,7 @@ public class AsyncCallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/async/AsyncCallActivityTest.asyncStartEvent.bpmn20.xml",
   "org/camunda/bpm/engine/test/bpmn/async/AsyncCallActivityTest.testCallSubProcess.bpmn20.xml" })
   @Test
+  // Ignored because the test requires a call activity with a async start event
   public void ignore_testCallProcessWithAsyncOnStartEvent() {
     runtimeService.startProcessInstanceByKey("callAsyncSubProcess");
 

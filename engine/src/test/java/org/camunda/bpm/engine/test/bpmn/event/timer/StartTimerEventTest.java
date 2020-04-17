@@ -618,7 +618,8 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/timer/simpleProcessWithCallActivity.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/event/timer/StartTimerEventTest.testStartTimerEventWithTwoEventSubProcesses.bpmn20.xml" })
-  public void testStartTimerEventSubProcessCalledFromCallActivity() {
+  // Ignored since the event subprocess starts with a timer inside the call activity.
+  public void ignore_testStartTimerEventSubProcessCalledFromCallActivity() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("calledProcess", "startTimerEventWithTwoEventSubProcesses");
     // start process instance

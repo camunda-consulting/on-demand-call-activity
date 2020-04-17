@@ -239,6 +239,7 @@ public class CallActivityDelegateMappingTest {
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
   })
   @Ignore
+  // Ignored because it depends in the delegate variable mapping throwing an error.
   public void testCallSubProcessWithDelegatedVariableMappingThrowExceptionOutput() {
     delegateVariableMappingThrowExceptionOutput();
   }
@@ -249,6 +250,7 @@ public class CallActivityDelegateMappingTest {
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
   })
   @Ignore
+  // Ignored because it depends in the delegate variable mapping
   public void testCallSubProcessWithDelegatedVariableMappingeExpressionThrowExceptionOutput() {
     //given
     Map<Object, Object> vars = engineRule.getProcessEngineConfiguration().getBeans();
@@ -263,6 +265,7 @@ public class CallActivityDelegateMappingTest {
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
   })
   @Ignore
+  // Ignored because it depends in the delegate variable mapping throwing an error.
   public void testCallSubProcessWithDelegatedVariableMappingThrowBpmnErrorOutput() {
     delegateVariableMappingThrowExceptionOutput();
   }
@@ -273,6 +276,7 @@ public class CallActivityDelegateMappingTest {
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
   })
   @Ignore
+  // Ignored because it depends in the delegate variable mapping
   public void testCallSubProcessWithDelegatedVariableMappingeExpressionThrowBpmnErrorOutput() {
     //given
     Map<Object, Object> vars = engineRule.getProcessEngineConfiguration().getBeans();
@@ -287,6 +291,7 @@ public class CallActivityDelegateMappingTest {
     "org/camunda/bpm/engine/test/bpmn/callactivity/failingSubProcess.bpmn20.xml"
   })
   @Ignore
+  // Ignored because the bpmn error is thrown within the call activity and it uses delegate variable mapping
   public void testCallFailingSubProcessWithDelegatedVariableMapping() {
     //given starting process instance with call activity
     //when call activity execution fails

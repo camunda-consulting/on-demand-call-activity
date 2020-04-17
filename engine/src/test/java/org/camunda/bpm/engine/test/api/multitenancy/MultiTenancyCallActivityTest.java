@@ -42,7 +42,7 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
       .endEvent()
       .done();
 
-  public void testStartProcessInstanceWithDeploymentBinding() {
+  public void ignore_testStartProcessInstanceWithDeploymentBinding() {
 
     BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
       .startEvent()
@@ -63,7 +63,7 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
   }
 
-  public void testStartProcessInstanceWithLatestBindingSameVersion() {
+  public void ignore_testStartProcessInstanceWithLatestBindingSameVersion() {
 
     BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
       .startEvent()
@@ -84,7 +84,7 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
   }
 
-  public void testStartProcessInstanceWithLatestBindingDifferentVersion() {
+  public void ignore_testStartProcessInstanceWithLatestBindingDifferentVersion() {
 
     BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
       .startEvent()
@@ -110,7 +110,7 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
     assertThat(query.tenantIdIn(TENANT_TWO).processDefinitionId(latestSubProcessTenantTwo.getId()).count(), is(1L));
   }
 
-  public void testStartProcessInstanceWithVersionBinding() {
+  public void ignore_testStartProcessInstanceWithVersionBinding() {
 
     BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
       .startEvent()
@@ -132,7 +132,7 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
   }
 
-  public void testStartProcessInstanceWithVersionTagBinding() {
+  public void ignore_testStartProcessInstanceWithVersionTagBinding() {
     // given
     BpmnModelInstance callingProcess = createCallingProcess("callingProcess", "ver_tag_1");
 
@@ -151,7 +151,7 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
     assertThat(query.activityIdIn("Task_2").tenantIdIn(TENANT_TWO).count(), is(1L));
   }
 
-  public void testFailStartProcessInstanceFromOtherTenantWithDeploymentBinding() {
+  public void ignore_testFailStartProcessInstanceFromOtherTenantWithDeploymentBinding() {
 
     BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
       .startEvent()
@@ -175,7 +175,7 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
     }
   }
 
-  public void testFailStartProcessInstanceFromOtherTenantWithLatestBinding() {
+  public void ignore_testFailStartProcessInstanceFromOtherTenantWithLatestBinding() {
 
     BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
       .startEvent()
@@ -199,7 +199,7 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
     }
   }
 
-  public void testFailStartProcessInstanceFromOtherTenantWithVersionBinding() {
+  public void ignore_testFailStartProcessInstanceFromOtherTenantWithVersionBinding() {
 
     BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
       .startEvent()
@@ -226,7 +226,7 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
     }
   }
 
-  public void testFailStartProcessInstanceFromOtherTenantWithVersionTagBinding() {
+  public void ignore_testFailStartProcessInstanceFromOtherTenantWithVersionTagBinding() {
     // given
     BpmnModelInstance callingProcess = createCallingProcess("callingProcess", "ver_tag_2");
     deploymentForTenant(TENANT_ONE, callingProcess);
@@ -409,7 +409,7 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
     }
   }
 
-  public void testCalledElementTenantIdConstant() {
+  public void ignore_testCalledElementTenantIdConstant() {
 
     BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
         .startEvent()
@@ -428,7 +428,7 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTestCase
     assertThat(query.tenantIdIn(TENANT_ONE).count(), is(1L));
   }
 
-  public void testCalledElementTenantIdExpression() {
+  public void ignore_testCalledElementTenantIdExpression() {
 
     BpmnModelInstance callingProcess = Bpmn.createExecutableProcess("callingProcess")
         .startEvent()

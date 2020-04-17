@@ -17,10 +17,13 @@
 package org.camunda.bpm.engine.test.bpmn.event.conditional;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.builder.UserTaskBuilder;
@@ -781,6 +784,10 @@ public class MixedConditionalEventTest extends AbstractConditionalEventTestCase 
     //when task is completed
     taskService.complete(task.getId());
 
+    Execution callActivityExecution = runtimeService.createExecutionQuery().activityId(TASK_WITH_CONDITION_ID).singleResult();
+    VariableMap variableMap = Variables.createVariables().putValue("variable", 1);
+    runtimeService.signal(callActivityExecution.getId(), variableMap);
+
     //then out mapping from call activity sets variable
     //-> interrupting conditional start event on process instance level is triggered
     tasksAfterVariableIsSet = taskQuery.list();
@@ -822,6 +829,10 @@ public class MixedConditionalEventTest extends AbstractConditionalEventTestCase 
 
     //when task before service task is completed
     taskService.complete(task.getId());
+
+    Execution callActivityExecution = runtimeService.createExecutionQuery().activityId(TASK_WITH_CONDITION_ID).singleResult();
+    VariableMap variableMap = Variables.createVariables().putValue("variable", 1);
+    runtimeService.signal(callActivityExecution.getId(), variableMap);
 
     //then out mapping of call activity sets a variable
     //-> all non interrupting conditional events are triggered
