@@ -795,6 +795,7 @@ public class MixedConditionalEventTest extends AbstractConditionalEventTestCase 
   }
 
   @Test
+  // Changed the assertions because of the conditional event config
   public void testNonInterruptingSetVariableInOutMappingOfCallActivity() {
     engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, DELEGATED_PROCESS).deploy());
 
@@ -836,8 +837,10 @@ public class MixedConditionalEventTest extends AbstractConditionalEventTestCase 
 
     //then out mapping of call activity sets a variable
     //-> all non interrupting conditional events are triggered
+    /* Changed the number of tasks due to the fact that the conditional event triggers 3 times, since we have three variables
+    and the conditional event is not filtering any variables */
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(5, tasksAfterVariableIsSet.size());
+    assertEquals(7, tasksAfterVariableIsSet.size());
     //three subscriptions: event sub process in sub process and on process instance level and boundary event of sub process
     assertEquals(3, conditionEventSubscriptionQuery.count());
   }
