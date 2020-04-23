@@ -851,6 +851,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testSequentialCallActivity.bpmn20.xml",
           "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml"})
+  // Adjusted the test to handle the multi-instance executions and not the tasks inside the call activity.
   public void testSequentialCallActivity() {
     String procId = runtimeService.startProcessInstanceByKey("miSequentialCallActivity").getId();
 
@@ -940,6 +941,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelCallActivity.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml" })
+  // Adjusted the test to handle the multi-instance executions and not the tasks inside the call activity.
   public void testParallelCallActivity() {
     String procId = runtimeService.startProcessInstanceByKey("miParallelCallActivity").getId();
     /*List<Task> tasks = taskService.createTaskQuery().list();
@@ -1150,6 +1152,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testNestedParallelCallActivityCompletionCondition.bpmn20.xml",
   "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml" })
+  // Adjusted the test to handle the multi-instance executions and not the tasks inside the call activity.
   public void testNestedParallelCallActivityCompletionCondition() {
     String procId = runtimeService.startProcessInstanceByKey("miNestedParallelCallActivityCompletionCondition").getId();
 
@@ -1221,6 +1224,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.callActivityWithBoundaryErrorEvent.bpmn20.xml",
   "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.throwingErrorEventSubProcess.bpmn20.xml" })
+  // Adjusted the test to handle the multi-instance executions and not the tasks inside the call activity.
   public void testMultiInstanceCallActivityWithErrorBoundaryEvent() {
     Map<String, Object> variableMap = new HashMap<String, Object>();
     variableMap.put("assignees", Arrays.asList("kermit", "gonzo"));
@@ -1262,6 +1266,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.callActivityWithBoundaryErrorEventSequential.bpmn20.xml",
   "org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.throwingErrorEventSubProcess.bpmn20.xml" })
+  // Adjusted the test to handle the multi-instance executions and not the tasks inside the call activity.
   public void testSequentialMultiInstanceCallActivityWithErrorBoundaryEvent() {
     Map<String, Object> variableMap = new HashMap<String, Object>();
     variableMap.put("assignees", Arrays.asList("kermit", "gonzo"));

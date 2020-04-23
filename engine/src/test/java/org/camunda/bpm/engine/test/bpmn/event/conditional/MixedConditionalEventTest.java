@@ -750,6 +750,7 @@ public class MixedConditionalEventTest extends AbstractConditionalEventTestCase 
   //conditional start event event sub process on process instance level and on sub process /////////////////////////////
 
   @Test
+  // Adjusted the test to handle the call activity execution after the human task. Added the variable = 1 back through the execution.
   public void testSetVariableInOutMappingOfCallActivity() {
     engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, DELEGATED_PROCESS).deploy());
 

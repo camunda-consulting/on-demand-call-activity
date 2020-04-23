@@ -296,6 +296,7 @@ public class TerminateEndEventTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateInCallActivityMulitInstance.bpmn",
     "org/camunda/bpm/engine/test/bpmn/event/end/TerminateEndEventTest.subProcessTerminate.bpmn"
   })
+  // Adjusted to run the executions of multi-instances before the task check.
   public void testTerminateInCallActivityMulitInstance() throws Exception {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
 
@@ -339,6 +340,7 @@ public class TerminateEndEventTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateInCallActivityConcurrentMulitInstance.bpmn",
     "org/camunda/bpm/engine/test/bpmn/event/end/TerminateEndEventTest.subProcessConcurrentTerminate.bpmn"
   })
+  // Adjusted to run the executions of multi-instances before the task check.
   public void testTerminateInCallActivityConcurrentMulitInstance() throws Exception {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
 

@@ -901,6 +901,7 @@ public class ExecutionListenerTest {
 
   @Test
   @Ignore
+  // Ignored since the listener throws an error from within the call activity.testThrowBpmnErrorInStartListenerOfStartEventAndCallActivity
   public void testThrowBpmnErrorInStartListenerOfStartEventAndCallActivity() {
     // given
     BpmnModelInstance subprocess = Bpmn.createExecutableProcess("subprocess")

@@ -81,6 +81,7 @@ public class CallActivityDelegateMappingTest {
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
   })
   @Ignore
+  // Ignored because it depends on the variable mapping.
   public void testCallSubProcessWithDelegatedVariableMappingeExpression() {
     //given
 
@@ -308,6 +309,7 @@ public class CallActivityDelegateMappingTest {
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcessWithAsyncService.bpmn20.xml"
   })
   @Ignore
+  // Ignored because it depends on async service task and delegate variable mapping.
   public void testCallSubProcessWithDelegatedVariableMappingAndAsyncServiceTask() {
     //given starting process instance with call activity which has asyn service task
     ProcessInstance superProcInst = engineRule.getRuntimeService().startProcessInstanceByKey("callSimpleSubProcess");

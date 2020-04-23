@@ -157,6 +157,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateRecursiveIncidents.bpmn",
       "org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateOneIncident.bpmn"})
+  // Also depends on the call activity (makes no sense without it). Ignore.
   public void ignore_testShouldCreateRecursiveIncidents() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callFailingProcess");
@@ -215,6 +216,7 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateRecursiveIncidentsForNestedCallActivity.bpmn",
   		"org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateRecursiveIncidents.bpmn",
   "org/camunda/bpm/engine/test/api/mgmt/IncidentTest.testShouldCreateOneIncident.bpmn"})
+  // This test depends on incidents inside call activity. Ignore for now.
   public void ignore_testShouldCreateRecursiveIncidentsForNestedCallActivity() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callingFailingCallActivity");

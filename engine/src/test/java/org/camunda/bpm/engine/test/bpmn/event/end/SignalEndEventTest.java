@@ -79,6 +79,7 @@ public class SignalEndEventTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/signal/testPropagateOutputVariablesWhileThrowSignal.bpmn20.xml",
                             "org/camunda/bpm/engine/test/bpmn/event/signal/SignalEndEventTest.parent.bpmn20.xml" })
+  // Ignored. Depends on a signal of the child process.
   public void ignore_testPropagateOutputVariablesWhileThrowSignal() {
     // given
     Map<String,Object> variables = new HashMap<String, Object>();

@@ -915,6 +915,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
   }
 
   @Test
+  // Changed the assertions because of the conditional event config
   public void testNonInterruptingSetVariableInOutputMappingOfCallActivity() {
     engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, DELEGATED_PROCESS).deploy());
 
@@ -1429,6 +1430,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
   }
 
   @Test
+  // Adjusted the test to handle the call activity execution after the human task.
   public void testSetVariableInCallActivity() {
     engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, DELEGATED_PROCESS).deploy());
 

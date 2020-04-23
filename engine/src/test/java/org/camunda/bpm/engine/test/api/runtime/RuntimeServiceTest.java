@@ -433,6 +433,7 @@ public class RuntimeServiceTest {
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Test
   @Ignore
+  // Test makes no sense without the call activity, since it validates the input/output mappings.
   public void testCascadingDeleteSubprocessInstanceSkipIoMappings() {
 
     // given a process instance
@@ -454,6 +455,7 @@ public class RuntimeServiceTest {
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
   @Test
   @Ignore
+  // Test makes no sense without the call activity, since it validates the input/output mappings.
   public void testCascadingDeleteSubprocessInstanceWithoutSkipIoMappings() {
 
     // given a process instance
@@ -614,6 +616,7 @@ public class RuntimeServiceTest {
   @Test
   @RequiredHistoryLevel(ProcessEngineConfigurationImpl.HISTORY_AUDIT)
   @Ignore
+  // Test makes no sense without the call activity.
   public void testDeleteCalledSubprocess() {
 
     // given

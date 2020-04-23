@@ -390,6 +390,7 @@ public class IncidentQueryTest {
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/IncidentQueryTest.testQueryByCauseIncidentId.bpmn"})
   @Ignore
+  // Depends on a call activity. Ignore. Maybe we can customize this test here.
   public void testQueryByCauseIncidentId() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callFailingProcess");
 

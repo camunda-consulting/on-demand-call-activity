@@ -686,6 +686,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
   }
 
   @Test
+  // Adjusted the test to handle the call activity execution after the human task. Added the variable = 1 back through the execution.
   public void testSetVariableInOutMappingOfCallActivity() {
     engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, DELEGATED_PROCESS).deploy());
 

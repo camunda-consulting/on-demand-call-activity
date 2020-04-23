@@ -220,6 +220,7 @@ public class DeploymentCacheCfgTest {
 
   @Test
   @Ignore
+  // This one is a synchronous, which is similar to the one in the top. I think we should ignore.
   public void testSequentialCallActivityCall() {
 
     // given a number process definitions which call each other by call activities (0->1->2->0->4),
@@ -239,6 +240,7 @@ public class DeploymentCacheCfgTest {
 
   @Test
   @Ignore
+  // Tests several call activities with jobs. I think we should ignore.
   public void  testSequentialCallActivityCallAsynchronously() throws InterruptedException {
 
     // given a number process definitions which call each other by call activities (0->1->2->0->4),
