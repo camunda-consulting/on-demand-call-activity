@@ -237,6 +237,7 @@ public class MigrationCallActivityTest {
   }
 
   @Test
+  @Ignore
   public void testCallCmmnCaseParallelMultiInstance() {
     // given
     BpmnModelInstance model = modify(CallActivityModels.oneCmmnCallActivityProcess("oneTaskCase"))
@@ -352,6 +353,7 @@ public class MigrationCallActivityTest {
   }
 
   @Test
+  @Ignore
   public void testCallCmmnCaseParallelMultiInstanceRemoveMiBody() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(
@@ -465,6 +467,7 @@ public class MigrationCallActivityTest {
   }
 
   @Test
+  @Ignore
   public void testCallCmmnCaseSequentialMultiInstanceRemoveMiBody() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(

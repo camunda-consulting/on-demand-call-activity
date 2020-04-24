@@ -1170,7 +1170,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testDeleteDoubleNestedProcessInstanceInCallActivityWithHashExpressions.bpmn20.xml",
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcessWithHashExpressions.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
   // Adjusted to deal with the lack of a task inside the call activity.
   public void testCallSimpleSubProcessWithHashExpressions() {
