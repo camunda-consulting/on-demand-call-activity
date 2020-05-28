@@ -10,8 +10,13 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CallActivityBehavior;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
+import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.JobUtil;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
@@ -46,6 +51,16 @@ public class OnDemandCallActivityBehavior extends CallActivityBehavior {
             execution.setVariable(getRetriesVarName(execution), jobs.get(0).getRetries());
         }
         super.execute(execution);
+
+        /*ExecutionEntity subProcessInstance = ((ExecutionEntity) execution).getSubProcessInstance();
+        logger.info("Method execute subprocess instance: {}", subProcessInstance);
+
+        final HistoryEventHandler historyEventHandler = Context.getProcessEngineConfiguration()
+                .getHistoryEventHandler();
+        final HistoryEventProducer historyEventProducer = Context.getProcessEngineConfiguration()
+                .getHistoryEventProducer();
+        HistoryEvent activityInstanceUpdateEvt = historyEventProducer.createActivityInstanceUpdateEvt(execution);
+        historyEventHandler.handleEvent(activityInstanceUpdateEvt);*/
     }
 
     @Override
@@ -53,6 +68,11 @@ public class OnDemandCallActivityBehavior extends CallActivityBehavior {
         // try to start process with the provided process definition key
         try {
             super.startInstance(execution, variables, businessKey);
+            ExecutionEntity subProcessInstance = ((ExecutionEntity) execution).getSubProcessInstance();
+            logger.info("Method start instance subprocess instance: {}", subProcessInstance);
+
+            // UPDATE THE HISTORY RECORD WITH THE PROCESS ID...
+            // SQL CALL
         }
         // process definition key is null => no child process needed
         catch (NullValueException e) {
@@ -72,7 +92,7 @@ public class OnDemandCallActivityBehavior extends CallActivityBehavior {
             Integer currentRetries = (Integer) execution.getVariable(getRetriesVarName(execution));
 
             if (currentRetries == null) {
-                currentRetries = 0; // TODO: read this from ProcessEngineConfiguration
+                currentRetries = 3; // TODO: read this from ProcessEngineConfiguration
             }
 
             Exception exception = (Exception) signalData;
