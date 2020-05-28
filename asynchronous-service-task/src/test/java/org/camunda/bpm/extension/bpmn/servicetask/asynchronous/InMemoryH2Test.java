@@ -1,4 +1,4 @@
-package com.camunda.bpm.consulting.snippet.asynchronous_service_task;
+package org.camunda.bpm.extension.bpmn.servicetask.asynchronous;
 
 import org.apache.ibatis.logging.LogFactory;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -10,6 +10,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 
+import static org.camunda.bpm.extension.bpmn.servicetask.asynchronous.ProcessConstants.*;
 import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
 import static org.junit.Assert.*;
 
@@ -43,7 +44,7 @@ public class InMemoryH2Test {
   @Test
   @Deployment(resources = "process.bpmn")
   public void testHappyPath() throws InterruptedException {
-    ProcessInstance processInstance = processEngine().getRuntimeService().startProcessInstanceByKey(ProcessConstants.PROCESS_DEFINITION_KEY);
+    ProcessInstance processInstance = processEngine().getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
 	Thread.sleep(300L);
     assertThat(processInstance).isEnded();
   }

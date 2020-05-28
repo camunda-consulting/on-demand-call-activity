@@ -1,4 +1,4 @@
-package com.camunda.bpm.consulting.snippet.asynchronous_service_task;
+package org.camunda.bpm.extension.bpmn.servicetask.asynchronous;
 
 import java.util.logging.Logger;
 

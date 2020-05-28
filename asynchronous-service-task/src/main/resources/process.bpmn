@@ -9,7 +9,7 @@
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="SequenceFlow1" sourceRef="StartEventProcessStarted" targetRef="Task_0o33j0d" />
     <bpmn:sequenceFlow id="SequenceFlow_1atxxsq" sourceRef="Task_0o33j0d" targetRef="EndEventProcessEnded" />
-    <bpmn:serviceTask id="Task_0o33j0d" name="Asynchronous Service Task" camunda:class="com.camunda.bpm.consulting.snippet.asynchronous_service_task.AsynchronousServiceTask">
+    <bpmn:serviceTask id="Task_0o33j0d" name="Asynchronous Service Task" camunda:class="org.camunda.bpm.extension.bpmn.servicetask.asynchronous.AsynchronousServiceTask">
       <bpmn:incoming>SequenceFlow1</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1atxxsq</bpmn:outgoing>
     </bpmn:serviceTask>
