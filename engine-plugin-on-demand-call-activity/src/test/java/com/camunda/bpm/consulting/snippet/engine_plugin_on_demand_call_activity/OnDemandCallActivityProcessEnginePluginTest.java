@@ -4,6 +4,7 @@ import org.apache.ibatis.logging.LogFactory;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngines;
+import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
@@ -20,6 +21,7 @@ import static org.camunda.bpm.engine.impl.test.TestHelper.createSchema;
 import static org.camunda.bpm.engine.impl.test.TestHelper.dropSchema;
 import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
 import static org.camunda.bpm.engine.test.assertions.bpmn.AbstractAssertions.processEngine;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Test case starting an in-memory database-backed Process Engine.
@@ -90,10 +92,44 @@ public class OnDemandCallActivityProcessEnginePluginTest {
         logger.info(job().toString());
         execute(job());
 
-        // TODO fix this assertion
-//        assertThat(processInstance).calledProcessInstance("process-child").isEnded();
         assertThat(processInstance).hasPassed("EndEventProcessEnded");
         assertThat(processInstance).isEnded();
+        HistoricProcessInstance historicChildProcessInstance = historyService().createHistoricProcessInstanceQuery()
+          .superProcessInstanceId(processInstance.getId())
+          .singleResult();
+        assertNotNull(historicChildProcessInstance);
+        HistoricProcessInstance historicChildProcessInstanceCockpit = historyService().createNativeHistoricProcessInstanceQuery()
+          .sql("select RES.* from (\n" + 
+              "      select RES.ID_, RES.START_TIME_, RES.END_TIME_, ACT.ID_ AS ACT_INST_ID_, ACT.ACT_ID_, PROC_.ID_ AS PROC_DEF_ID_, PROC_.KEY_, PROC_.NAME_, INCIDENT.INCIDENT_TYPE_, INCIDENT.INCIDENT_COUNT_\n" + 
+              "      from\n" + 
+              "        ACT_HI_PROCINST RES\n" + 
+              "      inner join\n" + 
+              "        ACT_HI_ACTINST ACT\n" + 
+              "      on\n" + 
+              "        ACT.CALL_PROC_INST_ID_ = RES.ID_\n" + 
+              "      inner join\n" + 
+              "        ACT_RE_PROCDEF PROC_\n" + 
+              "      on\n" + 
+              "        RES.PROC_DEF_ID_ = PROC_.ID_" +
+              "      left join\n" + 
+              "      (\n" + 
+              "        select\n" + 
+              "          INCIDENT.PROC_INST_ID_, INCIDENT.INCIDENT_TYPE_, count(INCIDENT.ID_) INCIDENT_COUNT_\n" + 
+              "        from\n" + 
+              "          ACT_HI_INCIDENT INCIDENT\n" + 
+              "        group by\n" + 
+              "          INCIDENT.PROC_INST_ID_, INCIDENT.INCIDENT_TYPE_\n" + 
+              "      ) INCIDENT\n" + 
+              "      on\n" + 
+              "        RES.PROC_INST_ID_ = INCIDENT.PROC_INST_ID_\n" + 
+              "\n" + 
+              "WHERE ACT.PROC_INST_ID_ = #{parentProcessInstanceId}" +
+              ") RES")
+          .parameter("parentProcessInstanceId", processInstance.getId())
+          .singleResult();
+        assertNotNull(historicChildProcessInstanceCockpit);
+        // TODO fix these assertion
+        assertThat(processInstance).calledProcessInstance("process-child").isEnded();
     }
 
     @Test
