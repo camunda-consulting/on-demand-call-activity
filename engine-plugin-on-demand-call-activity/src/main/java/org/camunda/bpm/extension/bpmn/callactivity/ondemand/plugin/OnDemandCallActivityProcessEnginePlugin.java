@@ -1,4 +1,4 @@
-package com.camunda.bpm.consulting.snippet.engine_plugin_on_demand_call_activity;
+package org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin;
 
 import java.util.ArrayList;
 import java.util.HashMap;

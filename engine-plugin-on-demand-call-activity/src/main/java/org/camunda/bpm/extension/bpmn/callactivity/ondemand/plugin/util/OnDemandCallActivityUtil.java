@@ -1,9 +1,8 @@
-package com.camunda.bpm.consulting.snippet.engine_plugin_on_demand_call_activity.util;
+package org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.util;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
-import static com.camunda.bpm.consulting.snippet.engine_plugin_on_demand_call_activity.util.OnDemandCallActivityConstants.*;
+import static org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.util.OnDemandCallActivityConstants.*;
 
 public class OnDemandCallActivityUtil {
 

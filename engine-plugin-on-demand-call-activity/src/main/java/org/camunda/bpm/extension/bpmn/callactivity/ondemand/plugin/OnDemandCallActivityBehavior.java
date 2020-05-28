@@ -1,4 +1,4 @@
-package com.camunda.bpm.consulting.snippet.engine_plugin_on_demand_call_activity;
+package org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -20,8 +20,8 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.camunda.bpm.consulting.snippet.engine_plugin_on_demand_call_activity.util.OnDemandCallActivityUtil.getAsyncServiceCallVarName;
-import static com.camunda.bpm.consulting.snippet.engine_plugin_on_demand_call_activity.util.OnDemandCallActivityUtil.getRetriesVarName;
+import static org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.util.OnDemandCallActivityUtil.getAsyncServiceCallVarName;
+import static org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.util.OnDemandCallActivityUtil.getRetriesVarName;
 
 public class OnDemandCallActivityBehavior extends CallActivityBehavior {
 

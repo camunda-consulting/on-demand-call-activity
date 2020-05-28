@@ -1,4 +1,4 @@
-package com.camunda.bpm.consulting.snippet.engine_plugin_on_demand_call_activity.util;
+package org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.util;
 
 public class OnDemandCallActivityConstants {
 

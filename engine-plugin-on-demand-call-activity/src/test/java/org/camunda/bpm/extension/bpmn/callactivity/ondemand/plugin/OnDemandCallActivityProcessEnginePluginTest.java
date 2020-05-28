@@ -1,4 +1,4 @@
-package com.camunda.bpm.consulting.snippet.engine_plugin_on_demand_call_activity;
+package org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin;
 
 import org.apache.ibatis.logging.LogFactory;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -16,11 +16,11 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.camunda.bpm.consulting.snippet.engine_plugin_on_demand_call_activity.TestUtil.cleanUpAndCreateEngine;
 import static org.camunda.bpm.engine.impl.test.TestHelper.createSchema;
 import static org.camunda.bpm.engine.impl.test.TestHelper.dropSchema;
 import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
 import static org.camunda.bpm.engine.test.assertions.bpmn.AbstractAssertions.processEngine;
+import static org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.TestUtil.cleanUpAndCreateEngine;
 import static org.junit.Assert.assertNotNull;
 
 /**
