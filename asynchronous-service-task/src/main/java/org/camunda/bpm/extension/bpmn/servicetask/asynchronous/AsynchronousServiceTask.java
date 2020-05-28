@@ -27,6 +27,8 @@ import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
 import org.camunda.bpm.engine.variable.VariableMap;
 
+import static org.camunda.bpm.extension.bpmn.servicetask.asynchronous.CompletableFutureJava8Compatibility.delayedExecutor;
+
 /**
  * <p>This is a simple implementation of the {@link SignallableActivityBehavior}
  * interface.</p> 
@@ -63,7 +65,7 @@ import org.camunda.bpm.engine.variable.VariableMap;
 public class AsynchronousServiceTask extends AbstractBpmnActivityBehavior {
 
   public static final String EXECUTION_ID = "executionId";
-  
+
 	public void execute(final ActivityExecution execution) throws Exception {
 	  
       // get variables
@@ -84,7 +86,7 @@ public class AsynchronousServiceTask extends AbstractBpmnActivityBehavior {
         Map<String, Object> newVariables = new HashMap<>();
         newVariables.put("foo", "bar");
         runtimeService.signal(executionId, newVariables);
-      }, CompletableFuture.delayedExecutor(250L, TimeUnit.MILLISECONDS));
+      }, delayedExecutor(250L, TimeUnit.MILLISECONDS));
 	  
 	}
 			

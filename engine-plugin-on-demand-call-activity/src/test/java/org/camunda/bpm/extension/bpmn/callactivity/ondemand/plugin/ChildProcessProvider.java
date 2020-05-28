@@ -15,6 +15,8 @@ import java.util.concurrent.TimeUnit;
 
 import static org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.util.OnDemandCallActivityUtil.getAsyncServiceCallVarName;
 import static org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.util.OnDemandCallActivityUtil.getSkipVarName;
+import static org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.CompletableFutureJava8Compatibility.delayedExecutor;
+
 
 public class ChildProcessProvider {
 
@@ -94,7 +96,7 @@ public class ChildProcessProvider {
 //                  }
                 }
                 //INCIDENT AND BPMN ERROR
-            }, CompletableFuture.delayedExecutor(250L, TimeUnit.MILLISECONDS));
+            }, delayedExecutor(250L, TimeUnit.MILLISECONDS));
             // TODO prepare REST request using input variables
 
             execution.setVariableLocal(getAsyncServiceCallVarName(execution), true);
