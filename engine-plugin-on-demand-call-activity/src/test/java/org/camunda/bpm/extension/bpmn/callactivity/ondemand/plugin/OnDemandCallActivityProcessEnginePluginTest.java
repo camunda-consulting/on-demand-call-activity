@@ -11,6 +11,8 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.mock.Mocks;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -170,4 +172,18 @@ public class OnDemandCallActivityProcessEnginePluginTest {
     
     // TODO: test all operations that should normally work with a call activity (see engine test suite)
 
+    @Test
+    public void testUserTaskForComparison() {
+      BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("user-task-process")
+          .startEvent()
+          .userTask()
+          .endEvent()
+          .done();
+      repositoryService().createDeployment()
+        .addModelInstance("user-task-process.bpmn", modelInstance)
+        .deploy();
+      ProcessInstance processInstance = runtimeService().startProcessInstanceByKey("user-task-process");
+      assertThat(processInstance).isActive();
+      claim(task(), "falko");
+    }
 }
