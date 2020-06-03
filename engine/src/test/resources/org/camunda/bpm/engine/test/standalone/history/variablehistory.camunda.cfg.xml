@@ -22,9 +22,9 @@
     
     <property name="processEnginePlugins">
       <list>
-                <bean class="com.camunda.bpm.consulting.snippet.engine_plugin_on_demand_call_activity.test.NullCallActivityProcessEnginePlugin" />
-                <bean class="com.camunda.bpm.consulting.snippet.engine_plugin_on_demand_call_activity.OnDemandCallActivityProcessEnginePlugin" />
-            </list>
+        <bean class="org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.OnDemandCallActivityProcessEnginePlugin" />
+        <bean class="org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.test.NullCallActivityProcessEnginePlugin" />
+      </list>
     </property>
   </bean>
 
