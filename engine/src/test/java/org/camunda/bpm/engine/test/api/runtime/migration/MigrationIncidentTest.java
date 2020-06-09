@@ -38,6 +38,7 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -99,6 +100,7 @@ public class MigrationIncidentTest {
   @Rule
   public RuleChain chain = RuleChain.outerRule(engineRule).around(testHelper);
 
+  @Ignore // Migration is a known limitation for On-demand Call Activities
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/migration/calledProcess.bpmn",
                            "org/camunda/bpm/engine/test/api/runtime/migration/callingProcess.bpmn",
@@ -191,6 +193,7 @@ public class MigrationIncidentTest {
 
 
 
+  @Ignore // Migration is a known limitation for On-demand Call Activities
   @Test
   public void testCallActivityJobIncidentMigration() {
     // Given we deploy process definitions

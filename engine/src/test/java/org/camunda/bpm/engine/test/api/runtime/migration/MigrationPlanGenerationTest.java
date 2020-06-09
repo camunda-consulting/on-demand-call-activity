@@ -45,6 +45,7 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.UserTask;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -626,6 +627,7 @@ public class MigrationPlanGenerationTest {
         migrate("userTask").to("userTask"));
   }
 
+  @Ignore // Migration is a known limitation for On-demand Call Activities
   @Test
   public void testMapCallActivitiesToBpmnTest() {
     assertGeneratedMigrationPlan(CallActivityModels.oneBpmnCallActivityProcess("foo"), CallActivityModels.oneBpmnCallActivityProcess("foo"))
@@ -642,6 +644,7 @@ public class MigrationPlanGenerationTest {
         migrate("userTask").to("userTask"));
   }
 
+  @Ignore // Migration is a known limitation for On-demand Call Activities
   @Test
   public void testMapCallActivitiesFromBpmnToCmmnTest() {
     assertGeneratedMigrationPlan(CallActivityModels.oneBpmnCallActivityProcess("foo"), CallActivityModels.oneCmmnCallActivityProcess("foo"))
@@ -650,6 +653,7 @@ public class MigrationPlanGenerationTest {
         migrate("userTask").to("userTask"));
   }
 
+  @Ignore // Migration is a known limitation for On-demand Call Activities
   @Test
   public void testMapCallActivitiesFromCmmnToBpmnTest() {
     assertGeneratedMigrationPlan(CallActivityModels.oneCmmnCallActivityProcess("foo"), CallActivityModels.oneBpmnCallActivityProcess("foo"))
