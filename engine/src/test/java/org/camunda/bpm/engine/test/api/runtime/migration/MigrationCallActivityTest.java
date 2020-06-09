@@ -29,7 +29,11 @@ import org.camunda.bpm.engine.test.api.runtime.migration.models.CallActivityMode
 import org.camunda.bpm.engine.test.api.runtime.migration.models.ProcessModels;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.RuleChain;
 
 /**
@@ -56,8 +60,8 @@ public class MigrationCallActivityTest {
     testHelper.deploy("org/camunda/bpm/engine/test/api/cmmn/oneTaskCase.cmmn");
   }
 
+  @Ignore // Migration is a known limitation for On-demand Call Activities
   @Test
-  @Ignore
   public void testCallBpmnProcessSimpleMigration() {
     // given
     BpmnModelInstance model = CallActivityModels.oneBpmnCallActivityProcess("oneTaskProcess");
@@ -140,8 +144,8 @@ public class MigrationCallActivityTest {
     testHelper.assertCaseEnded(caseExecution.getCaseInstanceId());
   }
 
+  @Ignore // Migration is a known limitation for On-demand Call Activities
   @Test
-  @Ignore
   public void testCallBpmnProcessAddParentScope() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(
@@ -180,8 +184,8 @@ public class MigrationCallActivityTest {
     testHelper.assertProcessEnded(processInstance.getId());
   }
 
+  @Ignore // Migration is a known limitation for On-demand Call Activities
   @Test
-  @Ignore
   public void testCallBpmnProcessParallelMultiInstance() {
     // given
     BpmnModelInstance model = modify(CallActivityModels.oneBpmnCallActivityProcess("oneTaskProcess"))
@@ -236,8 +240,8 @@ public class MigrationCallActivityTest {
     testHelper.assertProcessEnded(processInstance.getId());
   }
 
+  @Ignore // Migration is a known limitation for On-demand Call Activities
   @Test
-  @Ignore
   public void testCallCmmnCaseParallelMultiInstance() {
     // given
     BpmnModelInstance model = modify(CallActivityModels.oneCmmnCallActivityProcess("oneTaskCase"))
@@ -301,8 +305,8 @@ public class MigrationCallActivityTest {
     testHelper.assertCaseEnded(caseExecution.getCaseInstanceId());
   }
 
+  @Ignore // Migration is a known limitation for On-demand Call Activities
   @Test
-  @Ignore
   public void testCallBpmnProcessParallelMultiInstanceRemoveMiBody() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(
@@ -352,8 +356,8 @@ public class MigrationCallActivityTest {
     testHelper.assertProcessEnded(processInstance.getId());
   }
 
+  @Ignore // Migration is a known limitation for On-demand Call Activities
   @Test
-  @Ignore
   public void testCallCmmnCaseParallelMultiInstanceRemoveMiBody() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(
@@ -414,8 +418,8 @@ public class MigrationCallActivityTest {
     testHelper.assertCaseEnded(caseExecution.getCaseInstanceId());
   }
 
+  @Ignore // Migration is a known limitation for On-demand Call Activities
   @Test
-  @Ignore
   public void testCallBpmnProcessSequentialMultiInstanceRemoveMiBody() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(
@@ -466,8 +470,8 @@ public class MigrationCallActivityTest {
     testHelper.assertProcessEnded(processInstance.getId());
   }
 
+  @Ignore // Migration is a known limitation for On-demand Call Activities
   @Test
-  @Ignore
   public void testCallCmmnCaseSequentialMultiInstanceRemoveMiBody() {
     // given
     ProcessDefinition sourceProcessDefinition = testHelper.deployAndGetDefinition(
@@ -527,8 +531,8 @@ public class MigrationCallActivityTest {
     testHelper.assertCaseEnded(caseExecution.getCaseInstanceId());
   }
 
+  @Ignore // Migration is a known limitation for On-demand Call Activities
   @Test
-  @Ignore
   public void testCallBpmnProcessReconfigureCallActivity() {
     // given
     BpmnModelInstance model = CallActivityModels.oneBpmnCallActivityProcess("oneTaskProcess");

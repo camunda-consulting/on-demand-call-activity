@@ -627,8 +627,8 @@ public class MigrationPlanGenerationTest {
         migrate("userTask").to("userTask"));
   }
 
+  @Ignore // Migration is a known limitation for On-demand Call Activities
   @Test
-  @Ignore
   public void testMapCallActivitiesToBpmnTest() {
     assertGeneratedMigrationPlan(CallActivityModels.oneBpmnCallActivityProcess("foo"), CallActivityModels.oneBpmnCallActivityProcess("foo"))
       .hasInstructions(
@@ -644,8 +644,8 @@ public class MigrationPlanGenerationTest {
         migrate("userTask").to("userTask"));
   }
 
+  @Ignore // Migration is a known limitation for On-demand Call Activities
   @Test
-  @Ignore
   public void testMapCallActivitiesFromBpmnToCmmnTest() {
     assertGeneratedMigrationPlan(CallActivityModels.oneBpmnCallActivityProcess("foo"), CallActivityModels.oneCmmnCallActivityProcess("foo"))
       .hasInstructions(
@@ -653,8 +653,8 @@ public class MigrationPlanGenerationTest {
         migrate("userTask").to("userTask"));
   }
 
+  @Ignore // Migration is a known limitation for On-demand Call Activities
   @Test
-  @Ignore
   public void testMapCallActivitiesFromCmmnToBpmnTest() {
     assertGeneratedMigrationPlan(CallActivityModels.oneCmmnCallActivityProcess("foo"), CallActivityModels.oneBpmnCallActivityProcess("foo"))
       .hasInstructions(

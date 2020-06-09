@@ -100,11 +100,11 @@ public class MigrationIncidentTest {
   @Rule
   public RuleChain chain = RuleChain.outerRule(engineRule).around(testHelper);
 
+  @Ignore // Migration is a known limitation for On-demand Call Activities
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/migration/calledProcess.bpmn",
                            "org/camunda/bpm/engine/test/api/runtime/migration/callingProcess.bpmn",
                            "org/camunda/bpm/engine/test/api/runtime/migration/callingProcess_v2.bpmn"})
-  @Ignore
   public void testCallActivityExternalTaskIncidentMigration() throws Exception {
     // Given we create a new process instance
     ProcessDefinition callingProcess = engineRule.getRepositoryService()
@@ -193,8 +193,8 @@ public class MigrationIncidentTest {
 
 
 
+  @Ignore // Migration is a known limitation for On-demand Call Activities
   @Test
-  @Ignore
   public void testCallActivityJobIncidentMigration() {
     // Given we deploy process definitions
     testHelper.deploy(FAIL_CALLED_PROC, FAIL_CALL_ACT_JOB_PROC, NEW_CALLED_PROC, NEW_CALL_ACT_PROC);
