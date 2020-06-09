@@ -45,6 +45,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Setup timezone
+      uses: zcong1993/setup-timezone@v1.0
+      with:
+        timezone: Europe/Berlin
     - uses: actions/checkout@v2
       with:
         ref: ${{ matrix.branch }}
