@@ -5,9 +5,13 @@ name: Engine Test Suite
 
 on:
   push:
-    branches: [ engine-test-suite-with-child-processes ]
+    branches:
+      - engine-test-suite-with-child-processes
+      - engine-test-suite-without-child-processes
   pull_request:
-    branches: [ engine-test-suite-with-child-processes ]
+    branches:
+      - engine-test-suite-with-child-processes
+      - engine-test-suite-without-child-processes
 
 jobs:
   test:
