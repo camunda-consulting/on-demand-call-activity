@@ -27,8 +27,17 @@ jobs:
     - uses: actions/cache@v2
       with:
         path: ~/.m2/repository
-        key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+        key: ${{ runner.os }}-engine-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
-          ${{ runner.os }}-maven-
+          ${{ runner.os }}-engine-maven-
+    - name: Download Build Artifacts
+      uses: actions/download-artifact@v2
+      with:
+        # Artifact name
+        name: Package
+        # Destination path
+        path: staging
+    - name: Install On-demand Call Activity Plugin
+      run: mvn --batch-mode install:install-file -Dfile=staging/engine-plugin-on-demand-call-activity-*.jar
     - name: Test with Maven
       run: mvn --projects engine --batch-mode test --file pom.xml
