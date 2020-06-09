@@ -1,4 +1,4 @@
-This branch is a fork of [camunda-bpm-platform](https://github.com/camunda/camunda-bpm-platform) and is used to run the camunda engine test suite with the [On-Demand Call Activity Plugin](https://github.com/camunda-consulting/on-demand-call-activity/tree/master/engine-plugin-on-demand-call-activity) enabled.
+This branch is a fork of [camunda-bpm-platform](https://github.com/camunda/camunda-bpm-platform) and is used to run the Camunda engine test suite with the [On-Demand Call Activity Plugin](https://github.com/camunda-consulting/on-demand-call-activity/tree/master/engine-plugin-on-demand-call-activity) enabled.
 
 camunda BPM - The open source BPM platform
 ==========================================
