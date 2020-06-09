@@ -74,7 +74,3 @@ jobs:
     - name: Test with Maven
       run: mvn --projects engine --batch-mode test --file pom.xml
       continue-on-error: true
-    - name: Delete oldest Artifact
-      uses: actions/delete-package-versions@v1
-      with:
-        package-name: 'Package'
