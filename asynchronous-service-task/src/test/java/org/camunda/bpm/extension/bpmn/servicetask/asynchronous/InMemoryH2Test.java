@@ -20,6 +20,10 @@ import static org.junit.Assert.*;
  */
 public class InMemoryH2Test {
 
+  public static final MultiThreadedJavaDelegate MULTI_THREADED_JAVA_DELEGATE = new MultiThreadedJavaDelegate();
+
+  public static final Async ASYNC = new Async();
+  
   @ClassRule
   @Rule
   public static ProcessEngineRule rule = TestCoverageProcessEngineRuleBuilder.create().build();
@@ -36,8 +40,8 @@ public class InMemoryH2Test {
   @Test
   @Deployment(resources = "process.bpmn")
   public void testHappyPath() throws InterruptedException {
-    Mocks.register("async", new Async());
-    Mocks.register("multiThreadedJavaDelegate", new MultiThreadedJavaDelegate());
+    Mocks.register("async", ASYNC);
+    Mocks.register("multiThreadedJavaDelegate", MULTI_THREADED_JAVA_DELEGATE);
     ProcessInstance processInstance = processEngine().getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
     assertThat(processInstance).isWaitingAt("AsynchronousServiceTask");
 	Thread.sleep(500L);

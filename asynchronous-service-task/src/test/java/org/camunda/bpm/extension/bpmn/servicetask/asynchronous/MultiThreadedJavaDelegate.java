@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+import org.camunda.bpm.engine.test.mock.Mocks;
+
 public class MultiThreadedJavaDelegate extends AsynchronousJavaDelegate {
 
   @Override
@@ -18,6 +20,12 @@ public class MultiThreadedJavaDelegate extends AsynchronousJavaDelegate {
       System.out.println("Hello");
       Map<String, Object> newVariables = new HashMap<>();
       newVariables.put("foo", "bar");
+
+      // just needed for unit test {@link InMemoryH2Test}
+      // {@link Mocks} must not be used in production
+      Mocks.register("async", InMemoryH2Test.ASYNC);
+      Mocks.register("multiThreadedJavaDelegate", InMemoryH2Test.MULTI_THREADED_JAVA_DELEGATE);
+
       //execution.signal(newVariables);
       completeTask(newVariables);
     }, delayedExecutor(250L, TimeUnit.MILLISECONDS));
