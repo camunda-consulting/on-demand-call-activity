@@ -177,6 +177,21 @@ public class OnDemandCallActivityProcessEnginePluginTest {
     }
 
     private void assertThatChildProcessIsInHistory(ProcessInstance processInstance, int numberOfChildren) {
+      List<HistoricProcessInstance> historicProcessInstances = historyService().createHistoricProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).list();
+      List<HistoricActivityInstance> historicActivityInstances = historyService().createHistoricActivityInstanceQuery().activityType("callActivity").list();
+
+      assertEquals(numberOfChildren, historicProcessInstances.size());
+      for(HistoricProcessInstance historicProcessInstance_ : historicProcessInstances){
+          System.out.println("Historic Child Instance: "+historicProcessInstance_.getId());
+          System.out.println(historicProcessInstance_.toString());
+      }
+
+      for(HistoricActivityInstance historicActivityInstance : historicActivityInstances){
+          System.out.println("Historic Call Activity: "+historicActivityInstance.getId());
+          System.out.println(historicActivityInstance.getActivityId() + " called '" + historicActivityInstance.getCalledProcessInstanceId() + "'");
+          assertNotNull(historicActivityInstance.getCalledProcessInstanceId());
+      }
+
       // this query is used by the Cockpit REST resource 
        int numberOfChildrenInCockpit = historyService().createNativeHistoricProcessInstanceQuery()
               .sql("select RES.* from (\n" +
@@ -209,21 +224,6 @@ public class OnDemandCallActivityProcessEnginePluginTest {
               .list()
               .size();
       assertEquals(numberOfChildren, numberOfChildrenInCockpit);
-
-      List<HistoricProcessInstance> historicProcessInstances = historyService().createHistoricProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).list();
-      List<HistoricActivityInstance> historicActivityInstances = historyService().createHistoricActivityInstanceQuery().activityType("callActivity").list();
-
-      assertEquals(numberOfChildren, historicProcessInstances.size());
-      for(HistoricProcessInstance historicProcessInstance_ : historicProcessInstances){
-          System.out.println("Historic Child Instance: "+historicProcessInstance_.getId());
-          System.out.println(historicProcessInstance_.toString());
-      }
-
-      for(HistoricActivityInstance historicActivityInstance : historicActivityInstances){
-          System.out.println("Historic Call Activity: "+historicActivityInstance.getId());
-          System.out.println(historicActivityInstance.getActivityId() + " called '" + historicActivityInstance.getCalledProcessInstanceId() + "'");
-          assertNotNull(historicActivityInstance.getCalledProcessInstanceId());
-      }
     }
 
     @Test
