@@ -15,18 +15,18 @@ public class UpdateHistoryExecutionListener implements ExecutionListener {
 
     @Override
     public void notify(DelegateExecution delegateExecution) throws Exception {
-        ExecutionEntity superExecution = ((ExecutionEntity) delegateExecution).getSuperExecution();
-        DbEntityManager dbEntityManager = Context.getCommandContext().getDbEntityManager();
-
-        final HistoryEventHandler historyEventHandler = Context.getProcessEngineConfiguration()
-                .getHistoryEventHandler();
-        final HistoryEventProducer historyEventProducer = Context.getProcessEngineConfiguration()
-                .getHistoryEventProducer();
-        HistoryEvent activityInstanceUpdateEvt = historyEventProducer.createActivityInstanceUpdateEvt(superExecution);
-
-        HistoricActivityInstanceEventEntity cachedHistoryEvent = (HistoricActivityInstanceEventEntity) dbEntityManager.getCachedEntity(activityInstanceUpdateEvt.getClass(), activityInstanceUpdateEvt.getId());
-
-        historyEventHandler.handleEvent(activityInstanceUpdateEvt);
+//        ExecutionEntity superExecution = ((ExecutionEntity) delegateExecution).getSuperExecution();
+//        DbEntityManager dbEntityManager = Context.getCommandContext().getDbEntityManager();
+//
+//        final HistoryEventHandler historyEventHandler = Context.getProcessEngineConfiguration()
+//                .getHistoryEventHandler();
+//        final HistoryEventProducer historyEventProducer = Context.getProcessEngineConfiguration()
+//                .getHistoryEventProducer();
+//        HistoryEvent activityInstanceUpdateEvt = historyEventProducer.createActivityInstanceUpdateEvt(superExecution);
+//
+//        HistoricActivityInstanceEventEntity cachedHistoryEvent = (HistoricActivityInstanceEventEntity) dbEntityManager.getCachedEntity(activityInstanceUpdateEvt.getClass(), activityInstanceUpdateEvt.getId());
+//
+//        historyEventHandler.handleEvent(activityInstanceUpdateEvt);
 
         //dbEntityManager.forceUpdate(cachedHistoryEvent);
 
