@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1mv1q6l" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1mv1q6l" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.3">
   <bpmn:process id="process-child" name="Process Child" isExecutable="true">
     <bpmn:extensionElements>
-      <camunda:executionListener class="com.camunda.bpm.consulting.snippet.engine_plugin_on_demand_call_activity.UpdateHistoryExecutionListener" event="start" />
+      <camunda:executionListener class="org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.UpdateHistoryExecutionListener" event="start" />
     </bpmn:extensionElements>
     <bpmn:startEvent id="StartEvent_1" name="Process Started">
       <bpmn:outgoing>SequenceFlow_0l1u1nm</bpmn:outgoing>
@@ -11,7 +11,7 @@
       <bpmn:incoming>SequenceFlow_0iau71j</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="SequenceFlow_0iau71j" sourceRef="CallLoggerTask" targetRef="EndEvent_1ifa85q" />
-    <bpmn:serviceTask id="CallLoggerTask" name="Call Logger" camunda:delegateExpression="${loggerDelegate}">
+    <bpmn:serviceTask id="CallLoggerTask" name="Call Logger" camunda:class="org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.LoggerDelegate">
       <bpmn:incoming>SequenceFlow_0l1u1nm</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0iau71j</bpmn:outgoing>
     </bpmn:serviceTask>
@@ -19,6 +19,14 @@
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="process-child">
+      <bpmndi:BPMNEdge id="SequenceFlow_0l1u1nm_di" bpmnElement="SequenceFlow_0l1u1nm">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="270" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0iau71j_di" bpmnElement="SequenceFlow_0iau71j">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="432" y="117" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
         <dc:Bounds x="179" y="99" width="36" height="36" />
         <bpmndi:BPMNLabel>
@@ -31,17 +39,9 @@
           <dc:Bounds x="413" y="142" width="75" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_0iau71j_di" bpmnElement="SequenceFlow_0iau71j">
-        <di:waypoint x="370" y="117" />
-        <di:waypoint x="432" y="117" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="ServiceTask_1fecd0q_di" bpmnElement="CallLoggerTask">
         <dc:Bounds x="270" y="77" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="SequenceFlow_0l1u1nm_di" bpmnElement="SequenceFlow_0l1u1nm">
-        <di:waypoint x="215" y="117" />
-        <di:waypoint x="270" y="117" />
-      </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </bpmn:definitions>
