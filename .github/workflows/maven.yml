@@ -1,13 +1,13 @@
-# This workflow will build a Java project with Maven
+# This workflow will build and test the Java project with Maven
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
 
 name: Java CI with Maven
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, engine-test-suite-with-child-processes, engine-test-suite-without-child-processes ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, engine-test-suite-with-child-processes, engine-test-suite-without-child-processes ]
 
 jobs:
   build:
@@ -28,3 +28,49 @@ jobs:
           ${{ runner.os }}-maven-
     - name: Build with Maven
       run: mvn -B package --file pom.xml
+    - run: mkdir staging && cp engine-plugin-on-demand-call-activity/target/*.jar staging/engine-plugin-on-demand-call-activity.jar
+    - uses: actions/upload-artifact@v1
+      with:
+        name: Package
+        path: staging
+
+
+
+  test:
+    needs: build
+    strategy:
+      matrix:
+        branch: [ engine-test-suite-with-child-processes, engine-test-suite-without-child-processes ]
+    
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Setup timezone
+      uses: zcong1993/setup-timezone@v1.0
+      with:
+        timezone: Europe/Berlin
+    - uses: actions/checkout@v2
+      with:
+        ref: ${{ matrix.branch }}
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+    - uses: actions/cache@v2
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-engine-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-engine-maven-
+    - name: Download Build Artifacts
+      uses: actions/download-artifact@v2
+      with:
+        # Artifact name
+        name: Package
+        # Destination path
+        path: staging
+    - name: Install On-demand Call Activity Plugin
+      run: mvn --batch-mode org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file -Dfile=staging/engine-plugin-on-demand-call-activity.jar
+    - name: Test with Maven
+      run: mvn --projects engine --batch-mode test --file pom.xml
+      continue-on-error: true

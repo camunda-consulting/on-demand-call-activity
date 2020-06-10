@@ -37,7 +37,7 @@ public class InMemoryH2Test {
   public void testHappyPath() throws InterruptedException {
     ProcessInstance processInstance = processEngine().getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
     assertThat(processInstance).isWaitingAt("AsynchronousServiceTask");
-	Thread.sleep(300L);
+	Thread.sleep(500L);
     assertThat(processInstance).isEnded();
   }
 
