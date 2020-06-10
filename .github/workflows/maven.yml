@@ -5,9 +5,9 @@ name: Java CI with Maven
 
 on:
   push:
-    branches: [ master, engine-test-suite-with-child-processes, engine-test-suite-without-child-processes ]
+    branches: [ master ]
   pull_request:
-    branches: [ master, engine-test-suite-with-child-processes, engine-test-suite-without-child-processes ]
+    branches: [ master ]
 
 jobs:
   build:
