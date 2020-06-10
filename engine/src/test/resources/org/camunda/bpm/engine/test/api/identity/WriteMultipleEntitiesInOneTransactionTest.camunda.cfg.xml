@@ -26,6 +26,7 @@
       <list>
         <bean class="org.camunda.bpm.engine.test.api.identity.plugin.TestDbIdentityServiceProviderPlugin" />
         <bean class="org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.OnDemandCallActivityProcessEnginePlugin" />
+        <bean class="org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.test.NullCallActivityProcessEnginePlugin" />
       </list>
   </property>
     
