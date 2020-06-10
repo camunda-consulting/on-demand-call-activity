@@ -22,6 +22,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
@@ -64,36 +66,20 @@ import static org.camunda.bpm.extension.bpmn.servicetask.asynchronous.Completabl
  */
 public class AsynchronousServiceTask extends AbstractBpmnActivityBehavior {
 
-  public static final String EXECUTION_ID = "executionId";
+  protected AsynchronousJavaDelegate delegate;
 
+  public AsynchronousServiceTask(AsynchronousJavaDelegate delegate) {
+    this.delegate = delegate;
+  }
+  
 	public void execute(final ActivityExecution execution) throws Exception {
-	  
-      // get variables
-      VariableMap inputVariables = execution.getVariablesTyped();
-      VariableMap inputVariablesLocal = execution.getVariablesLocalTyped();
-
-	  String executionId = execution.getId();
-	  
-	  // Publish a task to a scheduled executor. This method returns after the task has 
-	  // been put into the executor. The actual service implementation (lambda) will not yet 
-	  // be invoked:
-	  RuntimeService runtimeService = execution.getProcessEngineServices().getRuntimeService();
-	  // TODO prepare REST request using input variables
-      CompletableFuture.runAsync(() -> { // simulates the sending of a non-blocking REST request
-        // the code inside this lambda runs in a separate thread outside the TX
-        // this will not work: execution.setVariable("foo", "bar");
-        System.out.println("Hello");
-        Map<String, Object> newVariables = new HashMap<>();
-        newVariables.put("foo", "bar");
-        runtimeService.signal(executionId, newVariables);
-      }, delayedExecutor(250L, TimeUnit.MILLISECONDS));
-	  
+	  delegate.execute(execution);
 	}
-			
+
+
 	public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
 	  
 	  // leave the service task activity:
 	  leave(execution);
 	}
-
 }
