@@ -33,6 +33,9 @@ public class ChildProcessProvider {
         }
         
         if (execution.hasVariable("firstTryHasFailed")) {
+          if (execution.hasVariable("Async")) {
+            return "process-child-async"; // child process with asyncBefore=true on start event
+          }
           return "process-child"; // process definition key
           // maybe also another process for repair or self-healing
         }
