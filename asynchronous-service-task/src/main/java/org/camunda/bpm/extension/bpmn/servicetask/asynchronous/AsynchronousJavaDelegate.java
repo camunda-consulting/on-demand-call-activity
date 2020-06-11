@@ -15,6 +15,8 @@ public abstract class AsynchronousJavaDelegate {
 
   /**
    * This method's implementation must call {@link #completeTask(Map)}
+   * or {@link ThreadSaveExecution#signal(Map)}
+   * in another thread and with enough delay to let the engine commit the TX
    */
   abstract public void execute(ThreadSaveExecution execution) throws Exception;
   

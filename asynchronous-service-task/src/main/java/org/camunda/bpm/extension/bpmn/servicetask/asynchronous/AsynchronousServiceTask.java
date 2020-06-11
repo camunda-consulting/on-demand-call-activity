@@ -16,20 +16,9 @@
  */
 package org.camunda.bpm.extension.bpmn.servicetask.asynchronous;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
-import org.camunda.bpm.engine.variable.VariableMap;
-
-import static org.camunda.bpm.extension.bpmn.servicetask.asynchronous.CompletableFutureJava8Compatibility.delayedExecutor;
 
 /**
  * <p>This is a simple implementation of the {@link SignallableActivityBehavior}

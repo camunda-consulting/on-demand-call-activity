@@ -26,7 +26,9 @@ public class MultiThreadedJavaDelegate extends AsynchronousJavaDelegate {
       Mocks.register("async", InMemoryH2Test.ASYNC);
       Mocks.register("multiThreadedJavaDelegate", InMemoryH2Test.MULTI_THREADED_JAVA_DELEGATE);
 
-      //execution.signal(newVariables);
+      // signal must be called in another threads and
+      // with enough delay to let the engine commit the TX
+      execution.signal(newVariables);
       completeTask(newVariables);
     }, delayedExecutor(250L, TimeUnit.MILLISECONDS));
   }
