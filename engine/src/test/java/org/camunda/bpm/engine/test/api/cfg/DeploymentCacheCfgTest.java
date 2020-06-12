@@ -33,10 +33,7 @@ import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.commons.utils.cache.Cache;
-import org.junit.Before;
-import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.RuleChain;
 
 import java.util.*;
@@ -222,6 +219,8 @@ public class DeploymentCacheCfgTest {
   }
 
   @Test
+  @Ignore
+  // This one is a synchronous, which is similar to the one in the top. I think we should ignore.
   public void testSequentialCallActivityCall() {
 
     // given a number process definitions which call each other by call activities (0->1->2->0->4),
@@ -240,7 +239,9 @@ public class DeploymentCacheCfgTest {
   }
 
   @Test
-  public void testSequentialCallActivityCallAsynchronously() throws InterruptedException {
+  @Ignore
+  // Tests several call activities with jobs. I think we should ignore.
+  public void  testSequentialCallActivityCallAsynchronously() throws InterruptedException {
 
     // given a number process definitions which call each other by call activities (0->1->2->0->4),
     // which stops after the first repetition of 0 in 4

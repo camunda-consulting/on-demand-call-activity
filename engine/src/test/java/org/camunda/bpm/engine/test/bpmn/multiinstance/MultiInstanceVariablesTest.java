@@ -18,10 +18,12 @@ package org.camunda.bpm.engine.test.bpmn.multiinstance;
 
 import static org.camunda.bpm.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior.NUMBER_OF_INSTANCES;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
@@ -48,6 +50,7 @@ public class MultiInstanceVariablesTest {
   public ProcessEngineRule engineRule = new ProvidedProcessEngineRule();
 
   @Test
+  // Adjusted the test to handle call activity execution rather than the human task inside of it.
   public void testMultiInstanceWithAllInOutMapping() {
     BpmnModelInstance modelInstance = getBpmnModelInstance();
 
@@ -60,12 +63,20 @@ public class MultiInstanceVariablesTest {
     BpmnModelInstance testProcess = getBpmnSubProcessModelInstance();
 
     deployAndStartProcess(modelInstance, testProcess);
+    /*
     assertThat(engineRule.getRuntimeService().createExecutionQuery().processDefinitionKey(SUB_PROCESS_ID).list().size(),is(2));
 
     List<Task> tasks = engineRule.getTaskService().createTaskQuery().active().list();
     for (Task task : tasks) {
       engineRule.getTaskService().setVariable(task.getId(),NUMBER_OF_INSTANCES,"3");
       engineRule.getTaskService().complete(task.getId());
+    }*/
+
+    List<Execution> callActivityExecutions = engineRule.getRuntimeService().createExecutionQuery().activityId("callActivity").list();
+    assertEquals(2, callActivityExecutions.size());
+
+    for(Execution execution : callActivityExecutions){
+      engineRule.getRuntimeService().signal(execution.getId());
     }
 
     assertThat(engineRule.getRuntimeService().createExecutionQuery().processDefinitionKey(SUB_PROCESS_ID).list().size(),is(0));

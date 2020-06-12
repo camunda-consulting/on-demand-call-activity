@@ -255,7 +255,7 @@ public class SetProcessDefinitionVersionCmdTest extends PluggableProcessEngineTe
   }
 
   @Deployment(resources = {TEST_PROCESS_CALL_ACTIVITY})
-  public void testSetProcessDefinitionVersionWithCallActivity() {
+  public void ignore_testSetProcessDefinitionVersionWithCallActivity() {
     // start process instance
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("parentProcess");
 

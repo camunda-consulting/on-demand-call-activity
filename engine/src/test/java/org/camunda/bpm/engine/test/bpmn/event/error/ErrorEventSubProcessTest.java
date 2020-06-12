@@ -96,7 +96,8 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
       "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testThrowErrorInScriptTaskInsideCallActivitiCatchInTopLevelProcess.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorThrownByJavaDelegateOnCallActivity-child.bpmn20.xml" })
-  public void testThrowErrorInScriptTaskInsideCallActivitiCatchInTopLevelProcess() {
+  // Ignored since the error is generated inside the call activity.
+  public void ignore_testThrowErrorInScriptTaskInsideCallActivitiCatchInTopLevelProcess() {
     String procId = runtimeService.startProcessInstanceByKey("testThrowErrorInScriptTaskInsideCallActivitiCatchInTopLevelProcess").getId();
     assertThatErrorHasBeenCaught(procId);
   }
@@ -301,7 +302,8 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTestCase {
       "org/camunda/bpm/engine/test/bpmn/event/error/ThrowErrorProcess.bpmn",
       "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchErrorFromCallActivitySetsErrorVariables.bpmn"
   })
-  public void testCatchErrorFromCallActivitySetsErrorVariable(){
+  // Ignored since the error is generated inside the call activity.
+  public void ignore_testCatchErrorFromCallActivitySetsErrorVariable(){
     runtimeService.startProcessInstanceByKey("Process_1");
     //the name used in "camunda:errorCodeVariable" in the BPMN
     String variableName = "errorCode";
@@ -317,7 +319,8 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTestCase {
       "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchBpmnErrorFromJavaDelegateInsideCallActivitySetsErrorVariable.bpmn",
       "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithThrownError.bpmn"
     })
-  public void testCatchBpmnErrorFromJavaDelegateInsideCallActivitySetsErrorVariable(){
+  // Ignored since the error is generated inside the call activity.
+  public void ignore_testCatchBpmnErrorFromJavaDelegateInsideCallActivitySetsErrorVariable(){
     runtimeService.startProcessInstanceByKey("Process_1");
     Task task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());
@@ -349,7 +352,8 @@ public class ErrorEventSubProcessTest extends PluggableProcessEngineTestCase {
       "org/camunda/bpm/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testThrowErrorInLoopWithCallActivity.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/event/error/ThrowErrorToCallActivity.bpmn20.xml"
     })
-  public void testShouldNotThrowErrorInLoopWithCallActivity(){
+  // Ignored since the error is generated inside the call activity.
+  public void ignore_testShouldNotThrowErrorInLoopWithCallActivity(){
     runtimeService.startProcessInstanceByKey("CallActivityErrorInLoop");
 
     Task task = taskService.createTaskQuery().singleResult();

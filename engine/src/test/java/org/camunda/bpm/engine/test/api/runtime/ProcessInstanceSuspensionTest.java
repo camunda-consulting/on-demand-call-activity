@@ -28,6 +28,8 @@ import org.camunda.bpm.engine.runtime.*;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.junit.Ignore;
+import org.python.antlr.ast.Exec;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -144,6 +146,31 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
   }
 
+  @Deployment(resources={
+          "org/camunda/bpm/engine/test/api/runtime/superProcessWithMultipleNestedSubProcess.bpmn20.xml",
+          "org/camunda/bpm/engine/test/api/runtime/nestedSubProcess.bpmn20.xml",
+          "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"
+  })
+  // Modified the test to work with the on-demand call activity executions by reducing the number of expected instances
+  public void testQueryForActiveAndSuspendedProcessInstances() {
+    runtimeService.startProcessInstanceByKey("nestedSubProcessQueryTest");
+
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().active().count());
+    assertEquals(0, runtimeService.createProcessInstanceQuery().suspended().count());
+
+    ProcessInstance piToSuspend = runtimeService.createProcessInstanceQuery()
+            .processDefinitionKey("nestedSubProcessQueryTest")
+            .singleResult();
+    runtimeService.suspendProcessInstanceById(piToSuspend.getId());
+
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+    assertEquals(0, runtimeService.createProcessInstanceQuery().active().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().suspended().count());
+
+    assertEquals(piToSuspend.getId(), runtimeService.createProcessInstanceQuery().suspended().singleResult().getId());
+  }
+
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
   public void testSuspendAlreadySuspendedProcessInstance() {
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -180,34 +207,11 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
   }
 
   @Deployment(resources={
-          "org/camunda/bpm/engine/test/api/runtime/superProcessWithMultipleNestedSubProcess.bpmn20.xml",
-          "org/camunda/bpm/engine/test/api/runtime/nestedSubProcess.bpmn20.xml",
-          "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"
-          })
-  public void testQueryForActiveAndSuspendedProcessInstances() {
-    runtimeService.startProcessInstanceByKey("nestedSubProcessQueryTest");
-
-    assertEquals(5, runtimeService.createProcessInstanceQuery().count());
-    assertEquals(5, runtimeService.createProcessInstanceQuery().active().count());
-    assertEquals(0, runtimeService.createProcessInstanceQuery().suspended().count());
-
-    ProcessInstance piToSuspend = runtimeService.createProcessInstanceQuery()
-            .processDefinitionKey("nestedSubProcessQueryTest")
-            .singleResult();
-    runtimeService.suspendProcessInstanceById(piToSuspend.getId());
-
-    assertEquals(5, runtimeService.createProcessInstanceQuery().count());
-    assertEquals(4, runtimeService.createProcessInstanceQuery().active().count());
-    assertEquals(1, runtimeService.createProcessInstanceQuery().suspended().count());
-
-    assertEquals(piToSuspend.getId(), runtimeService.createProcessInstanceQuery().suspended().singleResult().getId());
-  }
-
-  @Deployment(resources={
       "org/camunda/bpm/engine/test/api/runtime/superProcessWithMultipleNestedSubProcess.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/runtime/nestedSubProcess.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"
       })
+  // Modified numbers in order to match non existing child process instances
   public void testQueryForActiveAndSuspendedProcessInstancesByProcessDefinitionId() {
     ProcessDefinition processDefinition = repositoryService
         .createProcessDefinitionQuery()
@@ -216,8 +220,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
 
     runtimeService.startProcessInstanceByKey("nestedSubProcessQueryTest");
 
-    assertEquals(5, runtimeService.createProcessInstanceQuery().count());
-    assertEquals(5, runtimeService.createProcessInstanceQuery().active().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().active().count());
     assertEquals(0, runtimeService.createProcessInstanceQuery().suspended().count());
 
     ProcessInstance piToSuspend = runtimeService.createProcessInstanceQuery()
@@ -225,8 +229,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
             .singleResult();
     runtimeService.suspendProcessInstanceByProcessDefinitionId(processDefinition.getId());
 
-    assertEquals(5, runtimeService.createProcessInstanceQuery().count());
-    assertEquals(4, runtimeService.createProcessInstanceQuery().active().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+    assertEquals(0, runtimeService.createProcessInstanceQuery().active().count());
     assertEquals(1, runtimeService.createProcessInstanceQuery().suspended().count());
 
     assertEquals(piToSuspend.getId(), runtimeService.createProcessInstanceQuery().suspended().singleResult().getId());
@@ -237,6 +241,7 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       "org/camunda/bpm/engine/test/api/runtime/nestedSubProcess.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"
       })
+  // Modified the number of instances in assertions to adhere to null call activity
   public void testQueryForActiveAndSuspendedProcessInstancesByProcessDefinitionKey() {
     ProcessDefinition processDefinition = repositoryService
         .createProcessDefinitionQuery()
@@ -245,8 +250,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
 
     runtimeService.startProcessInstanceByKey("nestedSubProcessQueryTest");
 
-    assertEquals(5, runtimeService.createProcessInstanceQuery().count());
-    assertEquals(5, runtimeService.createProcessInstanceQuery().active().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().active().count());
     assertEquals(0, runtimeService.createProcessInstanceQuery().suspended().count());
 
     ProcessInstance piToSuspend = runtimeService.createProcessInstanceQuery()
@@ -254,8 +259,8 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
             .singleResult();
     runtimeService.suspendProcessInstanceByProcessDefinitionKey(processDefinition.getKey());
 
-    assertEquals(5, runtimeService.createProcessInstanceQuery().count());
-    assertEquals(4, runtimeService.createProcessInstanceQuery().active().count());
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+    assertEquals(0, runtimeService.createProcessInstanceQuery().active().count());
     assertEquals(1, runtimeService.createProcessInstanceQuery().suspended().count());
 
     assertEquals(piToSuspend.getId(), runtimeService.createProcessInstanceQuery().suspended().singleResult().getId());
@@ -1749,36 +1754,56 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.callSimpleProcess.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"})
+  // Modified the test to work with the on-demand call activity executions
   public void testCallActivityReturnAfterProcessInstanceSuspend() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("callSimpleProcess");
     runtimeService.suspendProcessInstanceById(instance.getId());
 
-    Task task = taskService.createTaskQuery().singleResult();
+    Execution execution = runtimeService.createExecutionQuery().activityId("callSubProcess").singleResult();
+
+    try{
+      runtimeService.signal(execution.getId());
+      fail("this should not be successful, as the execution of a suspended instance is resumed");
+    } catch(SuspendedEntityInteractionException e){
+      // This is expected to fail
+    }
+
+    /*Task task = taskService.createTaskQuery().singleResult();
 
     try {
       taskService.complete(task.getId());
       fail("this should not be successful, as the execution of a suspended instance is resumed");
     } catch (SuspendedEntityInteractionException e) {
       // this is expected to fail
-    }
+    }*/
 
     // should be successful after reactivation
     runtimeService.activateProcessInstanceById(instance.getId());
-    taskService.complete(task.getId());
+    runtimeService.signal(execution.getId());
+    //taskService.complete(task.getId());
 
     assertEquals(1, runtimeService.createProcessInstanceQuery().count());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.callSimpleProcess.bpmn20.xml",
   "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"})
+  // Adjusted the finishing of a task with the signal to a execution, to adhere to null call activity
   public void testCallActivityReturnAfterProcessInstanceSuspendByProcessDefinitionId() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("callSimpleProcess");
     runtimeService.suspendProcessInstanceByProcessDefinitionId(instance.getProcessDefinitionId());
 
-    Task task = taskService.createTaskQuery().singleResult();
+    //Task task = taskService.createTaskQuery().singleResult();
+    Execution execution = runtimeService.createExecutionQuery().activityId("callSubProcess").singleResult();
+
+    /*try {
+      taskService.complete(task.getId());
+      fail("this should not be successful, as the execution of a suspended instance is resumed");
+    } catch (SuspendedEntityInteractionException e) {
+      // this is expected to fail
+    }*/
 
     try {
-      taskService.complete(task.getId());
+      runtimeService.signal(execution.getId());
       fail("this should not be successful, as the execution of a suspended instance is resumed");
     } catch (SuspendedEntityInteractionException e) {
       // this is expected to fail
@@ -1786,13 +1811,15 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
 
     // should be successful after reactivation
     runtimeService.activateProcessInstanceByProcessDefinitionId(instance.getProcessDefinitionId());
-    taskService.complete(task.getId());
+    //taskService.complete(task.getId());
+    runtimeService.signal(execution.getId());
 
     assertEquals(1, runtimeService.createProcessInstanceQuery().count());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.callSimpleProcess.bpmn20.xml",
   "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"})
+  // Substitute the task completion fo the call activity signal
   public void testCallActivityReturnAfterProcessInstanceSuspendByProcessDefinitionKey() {
     ProcessDefinition processDefinition = repositoryService
         .createProcessDefinitionQuery()
@@ -1801,30 +1828,57 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
 
     runtimeService.startProcessInstanceByKey("callSimpleProcess");
     runtimeService.suspendProcessInstanceByProcessDefinitionKey(processDefinition.getKey());
+    Execution execution = runtimeService.createExecutionQuery().activityId("callSubProcess").singleResult();
 
-    Task task = taskService.createTaskQuery().singleResult();
+    try {
+      runtimeService.signal(execution.getId());
+      fail("this should not be successful, as the execution of a suspended instance is resumed");
+    } catch(SuspendedEntityInteractionException e){
+      // this is expected to fail
+    }
+    /*Task task = taskService.createTaskQuery().singleResult();
 
     try {
       taskService.complete(task.getId());
       fail("this should not be successful, as the execution of a suspended instance is resumed");
     } catch (SuspendedEntityInteractionException e) {
       // this is expected to fail
-    }
+    }*/
 
     // should be successful after reactivation
     runtimeService.activateProcessInstanceByProcessDefinitionKey(processDefinition.getKey());
-    taskService.complete(task.getId());
+    runtimeService.signal(execution.getId());
+    //taskService.complete(task.getId());
 
     assertEquals(1, runtimeService.createProcessInstanceQuery().count());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.callMISimpleProcess.bpmn20.xml",
   "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"})
+  // Modified the test to work with the on-demand call activity executions
   public void testMICallActivityReturnAfterProcessInstanceSuspend() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("callMISimpleProcess");
     runtimeService.suspendProcessInstanceById(instance.getId());
 
-    List<Task> tasks = taskService.createTaskQuery().list();
+    List<Execution> executions = runtimeService.createExecutionQuery().activityId("callSubProcess").list();
+    Execution execution1 = executions.get(0);
+    Execution execution2 = executions.get(1);
+
+    try {
+      runtimeService.signal(execution1.getId());
+      fail("this should not be successful, as the execution of a suspended instance is resumed");
+    } catch (SuspendedEntityInteractionException e) {
+      // this is expected to fail
+    }
+
+    try {
+      runtimeService.signal(execution2.getId());
+      fail("this should not be successful, as the execution of a suspended instance is resumed");
+    } catch (SuspendedEntityInteractionException e) {
+      // this is expected to fail
+    }
+
+    /*List<Task> tasks = taskService.createTaskQuery().list();
     Task task1 = tasks.get(0);
     Task task2 = tasks.get(1);
 
@@ -1840,23 +1894,44 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       fail("this should not be successful, as the execution of a suspended instance is resumed");
     } catch (SuspendedEntityInteractionException e) {
       // this is expected to fail
-    }
+    }*/
 
     // should be successful after reactivation
     runtimeService.activateProcessInstanceById(instance.getId());
-    taskService.complete(task1.getId());
-    taskService.complete(task2.getId());
+    /*taskService.complete(task1.getId());
+    taskService.complete(task2.getId());*/
+    runtimeService.signal(execution1.getId());
+    runtimeService.signal(execution2.getId());
 
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.callMISimpleProcess.bpmn20.xml",
   "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"})
+  // Modified the test to work with the on-demand call activity executions
   public void testMICallActivityReturnAfterProcessInstanceSuspendByProcessDefinitionId() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("callMISimpleProcess");
     runtimeService.suspendProcessInstanceByProcessDefinitionId(instance.getProcessDefinitionId());
 
-    List<Task> tasks = taskService.createTaskQuery().list();
+    List<Execution> executions = runtimeService.createExecutionQuery().activityId("callSubProcess").list();
+    Execution execution1 = executions.get(0);
+    Execution execution2 = executions.get(1);
+
+    try{
+      runtimeService.signal(execution1.getId());
+      fail("this should not be successful, as the execution of a suspended instance is resumed");
+    } catch (SuspendedEntityInteractionException e) {
+      // this is expected to fail
+    }
+
+    try{
+      runtimeService.signal(execution2.getId());
+      fail("this should not be successful, as the execution of a suspended instance is resumed");
+    } catch (SuspendedEntityInteractionException e) {
+      // this is expected to fail
+    }
+
+    /*List<Task> tasks = taskService.createTaskQuery().list();
     Task task1 = tasks.get(0);
     Task task2 = tasks.get(1);
 
@@ -1872,18 +1947,21 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       fail("this should not be successful, as the execution of a suspended instance is resumed");
     } catch (SuspendedEntityInteractionException e) {
       // this is expected to fail
-    }
+    }*/
 
     // should be successful after reactivation
     runtimeService.activateProcessInstanceByProcessDefinitionId(instance.getProcessDefinitionId());
-    taskService.complete(task1.getId());
-    taskService.complete(task2.getId());
+    /*taskService.complete(task1.getId());
+    taskService.complete(task2.getId());*/
+    runtimeService.signal(execution1.getId());
+    runtimeService.signal(execution2.getId());
 
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.callMISimpleProcess.bpmn20.xml",
   "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"})
+  // Adjusted the finishing of a task with the signal to a execution, to adhere to null call activity
   public void testMICallActivityReturnAfterProcessInstanceSuspendByProcessDefinitionKey() {
     ProcessDefinition processDefinition = repositoryService
         .createProcessDefinitionQuery()
@@ -1892,7 +1970,25 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     runtimeService.startProcessInstanceByKey("callMISimpleProcess");
     runtimeService.suspendProcessInstanceByProcessDefinitionKey(processDefinition.getKey());
 
-    List<Task> tasks = taskService.createTaskQuery().list();
+    List<Execution> executions = runtimeService.createExecutionQuery().activityId("callSubProcess").list();
+    Execution execution1 = executions.get(0);
+    Execution execution2 = executions.get(1);
+
+    try {
+      runtimeService.signal(execution1.getId());
+      fail("this should not be successful, as the execution of a suspended instance is resumed");
+    } catch (SuspendedEntityInteractionException e) {
+      // this is expected to fail
+    }
+
+    try {
+      runtimeService.signal(execution2.getId());
+      fail("this should not be successful, as the execution of a suspended instance is resumed");
+    } catch (SuspendedEntityInteractionException e) {
+      // this is expected to fail
+    }
+
+    /*List<Task> tasks = taskService.createTaskQuery().list();
     Task task1 = tasks.get(0);
     Task task2 = tasks.get(1);
 
@@ -1908,12 +2004,14 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       fail("this should not be successful, as the execution of a suspended instance is resumed");
     } catch (SuspendedEntityInteractionException e) {
       // this is expected to fail
-    }
+    }*/
 
     // should be successful after reactivation
     runtimeService.activateProcessInstanceByProcessDefinitionKey(processDefinition.getKey());
-    taskService.complete(task1.getId());
-    taskService.complete(task2.getId());
+    //taskService.complete(task1.getId());
+    //taskService.complete(task2.getId());
+    runtimeService.signal(execution1.getId());
+    runtimeService.signal(execution2.getId());
 
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
   }

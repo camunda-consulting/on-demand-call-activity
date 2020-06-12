@@ -118,6 +118,7 @@ public class ProcessInstanceModificationSubProcessTest {
   }
 
   @Test
+  @Ignore
   public void shouldCompleteParentProcess() {
     final BpmnModelInstance parentProcessInstance =
       Bpmn.createExecutableProcess("parentProcess")
@@ -155,6 +156,7 @@ public class ProcessInstanceModificationSubProcessTest {
   }
 
   @Test
+  @Ignore
   public void shouldContinueParentProcess() {
     final BpmnModelInstance parentProcessInstance =
       Bpmn.createExecutableProcess("parentProcess")
@@ -196,6 +198,7 @@ public class ProcessInstanceModificationSubProcessTest {
   }
 
   @Test
+  @Ignore
   public void shouldCompleteParentProcessWithParallelGateway() {
 
     final BpmnModelInstance modelInstance =
@@ -242,6 +245,7 @@ public class ProcessInstanceModificationSubProcessTest {
   }
 
   @Test
+  @Ignore
   public void shouldContinueParentProcessWithParallelGateway() {
 
     final BpmnModelInstance modelInstance =
@@ -292,6 +296,7 @@ public class ProcessInstanceModificationSubProcessTest {
   }
 
   @Test
+  @Ignore
   public void shouldCompleteParentProcessWithMultiInstance() {
 
     final BpmnModelInstance parentProcessInstance =
@@ -331,6 +336,7 @@ public class ProcessInstanceModificationSubProcessTest {
   }
 
   @Test
+  @Ignore
   public void shouldContinueParentProcessWithMultiInstance() {
 
     final BpmnModelInstance parentProcessInstance =
@@ -374,6 +380,7 @@ public class ProcessInstanceModificationSubProcessTest {
   }
 
   @Test
+  @Ignore
   public void shouldCompleteParentProcessWithMultiInstanceInsideEmbeddedSubProcess() {
 
     final BpmnModelInstance parentProcessInstance =
@@ -420,6 +427,7 @@ public class ProcessInstanceModificationSubProcessTest {
   }
 
   @Test
+  @Ignore
   public void shouldContinueParentProcessWithMultiInstanceInsideEmbeddedSubProcess() {
 
     final BpmnModelInstance parentProcessInstance =
@@ -470,6 +478,7 @@ public class ProcessInstanceModificationSubProcessTest {
   }
 
   @Test
+  @Ignore
   public void shouldCompleteParentProcessWithMultiInstanceEmbeddedSubProcess() {
 
     final BpmnModelInstance parentProcessInstance =
@@ -516,6 +525,7 @@ public class ProcessInstanceModificationSubProcessTest {
   }
 
   @Test
+  @Ignore
   public void shouldContinueParentProcessWithMultiInstanceEmbeddedSubProcess() {
 
     final BpmnModelInstance parentProcessInstance =
@@ -566,6 +576,7 @@ public class ProcessInstanceModificationSubProcessTest {
   }
 
   @Test
+  @Ignore
   public void shouldCancelParentProcessWithMultiInstanceCallActivity() {
     BpmnModelInstance parentProcess = Bpmn.createExecutableProcess("parentProcess")
       .startEvent()
@@ -611,6 +622,7 @@ public class ProcessInstanceModificationSubProcessTest {
   }
 
   @Test
+  @Ignore
   public void shouldCancelParentProcessWithCallActivityInMultiInstanceEmbeddedSubprocess() {
     BpmnModelInstance parentProcess = Bpmn.createExecutableProcess("parentProcess")
       .startEvent()
@@ -661,6 +673,7 @@ public class ProcessInstanceModificationSubProcessTest {
   }
 
   @Test
+  @Ignore
   public void shouldCancelConcurrentExecutionInCallingProcess()
   {
     // given

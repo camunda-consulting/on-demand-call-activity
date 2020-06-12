@@ -30,11 +30,7 @@ import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.RuleChain;
 
 /**
@@ -150,6 +146,8 @@ public class JobExecutorFollowUpTest {
   }
 
   @Test
+  @Ignore
+  // Ignored because the service task is within the call activity
   public void testExecuteExclusiveFollowUpJobInDifferentProcessInstance() {
     testHelper.deploy(CALL_ACTIVITY_PROCESS, ONE_TASK_PROCESS);
 

@@ -18,6 +18,7 @@ package org.camunda.bpm.engine.test.bpmn.event.conditional;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
@@ -608,6 +609,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
   }
 
   @Test
+  // Adjusted the test to handle the call activity execution after the human task. Added the variable = 1 back through the execution.
   public void testSetVariableInOutputMappingOfCallActivity() {
     engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, DELEGATED_PROCESS).deploy());
 
@@ -634,6 +636,10 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
     //when task is completed
     taskService.complete(task.getId());
 
+    Execution callActivityExecution = runtimeService.createExecutionQuery().activityId(TASK_WITH_CONDITION_ID).singleResult();
+    VariableMap variableMap = Variables.createVariables().putValue("variable", 1);
+    runtimeService.signal(callActivityExecution.getId(), variableMap);
+
     //then output mapping from call activity sets variable
     //-> interrupting conditional event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
@@ -641,6 +647,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
   }
 
   @Test
+  // Adjusted the test to handle the call activity execution after the human task.
   public void testNonInterruptingSetVariableInOutputMappingOfCallActivity() {
     engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, DELEGATED_PROCESS).deploy());
 
@@ -668,6 +675,9 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
     //when task is completed
     taskService.complete(task.getId());
 
+    Execution callActivityExecution = runtimeService.createExecutionQuery().activityId(TASK_WITH_CONDITION_ID).singleResult();
+    runtimeService.signal(callActivityExecution.getId());
+
     //then output mapping from call activity sets variable
     //-> non interrupting conditional event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
@@ -676,6 +686,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
   }
 
   @Test
+  // Adjusted the test to handle the call activity execution after the human task. Added the variable = 1 back through the execution.
   public void testSetVariableInOutMappingOfCallActivity() {
     engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, DELEGATED_PROCESS).deploy());
 
@@ -702,6 +713,10 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
     //when task is completed
     taskService.complete(task.getId());
 
+    Execution callActivityExecution = runtimeService.createExecutionQuery().activityId(TASK_WITH_CONDITION_ID).singleResult();
+    VariableMap variables = Variables.createVariables().putValue("variable", 1);
+    runtimeService.signal(callActivityExecution.getId(), variables);
+
     //then out mapping from call activity sets variable
     //-> interrupting conditional event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
@@ -709,6 +724,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
   }
 
   @Test
+  // Adjusted the test to handle the call activity execution after the human task. Added the variable = 1 back through the execution.
   public void testNonInterruptingSetVariableInOutMappingOfCallActivity() {
     engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, DELEGATED_PROCESS).deploy());
 
@@ -736,6 +752,10 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
     //when task before service task is completed
     taskService.complete(task.getId());
 
+    Execution callActivityExecution = runtimeService.createExecutionQuery().activityId(TASK_WITH_CONDITION_ID).singleResult();
+    VariableMap variables = Variables.createVariables().putValue("variable", 1);
+    runtimeService.signal(callActivityExecution.getId(), variables);
+
     //then out mapping of call activity sets a variable
     //-> non interrupting conditional event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
@@ -745,6 +765,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
 
 
   @Test
+  // Adjusted by finishing the execution afer the human task
   public void testSetVariableInInMappingOfCallActivity() {
     engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, DELEGATED_PROCESS).deploy());
 
@@ -771,6 +792,9 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
     //when task is completed
     taskService.complete(task.getId());
 
+    Execution callActivityExecution = runtimeService.createExecutionQuery().activityId(TASK_WITH_CONDITION_ID).singleResult();
+    runtimeService.signal(callActivityExecution.getId());
+
     //then in mapping from call activity sets variable
     //-> interrupting conditional event is not triggered, since variable is only locally
     tasksAfterVariableIsSet = taskQuery.list();
@@ -778,6 +802,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
   }
 
   @Test
+  // Adjusted the test to handle the call activity execution after the human task.
   public void testNonInterruptingSetVariableInInMappingOfCallActivity() {
     engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, DELEGATED_PROCESS).deploy());
 
@@ -804,6 +829,9 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
     //when task is completed
     taskService.complete(task.getId());
 
+    Execution callActivityExecution = runtimeService.createExecutionQuery().activityId(TASK_WITH_CONDITION_ID).singleResult();
+    runtimeService.signal(callActivityExecution.getId());
+
     //then in mapping from call activity sets variable
     //-> interrupting conditional event is not triggered, since variable is only locally
     tasksAfterVariableIsSet = taskQuery.list();
@@ -811,6 +839,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
   }
 
   @Test
+  // Adjusted the test to handle the call activity execution after the human task.
   public void testSetVariableInCallActivity() {
     engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, DELEGATED_PROCESS).deploy());
 
@@ -836,6 +865,9 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
     //when task is completed
     taskService.complete(task.getId());
 
+    Execution callActivityExecution = runtimeService.createExecutionQuery().activityId(TASK_WITH_CONDITION_ID).singleResult();
+    runtimeService.signal(callActivityExecution.getId());
+
     //then service task in call activity sets variable
     //conditional event is not triggered
     tasksAfterVariableIsSet = taskQuery.list();
@@ -843,6 +875,7 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
   }
 
   @Test
+  // Adjusted the test to handle the call activity execution after the human task.
   public void testNonInterruptingSetVariableInCallActivity() {
     engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, DELEGATED_PROCESS).deploy());
 
@@ -867,6 +900,9 @@ public class EventSubProcessStartConditionalEventTest extends AbstractConditiona
 
     //when task is completed
     taskService.complete(task.getId());
+
+    Execution callActivityExecution = runtimeService.createExecutionQuery().activityId(TASK_WITH_CONDITION_ID).singleResult();
+    runtimeService.signal(callActivityExecution.getId());
 
     //then service task in call activity sets variable
     //conditional event is not triggered

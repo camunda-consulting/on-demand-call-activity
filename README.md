@@ -1,5 +1,9 @@
 This branch is a fork of [camunda-bpm-platform](https://github.com/camunda/camunda-bpm-platform)
 and is used to run the Camunda engine test suite with the [On-Demand Call Activity Plugin](https://github.com/camunda-consulting/on-demand-call-activity/tree/master/engine-plugin-on-demand-call-activity) enabled.
+This branch tests the scenario were no child processes are invoked.
+Some tests that check for the existence of child processes had to be changed or ignored.
+Any operations on parent processes are still tested
+in order to see if they also work in absense of a child process instance.
 
 camunda BPM - The open source BPM platform
 ==========================================

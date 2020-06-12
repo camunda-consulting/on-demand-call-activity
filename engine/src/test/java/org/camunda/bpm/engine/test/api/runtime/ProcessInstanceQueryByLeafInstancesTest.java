@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -47,6 +48,8 @@ public class ProcessInstanceQueryByLeafInstancesTest {
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/superProcessWithNestedSubProcess.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/runtime/nestedSubProcess.bpmn20.xml", "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml" })
+  @Ignore
+  // Ignored because it depends on na call activity for the assertions
   public void testQueryByLeafInstancesThreeLayers() {
     /*
      * nested structure: 
@@ -70,6 +73,8 @@ public class ProcessInstanceQueryByLeafInstancesTest {
   @Test
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/nestedSubProcess.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml" })
+  @Ignore
+  // Ignored because it depends on na call activity for the assertions
   public void testQueryByLeafInstancesTwoLayers() {
     /*
      * nested structure: 

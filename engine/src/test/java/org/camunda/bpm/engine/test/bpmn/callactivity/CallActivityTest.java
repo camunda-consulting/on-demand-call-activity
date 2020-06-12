@@ -31,14 +31,11 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
-import org.camunda.bpm.engine.runtime.EventSubscription;
-import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
-import org.camunda.bpm.engine.runtime.Job;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.runtime.VariableInstance;
+import org.camunda.bpm.engine.runtime.*;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
@@ -52,6 +49,7 @@ import org.camunda.bpm.model.bpmn.builder.CallActivityBuilder;
 import org.camunda.bpm.model.bpmn.instance.CallActivity;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaIn;
 import org.camunda.bpm.model.bpmn.instance.camunda.CamundaOut;
+import org.junit.Ignore;
 
 /**
  * @author Joram Barrez
@@ -65,6 +63,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
   })
+  // Adjusted to deal with the lack of a task inside the call activity.
   public void testCallSimpleSubProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
 
@@ -75,11 +74,16 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
 
     // Completing the task continues the process which leads to calling the subprocess
     taskService.complete(taskBeforeSubProcess.getId());
-    Task taskInSubProcess = taskQuery.singleResult();
+
+    Execution callActivityExecution = runtimeService.createExecutionQuery().activityId("callSubProcess").singleResult();
+    assertNotNull(callActivityExecution);
+    runtimeService.signal(callActivityExecution.getId());
+
+    /*Task taskInSubProcess = taskQuery.singleResult();
     assertEquals("Task in subprocess", taskInSubProcess.getName());
 
     // Completing the task in the subprocess, finishes the subprocess
-    taskService.complete(taskInSubProcess.getId());
+     taskService.complete(taskInSubProcess.getId());*/
     Task taskAfterSubProcess = taskQuery.singleResult();
     assertEquals("Task after subprocess", taskAfterSubProcess.getName());
 
@@ -92,7 +96,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcessParentVariableAccess.bpmn20.xml"
   })
-  public void testAccessSuperInstanceVariables() {
+  // Ignored. It depends on a delegate inside the call activity.
+  public void ignore_testAccessSuperInstanceVariables() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
 
     // one task in the subprocess should be active after starting the process instance
@@ -115,7 +120,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/concurrentSubProcessParentVariableAccess.bpmn20.xml"
   })
-  public void testAccessSuperInstanceVariablesFromConcurrentExecution() {
+  // Ignored. Test relies on the call activity with a parallel gateway.testSubProcessEndsSuperProcess
+  public void ignore_testAccessSuperInstanceVariablesFromConcurrentExecution() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
 
     // one task in the subprocess should be active after starting the process instance
@@ -136,7 +142,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcessWithExpressions.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
-  public void testCallSimpleSubProcessWithExpressions() {
+  // Ignored. Test relies on a expression to define the call activity key. We have no call activity in this test.
+  public void ignore_testCallSimpleSubProcessWithExpressions() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
 
@@ -171,7 +178,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessEndsSuperProcess.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
-  public void testSubProcessEndsSuperProcess() {
+  // Ignored. The test is simple and just checks if the parent ends when the child ends.
+  public void ignore_testSubProcessEndsSuperProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessEndsSuperProcess");
 
     // one task in the subprocess should be active after starting the process instance
@@ -188,7 +196,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallParallelSubProcess.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleParallelSubProcess.bpmn20.xml"})
-  public void testCallParallelSubProcess() {
+  // Ignored. It depends on a process with parallel gateway inside.
+  public void ignore_testCallParallelSubProcess() {
     runtimeService.startProcessInstanceByKey("callParallelSubProcess");
 
     // The two tasks in the parallel subprocess should be active
@@ -217,7 +226,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcessWithExpressions.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess2.bpmn20.xml"})
-  public void testCallSequentialSubProcessWithExpressions() {
+  // Ignored. Test relies on parent that creates two instances of a child process, each child has another call activity with an expression defining the called element.testInterruptingMessageEventSubProcessEventSubscriptionsInsideCallActivity
+  public void ignore_testCallSequentialSubProcessWithExpressions() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSequentialSubProcess");
 
@@ -272,12 +282,13 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testTimerOnCallActivity.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
+  // Adjusted to not consider the task inside the call activity
   public void testTimerOnCallActivity() {
     // After process start, the task in the subprocess should be active
     runtimeService.startProcessInstanceByKey("timerOnCallActivity");
     TaskQuery taskQuery = taskService.createTaskQuery();
-    Task taskInSubProcess = taskQuery.singleResult();
-    assertEquals("Task in subprocess", taskInSubProcess.getName());
+    /*Task taskInSubProcess = taskQuery.singleResult();
+    assertEquals("Task in subprocess", taskInSubProcess.getName());*/
 
     Job timer = managementService.createJobQuery().singleResult();
     assertNotNull(timer);
@@ -298,7 +309,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessDataInputOutput.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
-  public void testSubProcessWithDataInputOutput() {
+  // Ignored. Test relies on the call activity variable mapping.
+  public void ignore_testSubProcessWithDataInputOutput() {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("superVariable", "Hello from the super process.");
 
@@ -360,7 +372,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessLimitedDataInputOutputTypedApi.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
-  public void testSubProcessWithLimitedDataInputOutputTypedApi() {
+  // Ignored since it depends on the call activity variable mapping.
+  public void ignore_testSubProcessWithLimitedDataInputOutputTypedApi() {
 
     TypedValue superVariable = Variables.stringValue(null);
     VariableMap vars = Variables.createVariables();
@@ -403,7 +416,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessAllDataInputOutputTypedApi.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
-  public void testSubProcessWithAllDataInputOutputTypedApi() {
+  // Ignored since it depends in the variable mappings for the call activity.
+  public void ignore_testSubProcessWithAllDataInputOutputTypedApi() {
 
     TypedValue superVariable = Variables.stringValue(null);
     VariableMap vars = Variables.createVariables();
@@ -502,7 +516,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessDataInputOutput.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/dataSubProcess.bpmn20.xml"})
-  public void testSubProcessWithNullDataInput() {
+  // Ignored. Test relies on the call activity variable mapping.
+  public void ignore_testSubProcessWithNullDataInput() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("subProcessDataInputOutput").getId();
 
     // the variable named "subVariable" is not set on process instance
@@ -549,7 +564,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessDataInputOutputAsExpression.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/dataSubProcess.bpmn20.xml"})
-  public void testSubProcessWithNullDataInputAsExpression() {
+  public void SubProcessWithNullDataInputAsExpression() {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("superVariable", null);
     String processInstanceId = runtimeService.startProcessInstanceByKey("subProcessDataInputOutput", params).getId();
@@ -596,7 +611,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessDataInputOutput.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/dataSubProcess.bpmn20.xml"})
-  public void testSubProcessWithNullDataOutput() {
+  // Ignored. Test relies on the call activity variable mapping.
+  public void ignore_testSubProcessWithNullDataOutput() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("subProcessDataInputOutput").getId();
 
     // the variable named "subVariable" is not set on process instance
@@ -649,7 +665,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessDataInputOutputAsExpression.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/dataSubProcess.bpmn20.xml"})
-  public void testSubProcessWithNullDataOutputAsExpression() {
+  // Ignored. Test relies on the call activity variable mapping.
+  public void ignore_testSubProcessWithNullDataOutputAsExpression() {
     Map<String, Object> params = new HashMap<String, Object>();
     params.put("superVariable", null);
     String processInstanceId = runtimeService.startProcessInstanceByKey("subProcessDataInputOutput", params).getId();
@@ -724,7 +741,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testTwoSubProcesses.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
-  public void testTwoSubProcesses() {
+  // Ignored. The test uses two call activities in a parallel gateway and test if deletiion in the parent cascades.
+  public void ignore_testTwoSubProcesses() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callTwoSubProcesses");
 
     List<ProcessInstance> instanceList = runtimeService.createProcessInstanceQuery().list();
@@ -752,7 +770,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessAllDataInputOutput.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
-  public void testSubProcessAllDataInputOutput() {
+  public void ignore_testSubProcessAllDataInputOutput() {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("superVariable", "Hello from the super process.");
     vars.put("testVariable", "Only a test.");
@@ -806,7 +824,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessAllDataInputOutputWithAdditionalInputMapping.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
-  public void testSubProcessAllDataInputOutputWithAdditionalInputMapping() {
+  // Ignored since it depends on call activity variable mapping, which doesnt work due to the fact we have no call activity.
+  public void ignore_testSubProcessAllDataInputOutputWithAdditionalInputMapping() {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("superVariable", "Hello from the super process.");
     vars.put("testVariable", "Only a test.");
@@ -865,7 +884,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessAllDataInputOutput.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
-  public void testSubProcessAllDataOutput() {
+  // Ignored. Test relies on call activity variables mapping.
+  public void ignore_testSubProcessAllDataOutput() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessAllDataInputOutput");
 
@@ -905,7 +925,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessLocalInputAllVariables.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
-  public void testSubProcessLocalInputAllVariables() {
+  // Ignored. Depends on call activity
+  public void ignore_testSubProcessLocalInputAllVariables() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessLocalInputAllVariables");
     Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();
 
@@ -943,7 +964,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessLocalInputSingleVariable.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
-  public void testSubProcessLocalInputSingleVariable() {
+  // Ignored. Uses variables mapping to map from input variables to call activity variables.testCallProcessByVersionTagTwoSubprocesses
+  public void ignore_testSubProcessLocalInputSingleVariable() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessLocalInputSingleVariable");
     Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();
 
@@ -982,7 +1004,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessLocalInputSingleVariableExpression.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
-  public void testSubProcessLocalInputSingleVariableExpression() {
+  // Ignored. Test call activity call with version mapping.
+  public void ignore_testSubProcessLocalInputSingleVariableExpression() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessLocalInputSingleVariableExpression");
     Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();
 
@@ -1019,7 +1042,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessLocalOutputAllVariables.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
-  public void testSubProcessLocalOutputAllVariables() {
+  // Ignored because it depends on a call activity and the output mapping
+  public void ignore_testSubProcessLocalOutputAllVariables() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessLocalOutputAllVariables");
     Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();
 
@@ -1056,6 +1080,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessLocalOutputSingleVariable.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
+  // Adjusted to deal with the non existing call activity. Also the variable mapping does not work, since there is no process, but the input/output mapping does.
   public void testSubProcessLocalOutputSingleVariable() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessLocalOutputSingleVariable");
     Task beforeCallActivityTask = taskService.createTaskQuery().singleResult();
@@ -1067,25 +1092,29 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     taskService.complete(beforeCallActivityTask.getId());
 
     // then all variables have been mapped into the called instance
-    ProcessInstance calledInstance = runtimeService.createProcessInstanceQuery()
+    /*ProcessInstance calledInstance = runtimeService.createProcessInstanceQuery()
             .superProcessInstanceId(processInstance.getId())
-            .singleResult();
+            .singleResult();*/
 
-    Map<String, Object> calledInstanceVariables = runtimeService.getVariables(calledInstance.getId());
-    assertEquals(2, calledInstanceVariables.size());
+    Execution callActivityExecution = runtimeService.createExecutionQuery().activityId("callSubProcess").singleResult();
+
+    Map<String, Object> calledInstanceVariables = runtimeService.getVariables(callActivityExecution.getId());
+    assertEquals(3, calledInstanceVariables.size());
     assertEquals("val1", calledInstanceVariables.get("callingProcessVar1"));
     assertEquals("val2", calledInstanceVariables.get("inputParameter"));
 
     // when setting a variable in the called process instance
-    runtimeService.setVariable(calledInstance.getId(), "calledProcessVar1", 42L);
+    runtimeService.setVariable(callActivityExecution.getId(), "outVar", 42L);
 
     // and completing it
-    Task calledProcessInstanceTask = taskService.createTaskQuery().singleResult();
-    taskService.complete(calledProcessInstanceTask.getId());
+    /*Task calledProcessInstanceTask = taskService.createTaskQuery().singleResult();
+    taskService.complete(calledProcessInstanceTask.getId());*/
+
+    runtimeService.signal(callActivityExecution.getId());
 
     // then only the output mapping variable has been mapped into the calling process instance
     Map<String, Object> callingInstanceVariables = runtimeService.getVariables(processInstance.getId());
-    assertEquals(2, callingInstanceVariables.size());
+    assertEquals(3, callingInstanceVariables.size());
     assertEquals("val1", callingInstanceVariables.get("callingProcessVar1"));
     assertEquals(43L, callingInstanceVariables.get("outputParameter"));
   }
@@ -1096,7 +1125,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessBusinessKeyInput.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
-  public void testSubProcessBusinessKeyInput() {
+  // Ignored. Business key mapping makes no sense without a call activity.
+  public void ignore_testSubProcessBusinessKeyInput() {
     String businessKey = "myBusinessKey";
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessBusinessKeyInput", businessKey);
 
@@ -1145,6 +1175,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcessWithHashExpressions.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
+  // Adjusted to deal with the lack of a task inside the call activity.
   public void testCallSimpleSubProcessWithHashExpressions() {
 
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
@@ -1160,11 +1191,13 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     // into this task
     taskService.setVariable(taskBeforeSubProcess.getId(), "simpleSubProcessExpression", "simpleSubProcess");
     taskService.complete(taskBeforeSubProcess.getId());
-    Task taskInSubProcess = taskQuery.singleResult();
+    Execution callActivityExecution = runtimeService.createExecutionQuery().activityId("callSubProcess").singleResult();
+    runtimeService.signal(callActivityExecution.getId());
+    /*Task taskInSubProcess = taskQuery.singleResult();
     assertEquals("Task in subprocess", taskInSubProcess.getName());
 
     // Completing the task in the subprocess, finishes the subprocess
-    taskService.complete(taskInSubProcess.getId());
+    taskService.complete(taskInSubProcess.getId());*/
     Task taskAfterSubProcess = taskQuery.singleResult();
     assertEquals("Task after subprocess", taskAfterSubProcess.getName());
 
@@ -1175,7 +1208,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testInterruptingEventSubProcessEventSubscriptions.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/interruptingEventSubProcessEventSubscriptions.bpmn20.xml"})
-  public void testInterruptingMessageEventSubProcessEventSubscriptionsInsideCallActivity() {
+  // Ignored. Test relies on a call activity with an interruptive event subprocess.
+  public void ignore_testInterruptingMessageEventSubProcessEventSubscriptionsInsideCallActivity() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callInterruptingEventSubProcess");
 
     // one task in the call activity subprocess should be active after starting the process instance
@@ -1208,7 +1242,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testInterruptingEventSubProcessEventSubscriptions.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/interruptingEventSubProcessEventSubscriptions.bpmn20.xml"})
-  public void testInterruptingSignalEventSubProcessEventSubscriptionsInsideCallActivity() {
+  // Ignored. It depends on an event subprocess inside the call activity.
+  public void ignore_testInterruptingSignalEventSubProcessEventSubscriptionsInsideCallActivity() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callInterruptingEventSubProcess");
 
     // one task in the call activity subprocess should be active after starting the process instance
@@ -1243,7 +1278,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testLiteralSourceExpression.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
   })
-  public void testInputParameterLiteralSourceExpression() {
+  // Ignored. Test relies on the call activity variable mapping.
+  public void ignore_testInputParameterLiteralSourceExpression() {
     runtimeService.startProcessInstanceByKey("process");
 
     String subInstanceId = runtimeService
@@ -1260,7 +1296,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testLiteralSourceExpression.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
   })
-  public void testOutputParameterLiteralSourceExpression() {
+  // Ignored. Test relies on call activity variables mapping.
+  public void ignore_testOutputParameterLiteralSourceExpression() {
     String processInstanceId = runtimeService.startProcessInstanceByKey("process").getId();
 
     String taskId = taskService
@@ -1277,7 +1314,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessDataOutputOnError.bpmn",
     "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithError.bpmn"
   })
-  public void testSubProcessDataOutputOnError() {
+  // Ignored. Testing relies on a user task inside the call activity and also on output mapping.
+  public void ignore_testSubProcessDataOutputOnError() {
     String variableName = "subVariable";
     Object variableValue = "Hello from Subprocess";
 
@@ -1301,7 +1339,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessDataOutputOnThrownError.bpmn",
     "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithThrownError.bpmn"
   })
-  public void testSubProcessDataOutputOnThrownError() {
+  // Ignored. Depends on a subprocess that throws error.
+  public void ignore_testSubProcessDataOutputOnThrownError() {
     String variableName = "subVariable";
     Object variableValue = "Hello from Subprocess";
 
@@ -1326,7 +1365,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessCallErrorSubProcess.bpmn",
     "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithError.bpmn"
   })
-  public void testTwoSubProcessesDataOutputOnError() {
+  // Ignored since it depends on two level process (one parent with one child and a grandchild).
+  public void ignore_testTwoSubProcessesDataOutputOnError() {
     String variableName = "subVariable";
     Object variableValue = "Hello from Subprocess";
 
@@ -1352,7 +1392,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessCallErrorSubProcessWithLimitedOutMapping.bpmn",
     "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithError.bpmn"
   })
-  public void testTwoSubProcessesLimitedDataOutputOnError() {
+  // Ignored since it depends on two level call activity.
+  public void ignore_testTwoSubProcessesLimitedDataOutputOnError() {
     String variableName1 = "subSubVariable1";
     String variableName2 = "subSubVariable2";
     String variableName3 = "subVariable";
@@ -1391,7 +1432,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityAdvancedTest.testCallProcessByVersionAsExpression.bpmn20.xml",
     "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"
   })
-  public void testCallCaseByVersionAsExpression() {
+  // Ignored. Test relies strongly in a call activity.testCallParallelSubProcess
+  public void ignore_testCallCaseByVersionAsExpression() {
     // given
 
     String bpmnResourceName = "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml";
@@ -1432,7 +1474,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivityAdvancedTest.testCallProcessByVersionAsDelegateExpression.bpmn20.xml",
     "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"
   })
-  public void testCallCaseByVersionAsDelegateExpression() {
+  // Ignored. Does serveral assertions by assuming a call activity, which the version binding is defined by a bean.testOrderProcessWithCallActivity
+  public void ignore_testCallCaseByVersionAsDelegateExpression() {
     processEngineConfiguration.getBeans().put("myDelegate", new MyVersionDelegate());
 
     // given
@@ -1471,7 +1514,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithVersionTag.bpmn20.xml" })
-  public void testCallProcessByVersionTag() {
+  // Ignored. Test relies on a call activity with a version tag.testSubProcessWithDataInputOutput
+  public void ignore_testCallProcessByVersionTag() {
     // given
     BpmnModelInstance modelInstance = getModelWithCallActivityVersionTagBinding("ver_tag_1");
 
@@ -1489,7 +1533,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithVersionTag.bpmn20.xml" })
-  public void testCallProcessByVersionTagAsExpression() {
+  // Ignored. Test relies on a call activity with a version tag definied by an expression.
+  public void ignore_testCallProcessByVersionTagAsExpression() {
     // given
     BpmnModelInstance modelInstance = getModelWithCallActivityVersionTagBinding("${versionTagExpr}");
 
@@ -1508,7 +1553,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithVersionTag.bpmn20.xml" })
-  public void testCallProcessByVersionTagAsDelegateExpression() {
+  public void ignore_testCallProcessByVersionTagAsDelegateExpression() {
     // given
     processEngineConfiguration.getBeans().put("myDelegate", new MyVersionDelegate());
     BpmnModelInstance modelInstance = getModelWithCallActivityVersionTagBinding("${myDelegate.getVersionTag()}");
@@ -1547,7 +1592,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     }
   }
 
-  public void testCallProcessByVersionTagNoneSubprocess() {
+  // Ignored because it depends on a subprocess with a different version tag
+  public void ignore_testCallProcessByVersionTagNoneSubprocess() {
     // given
     BpmnModelInstance modelInstance = getModelWithCallActivityVersionTagBinding("ver_tag_1");
 
@@ -1564,7 +1610,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithVersionTag.bpmn20.xml" })
-  public void testCallProcessByVersionTagTwoSubprocesses() {
+  public void ignore_testCallProcessByVersionTagTwoSubprocesses() {
     // given
     BpmnModelInstance modelInstance = getModelWithCallActivityVersionTagBinding("ver_tag_1");
 
@@ -1588,7 +1634,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/orderProcess.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/checkCreditProcess.bpmn20.xml"
   })
-  public void testOrderProcessWithCallActivity() {
+  // Ignored. Test relies heavily in the call activity to call the check credit process.
+  public void ignore_testOrderProcessWithCallActivity() {
     // After the process has started, the 'verify credit history' task should be active
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("orderProcess");
     TaskQuery taskQuery = taskService.createTaskQuery();
@@ -1613,7 +1660,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
   })
-  public void testDeleteProcessInstanceInCallActivity() {
+  // Makes no sense to test this because it needs a call activity
+  public void ignore_testDeleteProcessInstanceInCallActivity() {
     // given
     runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
 
@@ -1654,7 +1702,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testTwoSubProcesses.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
-  public void testSingleDeletionWithTwoSubProcesses() {
+  // Ignored. It depends on user tasks that are inside the call activities. Also it validates constantly the number of instances.
+  public void ignore_testSingleDeletionWithTwoSubProcesses() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callTwoSubProcesses");
 
@@ -1696,7 +1745,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testNestedCallActivity.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
   })
-  public void testDeleteMultilevelProcessInstanceInCallActivity() {
+  // Ignored. Depends on multi level call activity.
+  public void ignore_testDeleteMultilevelProcessInstanceInCallActivity() {
     // given
     runtimeService.startProcessInstanceByKey("nestedCallActivity");
 
@@ -1746,7 +1796,8 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testDoubleNestedCallActivity.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"
   })
-  public void testDeleteDoubleNestedProcessInstanceInCallActivity() {
+  // Ignored because it has several levels of call activity
+  public void ignore_testDeleteDoubleNestedProcessInstanceInCallActivity() {
     // given
     runtimeService.startProcessInstanceByKey("doubleNestedCallActivity");
 

@@ -222,7 +222,8 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
           "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorOnCallActivity-parent.bpmn20.xml",
           "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.subprocess.bpmn20.xml"
   })
-  public void testCatchErrorOnCallActivity() {
+  // Ignored since the error is generated inside the call activity.
+  public void ignore_testCatchErrorOnCallActivity() {
     String procId = runtimeService.startProcessInstanceByKey("catchErrorOnCallActivity").getId();
     Task task = taskService.createTaskQuery().singleResult();
     assertEquals("Task in subprocess", task.getName());
@@ -282,15 +283,18 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
           "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testUncaughtErrorOnCallActivity-parent.bpmn20.xml",
           "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.subprocess.bpmn20.xml"
   })
+  // Adjusted to run the call activity execution.
   public void testUncaughtErrorOnCallActivity() {
     runtimeService.startProcessInstanceByKey("uncaughtErrorOnCallActivity");
-    Task task = taskService.createTaskQuery().singleResult();
-    assertEquals("Task in subprocess", task.getName());
+    /*Task task = taskService.createTaskQuery().singleResult();
+    assertEquals("Task in subprocess", task.getName());*/
+    Execution callActivityExecution = runtimeService.createExecutionQuery().activityId("callSubProcess").singleResult();
 
     try {
       // Completing the task will reach the end error event,
       // which is never caught in the process
-      taskService.complete(task.getId());
+      //taskService.complete(task.getId());
+      runtimeService.signal(callActivityExecution.getId());
     } catch (BpmnError e) {
       assertTextPresent("No catching boundary event found for error with errorCode 'myError', neither in same process nor in parent process", e.getMessage());
     }
@@ -300,7 +304,8 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
           "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorThrownByCallActivityOnSubprocess.bpmn20.xml",
           "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.subprocess.bpmn20.xml"
   })
-  public void testCatchErrorThrownByCallActivityOnSubprocess() {
+  // Ignored since the error is generated inside the call activity.
+  public void ignore_testCatchErrorThrownByCallActivityOnSubprocess() {
     String procId = runtimeService.startProcessInstanceByKey("catchErrorOnSubprocess").getId();
     Task task = taskService.createTaskQuery().singleResult();
     assertEquals("Task in subprocess", task.getName());
@@ -321,7 +326,8 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
           "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.subprocess2ndLevel.bpmn20.xml",
           "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.subprocess.bpmn20.xml"
   })
-  public void testCatchErrorThrownByCallActivityOnCallActivity() throws InterruptedException {
+  // Ignored since the error is generated inside the call activity.
+  public void ignore_testCatchErrorThrownByCallActivityOnCallActivity() throws InterruptedException {
       String procId = runtimeService.startProcessInstanceByKey("catchErrorOnCallActivity2ndLevel").getId();
 
       Task task = taskService.createTaskQuery().singleResult();
@@ -430,7 +436,8 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
           "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorThrownByJavaDelegateOnCallActivity-parent.bpmn20.xml",
           "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorThrownByJavaDelegateOnCallActivity-child.bpmn20.xml"
   })
-  public void testCatchErrorThrownByJavaDelegateOnCallActivity() {
+  // Ignored since the error that is handled is thrown inside the call activity.
+  public void ignore_testCatchErrorThrownByJavaDelegateOnCallActivity() {
     String procId = runtimeService.startProcessInstanceByKey("catchErrorThrownByJavaDelegateOnCallActivity-parent").getId();
     assertThatErrorHasBeenCaught(procId);
 
@@ -870,7 +877,8 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
       "org/camunda/bpm/engine/test/bpmn/event/error/ThrowErrorProcess.bpmn",
       "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchErrorThrownByCallActivityOnSubprocessSetsErrorCodeVariable.bpmn"
   })
-  public void testCatchErrorThrownByCallActivityOnSubprocessSetsErrorVariables(){
+  // Ignored since the error is generated inside the call activity.
+  public void ignore_testCatchErrorThrownByCallActivityOnSubprocessSetsErrorVariables(){
     runtimeService.startProcessInstanceByKey("Process_1");
     //the name used in "camunda:errorCodeVariable" in the BPMN
     String variableName = "errorVariable";
@@ -903,7 +911,8 @@ public class BoundaryErrorEventTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/event/error/BoundaryErrorEventTest.testCatchBpmnErrorThrownByJavaDelegateInCallActivityOnSubprocessSetsErrorVariables.bpmn",
     "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithThrownError.bpmn"
   })
-  public void testCatchBpmnErrorThrownByJavaDelegateInCallActivityOnSubprocessSetsErrorVariables(){
+  // Ignored since the error that is handled is thrown inside the call activity.
+  public void ignore_testCatchBpmnErrorThrownByJavaDelegateInCallActivityOnSubprocessSetsErrorVariables(){
     runtimeService.startProcessInstanceByKey("Process_1");
     Task task = taskService.createTaskQuery().singleResult();
     taskService.complete(task.getId());

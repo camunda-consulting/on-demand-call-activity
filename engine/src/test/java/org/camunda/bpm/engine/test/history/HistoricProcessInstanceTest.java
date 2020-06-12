@@ -74,10 +74,7 @@ import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.RuleChain;
 
 /**
@@ -646,6 +643,8 @@ public class HistoricProcessInstanceTest {
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/superProcess.bpmn20.xml",
       "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"})
+  @Ignore
+  // Ignore because the historical query relies on a call activity
   public void testHistoricProcessInstanceSubProcess() {
     ProcessInstance superPi = runtimeService.startProcessInstanceByKey("subProcessQueryTest");
     ProcessInstance subPi = runtimeService.createProcessInstanceQuery().superProcessInstanceId(superPi.getProcessInstanceId()).singleResult();
@@ -771,6 +770,8 @@ public class HistoricProcessInstanceTest {
       "org/camunda/bpm/engine/test/history/HistoricProcessInstanceTest.testQueryByCaseInstanceIdHierarchy-super.bpmn20.xml",
       "org/camunda/bpm/engine/test/history/HistoricProcessInstanceTest.testQueryByCaseInstanceIdHierarchy-sub.bpmn20.xml"
       })
+  @Ignore
+  // Ignored because this is case management
   public void testQueryByCaseInstanceIdHierarchy() {
     // given
     String caseInstanceId = caseService
@@ -860,6 +861,8 @@ public class HistoricProcessInstanceTest {
       "org/camunda/bpm/engine/test/history/HistoricProcessInstanceTest.testStartActivityId-super.bpmn20.xml",
       "org/camunda/bpm/engine/test/history/HistoricProcessInstanceTest.testStartActivityId-sub.bpmn20.xml"
   })
+  @Ignore
+  // Ignore because the historical query relies on a call activity.
   public void testStartActivityId() {
     // given
 
@@ -881,6 +884,8 @@ public class HistoricProcessInstanceTest {
       "org/camunda/bpm/engine/test/history/HistoricProcessInstanceTest.testStartActivityId-super.bpmn20.xml",
       "org/camunda/bpm/engine/test/history/HistoricProcessInstanceTest.testAsyncStartActivityId-sub.bpmn20.xml"
   })
+  @Ignore
+  // Ignored because the async start event is in the call activity.
   public void testAsyncStartActivityId() {
     // given
     runtimeService.startProcessInstanceByKey("super");
@@ -1608,6 +1613,8 @@ public class HistoricProcessInstanceTest {
 
   @Test
   @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  @Ignore
+  // Ignored because the incident is generated inside the call activity
   public void testQueryWithRootIncidents() {
     // given
     deployment("org/camunda/bpm/engine/test/history/HistoricProcessInstanceTest.testQueryWithRootIncidents.bpmn20.xml");

@@ -393,6 +393,7 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
 
   @Deployment (resources={ "org/camunda/bpm/engine/test/history/HistoricActivityInstanceStateTest.testCancelProcessInstanceInUserTask.bpmn",
       "org/camunda/bpm/engine/test/history/HistoricActivityInstanceStateTest.testEndTerminateEventWithCallActivity.bpmn" })
+  // Adjusted to not handle human tasks.
   public void testEndTerminateEventCancelWithCallActivity() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process1");
     runtimeService.correlateMessage("continue");
@@ -403,8 +404,8 @@ public class HistoricActivityInstanceStateTest extends PluggableProcessEngineTes
     assertIsCanceledActivityInstances(allInstances, "callActivity", 1);
     assertNonCompletingActivityInstance(allInstances, "callActivity");
 
-    assertIsCanceledActivityInstances(allInstances, "userTask", 1);
-    assertNonCompletingActivityInstance(allInstances, "userTask");
+    /*assertIsCanceledActivityInstances(allInstances, "userTask", 1);
+    assertNonCompletingActivityInstance(allInstances, "userTask");*/
 
     assertNonCanceledActivityInstance(allInstances, "terminateEnd");
     assertIsCompletingActivityInstances(allInstances, "terminateEnd", 1);

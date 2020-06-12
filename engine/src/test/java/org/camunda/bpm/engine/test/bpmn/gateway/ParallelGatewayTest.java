@@ -126,6 +126,7 @@ public class ParallelGatewayTest extends PluggableProcessEngineTestCase {
    * http://jira.codehaus.org/browse/ACT-1222
    */
   @Deployment
+  // Adjusted the test to handle call activity execution rather than the human task inside of it.
   public void testReceyclingExecutionWithCallActivity() {
     runtimeService.startProcessInstanceByKey("parent-process").getId();
 
@@ -133,16 +134,19 @@ public class ParallelGatewayTest extends PluggableProcessEngineTestCase {
     // the sub process
     TaskQuery query = taskService.createTaskQuery().orderByTaskName().asc();
     List<Task> tasks = query.list();
-    assertEquals(2, tasks.size());
-    assertEquals("Another task", tasks.get(0).getName());
-    assertEquals("Some Task", tasks.get(1).getName());
+    assertEquals(1, tasks.size());
+    //assertEquals("Another task", tasks.get(0).getName());
+    assertEquals("Some Task", tasks.get(0).getName());
+
+    Execution callActivityExecution = runtimeService.createExecutionQuery().activityId("sid-80012F94-DFDA-40F6-A1DF-B3E4251EED21").singleResult();
+    runtimeService.signal(callActivityExecution.getId());
 
     // we complete the task from the parent process, the root execution is
     // receycled, the task in the sub process is still there
-    taskService.complete(tasks.get(1).getId());
+    /*taskService.complete(tasks.get(1).getId());
     tasks = query.list();
     assertEquals(1, tasks.size());
-    assertEquals("Another task", tasks.get(0).getName());
+    assertEquals("Another task", tasks.get(0).getName());*/
 
     // we end the task in the sub process and the sub process instance end is
     // propagated to the parent process

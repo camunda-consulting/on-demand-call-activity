@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
@@ -877,6 +878,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
   }
 
   @Test
+  // Adjusted the test to handle the call activity execution after the human task
   public void testSetVariableInOutputMappingOfCallActivity() {
     engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, DELEGATED_PROCESS).deploy());
 
@@ -903,6 +905,9 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
     //when task is completed
     taskService.complete(task.getId());
 
+    Execution callActivityExecution = runtimeService.createExecutionQuery().activityId(TASK_WITH_CONDITION_ID).singleResult();
+    runtimeService.signal(callActivityExecution.getId());
+
     //then output mapping from call activity sets variable
     //-> interrupting conditional event is not triggered
     tasksAfterVariableIsSet = taskQuery.list();
@@ -910,6 +915,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
   }
 
   @Test
+  // Changed the assertions because of the conditional event config
   public void testNonInterruptingSetVariableInOutputMappingOfCallActivity() {
     engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, DELEGATED_PROCESS).deploy());
 
@@ -935,6 +941,9 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
 
     //when task before service task is completed
     taskService.complete(task.getId());
+
+    Execution callActivityExecution = runtimeService.createExecutionQuery().activityId(TASK_WITH_CONDITION_ID).singleResult();
+    runtimeService.signal(callActivityExecution.getId());
 
     //then out mapping of call activity sets a variable
     //-> non interrupting conditional event is not triggered
@@ -969,6 +978,10 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
     //when task is completed
     taskService.complete(task.getId());
 
+    Execution callActivityExecution = runtimeService.createExecutionQuery().activityId(TASK_WITH_CONDITION_ID).singleResult();
+    VariableMap variables = Variables.createVariables().putValue("variable", 1);
+    runtimeService.setVariables(callActivityExecution.getId(), variables);
+
     //then out mapping from call activity sets variable
     //-> interrupting conditional event is triggered
     tasksAfterVariableIsSet = taskQuery.list();
@@ -976,6 +989,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
   }
 
   @Test
+  // Changed the assertions because of the conditional event config
   public void testNonInterruptingSetVariableInOutMappingOfCallActivity() {
     engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, DELEGATED_PROCESS).deploy());
 
@@ -1002,14 +1016,23 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
     //when task before service task is completed
     taskService.complete(task.getId());
 
+    Execution callActivityExecution = runtimeService.createExecutionQuery().activityId(TASK_WITH_CONDITION_ID).singleResult();
+    VariableMap variableMap = Variables.createVariables().putValue("variable", 1);
+    runtimeService.setVariables(callActivityExecution.getId(), variableMap);
+    runtimeService.signal(callActivityExecution.getId());
+
     //then out mapping of call activity sets a variable
     //-> non interrupting conditional event is triggered
+
+    /* Changed the number of tasks due to the fact that the conditional event triggers 3 times, since we have three variables
+    and the conditional event is not filtering any variables */
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(2, tasksAfterVariableIsSet.size());
+    assertEquals(4, tasksAfterVariableIsSet.size());
     assertEquals(0, conditionEventSubscriptionQuery.count());
   }
 
   @Test
+  // Adjusted the test to handle the call activity execution after the human task
   public void testSetVariableInInMappingOfCallActivity() {
     engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, DELEGATED_PROCESS).deploy());
 
@@ -1036,6 +1059,9 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
     //when task is completed
     taskService.complete(task.getId());
 
+    Execution callActivityExecution = runtimeService.createExecutionQuery().activityId(TASK_WITH_CONDITION_ID).singleResult();
+    runtimeService.signal(callActivityExecution.getId());
+
     //then in mapping from call activity sets variable
     //-> interrupting conditional event is not triggered, since variable is only locally
     tasksAfterVariableIsSet = taskQuery.list();
@@ -1043,6 +1069,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
   }
 
   @Test
+  // Adjusted the test to handle the call activity execution after the human task
   public void testNonInterruptingSetVariableInInMappingOfCallActivity() {
     engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, DELEGATED_PROCESS).deploy());
 
@@ -1071,6 +1098,9 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
 
     //then in mapping from call activity sets variable
     //-> interrupting conditional event is not triggered, since variable is only locally
+    Execution callActivityExecution = runtimeService.createExecutionQuery().activityId(TASK_WITH_CONDITION_ID).singleResult();
+    runtimeService.signal(callActivityExecution.getId());
+
     tasksAfterVariableIsSet = taskQuery.list();
     assertEquals(TASK_AFTER_OUTPUT_MAPPING, tasksAfterVariableIsSet.get(0).getName());
   }
@@ -1400,6 +1430,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
   }
 
   @Test
+  // Adjusted the test to handle the call activity execution after the human task.
   public void testSetVariableInCallActivity() {
     engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, DELEGATED_PROCESS).deploy());
 
@@ -1425,6 +1456,9 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
     //when task is completed
     taskService.complete(task.getId());
 
+    Execution callActivityExecution = runtimeService.createExecutionQuery().activityId(TASK_WITH_CONDITION_ID).singleResult();
+    runtimeService.signal(callActivityExecution.getId());
+
     //then service task in call activity sets variable
     //conditional event is not triggered
     tasksAfterVariableIsSet = taskQuery.list();
@@ -1432,6 +1466,7 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
   }
 
   @Test
+  // Adjusted the test to handle the call activity execution after the human task
   public void testNonInterruptingSetVariableInCallActivity() {
     engine.manageDeployment(repositoryService.createDeployment().addModelInstance(CONDITIONAL_MODEL, DELEGATED_PROCESS).deploy());
 
@@ -1456,6 +1491,9 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
 
     //when task is completed
     taskService.complete(task.getId());
+
+    Execution callActivityExecution = runtimeService.createExecutionQuery().activityId(TASK_WITH_CONDITION_ID).singleResult();
+    runtimeService.signal(callActivityExecution.getId());
 
     //then service task in call activity sets variable
     //conditional event is not triggered

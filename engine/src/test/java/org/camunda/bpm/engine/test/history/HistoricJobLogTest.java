@@ -1041,6 +1041,8 @@ public class HistoricJobLogTest {
       "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testSuperProcessWithCallActivity.bpmn20.xml",
       "org/camunda/bpm/engine/test/history/HistoricJobLogTest.testSubProcessWithErrorEndEvent.bpmn20.xml"
   })
+  // Ignored because the job in question is inside the call activity
+  @Ignore
   @Test
   public void testErrorEndEventInterruptingCallActivity() {
     // given

@@ -762,7 +762,7 @@ public class SingleProcessInstanceModificationAsyncTest extends PluggableProcess
   }
 
   @Deployment(resources = { CALL_ACTIVITY_PARENT_PROCESS, CALL_ACTIVITY_CHILD_PROCESS })
-  public void testCancelCallActivityInstance() {
+  public void ignore_testCancelCallActivityInstance() {
     // given
     ProcessInstance parentprocess = runtimeService.startProcessInstanceByKey("parentprocess");
     ProcessInstance subProcess = runtimeService.createProcessInstanceQuery().processDefinitionKey("subprocess").singleResult();

@@ -25,6 +25,7 @@
     <property name="processEnginePlugins">
       <list>
         <bean class="org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.OnDemandCallActivityProcessEnginePlugin" />
+        <bean class="org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.test.NullCallActivityProcessEnginePlugin" />
       </list>
     </property>
   </bean>

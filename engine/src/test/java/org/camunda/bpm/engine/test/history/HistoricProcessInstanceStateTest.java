@@ -242,6 +242,8 @@ public class HistoricProcessInstanceStateTest {
 
   @Test
   @Deployment(resources = {"org/camunda/bpm/engine/test/history/HistoricProcessInstanceStateTest.testWithCallActivity.bpmn"})
+  @Ignore
+  // Ignored because the test depends heavily in the call activity
   public void testWithCallActivity() {
     processEngineRule.getRuntimeService().startProcessInstanceByKey("Main_Process");
     assertThat(processEngineRule.getRuntimeService().createProcessInstanceQuery().active().list().size(), is(0));

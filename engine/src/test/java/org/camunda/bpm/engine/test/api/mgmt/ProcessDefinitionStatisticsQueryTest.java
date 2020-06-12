@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngineTestCase {
@@ -246,7 +247,8 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testCallActivityWithIncidentsWithoutFailedJobs.bpmn20.xml")
-  public void testCallActivityProcessDefinitionStatisticsQuery() {
+  // Ignored. The incident that is tested is generated inside the call activity.
+  public void ignore_testCallActivityProcessDefinitionStatisticsQuery() {
     runtimeService.startProcessInstanceByKey("callExampleSubProcess");
 
     executeAvailableJobs();
@@ -449,7 +451,8 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testCallActivityWithIncidentsWithoutFailedJobs.bpmn20.xml")
-  public void testProcessDefinitionStatisticsQueryWithIncidentsWithoutFailedJobs() {
+  // Ignored. The incident that is tested is generated inside the call activity.
+  public void ignore_testProcessDefinitionStatisticsQueryWithIncidentsWithoutFailedJobs() {
     runtimeService.startProcessInstanceByKey("callExampleSubProcess");
 
     executeAvailableJobs();
@@ -612,7 +615,8 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testCallActivityWithIncidentsWithoutFailedJobs.bpmn20.xml")
-  public void testIncludeRootIncidentsOnly() {
+  // Ignored. The incident that is tested is generated inside the call activity.
+  public void ignore_testIncludeRootIncidentsOnly() {
     runtimeService.startProcessInstanceByKey("callExampleSubProcess");
 
     executeAvailableJobs();

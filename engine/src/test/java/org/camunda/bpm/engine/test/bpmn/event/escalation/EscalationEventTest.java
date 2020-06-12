@@ -54,7 +54,8 @@ public class EscalationEventTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.nonInterruptingEscalationBoundaryEventOnCallActivity.bpmn20.xml"})
-  public void testThrowEscalationEventFromCallActivity() {
+  // Ignored since the escalation is generated inside the call activity.
+  public void ignore_testThrowEscalationEventFromCallActivity() {
     runtimeService.startProcessInstanceByKey("catchEscalationProcess");
     // when throw an escalation event on called process
 
@@ -174,7 +175,8 @@ public class EscalationEventTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
       "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.interruptingEscalationBoundaryEventOnCallActivity.bpmn20.xml" })
-  public void testInterruptingEscalationBoundaryEventOnCallActivity(){
+  // Ignored since the escalation is generated inside the call activity.
+  public void ignore_testInterruptingEscalationBoundaryEventOnCallActivity(){
     runtimeService.startProcessInstanceByKey("catchEscalationProcess");
     // when throw an escalation event on called process
 
@@ -208,7 +210,8 @@ public class EscalationEventTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
   "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.testPropagateOutputVariablesWhileCatchEscalationOnCallActivity.bpmn20.xml"})
-  public void testPropagateOutputVariablesWhileCatchEscalationOnCallActivity() {
+  // Ignored since it uses call activity input/output mapping and escalation inside the subprocess.
+  public void ignored_testPropagateOutputVariablesWhileCatchEscalationOnCallActivity() {
     Map<String,Object> variables = new HashMap<String, Object>();
     variables.put("input", 42);
     String processInstanceId = runtimeService.startProcessInstanceByKey("catchEscalationProcess", variables).getId();
@@ -222,7 +225,8 @@ public class EscalationEventTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
   "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.testPropagateOutputVariablesWhileCatchEscalationOnCallActivity.bpmn20.xml"})
-  public void testPropagateOutputVariablesTwoTimes() {
+  // Ignored since the escalation is generated inside the call activity.
+  public void ignore_testPropagateOutputVariablesTwoTimes() {
     Map<String,Object> variables = new HashMap<String, Object>();
     variables.put("input", 42);
     String processInstanceId = runtimeService.startProcessInstanceByKey("catchEscalationProcess", variables).getId();
@@ -245,7 +249,8 @@ public class EscalationEventTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
   "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.testPropagateOutputVariablesWhileCatchInterruptingEscalationOnCallActivity.bpmn20.xml"})
-  public void testPropagateOutputVariablesWhileCatchInterruptingEscalationOnCallActivity() {
+  // Ignored since it uses call activity input/output mapping.
+  public void ignore_testPropagateOutputVariablesWhileCatchInterruptingEscalationOnCallActivity() {
     Map<String,Object> variables = new HashMap<String, Object>();
     variables.put("input", 42);
     String processInstanceId = runtimeService.startProcessInstanceByKey("catchEscalationProcess", variables).getId();
@@ -259,7 +264,8 @@ public class EscalationEventTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
   "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.testPropagateOutputVariablesWithoutCatchEscalation.bpmn20.xml"})
-  public void testPropagateOutputVariablesWithoutCatchEscalation() {
+  // Ignored since the escalation is generated inside the call activity.
+  public void ignore_testPropagateOutputVariablesWithoutCatchEscalation() {
     Map<String,Object> variables = new HashMap<String, Object>();
     variables.put("input", 42);
     String processInstanceId = runtimeService.startProcessInstanceByKey("catchEscalationProcess", variables).getId();
@@ -298,7 +304,8 @@ public class EscalationEventTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.testInterruptingRetrieveEscalationCodeInSuperProcess.bpmn20.xml"})
-  public void testInterruptingRetrieveEscalationCodeInSuperProcess() {
+  // Ignored since the escalation is generated inside the call activity.
+  public void ignore_testInterruptingRetrieveEscalationCodeInSuperProcess() {
     runtimeService.startProcessInstanceByKey("catchEscalationProcess");
 
     // the event subprocess without escalationCode should catch the escalation event
@@ -311,7 +318,8 @@ public class EscalationEventTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.testInterruptingRetrieveEscalationCodeInSuperProcessWithoutEscalationCode.bpmn20.xml"})
-  public void testInterruptingRetrieveEscalationCodeInSuperProcessWithoutEscalationCode() {
+  // Ignored since the escalation is generated inside the call activity.
+  public void ignore_testInterruptingRetrieveEscalationCodeInSuperProcessWithoutEscalationCode() {
     runtimeService.startProcessInstanceByKey("catchEscalationProcess");
 
     // the event subprocess without escalationCode should catch the escalation event
@@ -323,7 +331,8 @@ public class EscalationEventTest extends PluggableProcessEngineTestCase {
   }
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.testNonInterruptingRetrieveEscalationCodeInSuperProcess.bpmn20.xml"})
-  public void testNonInterruptingRetrieveEscalationCodeInSuperProcess() {
+  // Ignored since the escalation is generated inside the call activity.
+  public void ignore_testNonInterruptingRetrieveEscalationCodeInSuperProcess() {
     runtimeService.startProcessInstanceByKey("catchEscalationProcess");
 
     // the event subprocess without escalationCode should catch the escalation event
@@ -336,7 +345,8 @@ public class EscalationEventTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.throwEscalationEvent.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.testNonInterruptingRetrieveEscalationCodeInSuperProcessWithoutEscalationCode.bpmn20.xml"})
-  public void testNonInterruptingRetrieveEscalationCodeInSuperProcessWithoutEscalationCode() {
+  // Ignored since the escalation is generated inside the call activity.
+  public void ignore_testNonInterruptingRetrieveEscalationCodeInSuperProcessWithoutEscalationCode() {
     runtimeService.startProcessInstanceByKey("catchEscalationProcess");
 
     // the event subprocess without escalationCode should catch the escalation event
@@ -349,7 +359,8 @@ public class EscalationEventTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/testOutputVariablesWhileThrowEscalation.bpmn20.xml",
   "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.escalationParent.bpmn20.xml"})
-  public void testPropagateOutputVariablesWhileThrowEscalation() {
+  // Ignored since the escalation is generated inside the call activity.
+  public void ignore_testPropagateOutputVariablesWhileThrowEscalation() {
     // given
     Map<String,Object> variables = new HashMap<String, Object>();
     variables.put("input", 42);
@@ -365,7 +376,8 @@ public class EscalationEventTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/testOutputVariablesWhileThrowEscalationTwoLevels.bpmn20.xml",
   "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.escalationParent.bpmn20.xml"})
-  public void testPropagateOutputVariablesWhileThrowEscalationTwoLevels() {
+  // Ignored since it uses call activity input/output mapping and escalation inside the subprocess.
+  public void ignore_testPropagateOutputVariablesWhileThrowEscalationTwoLevels() {
     // given
     Map<String,Object> variables = new HashMap<String, Object>();
     variables.put("input", 42);
@@ -381,7 +393,8 @@ public class EscalationEventTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/testOutputVariablesWhileThrowEscalationThreeLevels.bpmn20.xml",
   "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.escalationParent.bpmn20.xml"})
-  public void testPropagateOutputVariablesWhileThrowEscalationThreeLevels() {
+  // Ignored since it uses call activity input/output mapping and escalation inside the subprocess.
+  public void ignore_testPropagateOutputVariablesWhileThrowEscalationThreeLevels() {
     // given
     Map<String,Object> variables = new HashMap<String, Object>();
     variables.put("input", 42);
@@ -397,7 +410,8 @@ public class EscalationEventTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/testOutputVariablesWhileThrowEscalationInSubProcess.bpmn20.xml",
   "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.escalationParent.bpmn20.xml"})
-  public void testPropagateOutputVariablesWhileThrowEscalationInSubProcess() {
+  // Ignored since the escalation is generated inside the call activity.
+  public void ignore_testPropagateOutputVariablesWhileThrowEscalationInSubProcess() {
     // given
     Map<String,Object> variables = new HashMap<String, Object>();
     variables.put("input", 42);
@@ -413,7 +427,8 @@ public class EscalationEventTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/testOutputVariablesWhileThrowEscalationInSubProcessThreeLevels.bpmn20.xml",
   "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.escalationParent.bpmn20.xml"})
-  public void testPropagateOutputVariablesWhileThrowEscalationInSubProcessThreeLevels() {
+  // Ignored since it uses call activity input/output mapping.
+  public void ignore_testPropagateOutputVariablesWhileThrowEscalationInSubProcessThreeLevels() {
     // given
     Map<String,Object> variables = new HashMap<String, Object>();
     variables.put("input", 42);
@@ -429,7 +444,8 @@ public class EscalationEventTest extends PluggableProcessEngineTestCase {
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/event/escalation/testOutputVariablesWhileThrowEscalation2.bpmn20.xml",
   "org/camunda/bpm/engine/test/bpmn/event/escalation/EscalationEventTest.escalationParent.bpmn20.xml"})
-  public void testPropagateOutputVariablesWhileThrowEscalation2() {
+  // Ignored since it uses call activity input/output mapping.
+  public void ignore_testPropagateOutputVariablesWhileThrowEscalation2() {
     // given
     Map<String,Object> variables = new HashMap<String, Object>();
     variables.put("input", 42);
