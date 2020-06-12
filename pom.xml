@@ -11,7 +11,7 @@
 
   <groupId>org.camunda.bpm</groupId>
   <artifactId>camunda-root</artifactId>
-  <version>7.13.0</version>
+  <version>7.14.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>camunda BPM - Root Pom</name>
   <inceptionYear>2013</inceptionYear>
@@ -60,6 +60,9 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
+        <!-- This profile is run in the CI as the first step (platform-ASSEMBLY); It must not activate
+          any modules that have a dependency to the webapps. See also the referenced POMs, 
+          they usually define which modules are covered by the distro profile -->
         <module>spring-boot-starter</module>
 
         <module>qa</module>
@@ -102,6 +105,10 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
+        <!-- This profile is run in the CI after the webapps were built (platform-DISTRO); 
+          It should activate any module that has a dependency to the webapps -->
+        <module>spring-boot-starter</module>
+        
         <module>distro/license-book</module>
         <module>distro/jbossas7</module>
         <module>distro/tomcat</module>
@@ -185,6 +192,16 @@
       </activation>
       <modules>
         <module>distro/run</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>distro-starter</id>
+      <!-- This profile is run in the release CI for building the enterprise artifacts
+          It can be removed if the webapp repo is merged to the platform and
+          distro-ce is not used for building the spring boot starter -->
+      <modules>
+        <module>spring-boot-starter</module>
       </modules>
     </profile>
 
@@ -279,7 +296,7 @@
     <url>https://github.com/camunda/camunda-bpm-platform</url>
     <connection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</connection>
     <developerConnection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</developerConnection>
-    <tag>7.13.0</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <issueManagement>
