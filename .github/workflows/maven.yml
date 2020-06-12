@@ -40,7 +40,9 @@ jobs:
     needs: build
     strategy:
       matrix:
-        branch: [ engine-test-suite-with-child-processes, engine-test-suite-without-child-processes ]
+        branch:
+        - engine-test-suite-with-child-processes
+        - engine-test-suite-without-child-processes
     
     runs-on: ubuntu-latest
 
