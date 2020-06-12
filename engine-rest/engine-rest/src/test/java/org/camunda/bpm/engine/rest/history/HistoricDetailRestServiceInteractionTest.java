@@ -140,6 +140,7 @@ public class HistoricDetailRestServiceInteractionTest extends AbstractRestServic
       .body("value", equalTo("a value"))
       .body("valueInfo.serializationDataFormat", equalTo("aDataFormat"))
       .body("valueInfo.objectTypeName", equalTo("aTypeName"))
+      .body("initial", equalTo(false))
       .body("processDefinitionKey", equalTo(builder.getProcessDefinitionKey()))
       .body("processDefinitionId", equalTo(builder.getProcessDefinitionId()))
       .body("processInstanceId", equalTo(builder.getProcessInstanceId()))
@@ -185,6 +186,7 @@ public class HistoricDetailRestServiceInteractionTest extends AbstractRestServic
       .body("value", equalTo("a serialized value"))
       .body("valueInfo.serializationDataFormat", equalTo("aDataFormat"))
       .body("valueInfo.objectTypeName", equalTo("aTypeName"))
+      .body("initial", equalTo(false))
       .body("processDefinitionKey", equalTo(builder.getProcessDefinitionKey()))
       .body("processDefinitionId", equalTo(builder.getProcessDefinitionId()))
       .body("processInstanceId", equalTo(builder.getProcessInstanceId()))
@@ -313,7 +315,7 @@ public class HistoricDetailRestServiceInteractionTest extends AbstractRestServic
       .statusCode(Status.OK.getStatusCode())
       . body(is(equalTo(new String(byteContent))))
       .and()
-        .header("Content-Disposition", "attachment; filename="+filename)
+        .header("Content-Disposition", "attachment; filename=\"" + filename + "\"")
     .when().get(VARIABLE_INSTANCE_BINARY_DATA_URL);
     //due to some problems with wildfly we gotta check this separately
     String contentType = response.getContentType();

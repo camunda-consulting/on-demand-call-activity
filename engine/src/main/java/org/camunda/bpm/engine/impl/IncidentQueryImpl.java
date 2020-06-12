@@ -19,13 +19,13 @@ package org.camunda.bpm.engine.impl;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.IncidentQuery;
-import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
 /**
  * @author roman.smirnov
@@ -37,8 +37,12 @@ public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> im
   protected String id;
   protected String incidentType;
   protected String incidentMessage;
+  protected String incidentMessageLike;
   protected String executionId;
+  protected Date incidentTimestampBefore;
+  protected Date incidentTimestampAfter;
   protected String activityId;
+  protected String failedActivityId;
   protected String processInstanceId;
   protected String processDefinitionId;
   protected String[] processDefinitionKeys;
@@ -70,13 +74,33 @@ public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> im
     return this;
   }
 
+  public IncidentQuery incidentMessageLike(String incidentMessageLike) {
+    this.incidentMessageLike = incidentMessageLike;
+    return this;
+  }
+
   public IncidentQuery executionId(String executionId) {
     this.executionId = executionId;
     return this;
   }
 
+  public IncidentQuery incidentTimestampBefore(Date incidentTimestampBefore) {
+    this.incidentTimestampBefore = incidentTimestampBefore;
+    return this;
+  }
+
+  public IncidentQuery incidentTimestampAfter(Date incidentTimestampAfter) {
+    this.incidentTimestampAfter = incidentTimestampAfter;
+    return this;
+  }
+
   public IncidentQuery activityId(String activityId) {
     this.activityId = activityId;
+    return this;
+  }
+
+  public IncidentQuery failedActivityId(String activityId) {
+    this.failedActivityId = activityId;
     return this;
   }
 

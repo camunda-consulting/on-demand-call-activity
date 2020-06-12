@@ -21,6 +21,7 @@ import static java.lang.Boolean.TRUE;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Date;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -29,6 +30,7 @@ import org.camunda.bpm.engine.history.HistoricIncidentQuery;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
+import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 
@@ -49,6 +51,7 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
   private static final String SORT_BY_ACTIVITY_ID = "activityId";
   private static final String SORT_BY_PROCESS_INSTANCE_ID = "processInstanceId";
   private static final String SORT_BY_PROCESS_DEFINITION_ID = "processDefinitionId";
+  private static final String SORT_BY_PROCESS_DEFINITION_KEY = "processDefinitionKey";
   private static final String SORT_BY_CAUSE_INCIDENT_ID = "causeIncidentId";
   private static final String SORT_BY_ROOT_CAUSE_INCIDENT_ID = "rootCauseIncidentId";
   private static final String SORT_BY_CONFIGURATION = "configuration";
@@ -68,6 +71,7 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
     VALID_SORT_BY_VALUES.add(SORT_BY_ACTIVITY_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_INSTANCE_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_DEFINITION_ID);
+    VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_DEFINITION_KEY);
     VALID_SORT_BY_VALUES.add(SORT_BY_CAUSE_INCIDENT_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_ROOT_CAUSE_INCIDENT_ID);
     VALID_SORT_BY_VALUES.add(SORT_BY_CONFIGURATION);
@@ -79,11 +83,18 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
   protected String incidentId;
   protected String incidentType;
   protected String incidentMessage;
+  protected String incidentMessageLike;
   protected String processDefinitionId;
+  protected String processDefinitionKey;
   protected String[] processDefinitionKeyIn;
   protected String processInstanceId;
   protected String executionId;
+  protected Date createTimeBefore;
+  protected Date createTimeAfter;
+  protected Date endTimeBefore;
+  protected Date endTimeAfter;
   protected String activityId;
+  protected String failedActivityId;
   protected String causeIncidentId;
   protected String rootCauseIncidentId;
   protected String configuration;
@@ -117,9 +128,19 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
     this.incidentMessage = incidentMessage;
   }
 
+  @CamundaQueryParam("incidentMessageLike")
+  public void setIncidentMessageLike(String incidentMessageLike) {
+    this.incidentMessageLike = incidentMessageLike;
+  }
+
   @CamundaQueryParam("processDefinitionId")
   public void setProcessDefinitionId(String processDefinitionId) {
     this.processDefinitionId = processDefinitionId;
+  }
+
+  @CamundaQueryParam("processDefinitionKey")
+  public void setProcessDefinitionKey(String processDefinitionKey) {
+    this.processDefinitionKey = processDefinitionKey;
   }
 
   @CamundaQueryParam(value = "processDefinitionKeyIn", converter = StringArrayConverter.class)
@@ -137,9 +158,34 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
     this.executionId = executionId;
   }
 
+  @CamundaQueryParam(value="createTimeBefore", converter= DateConverter.class)
+  public void setCreateTimeBefore(Date createTimeBefore) {
+    this.createTimeBefore = createTimeBefore;
+  }
+
+  @CamundaQueryParam(value="createTimeAfter", converter= DateConverter.class)
+  public void setCreateTimeAfter(Date createTimeAfter) {
+    this.createTimeAfter = createTimeAfter;
+  }
+
+  @CamundaQueryParam(value="endTimeBefore", converter= DateConverter.class)
+  public void setEndTimeBefore(Date endTimeBefore) {
+    this.endTimeBefore = endTimeBefore;
+  }
+
+  @CamundaQueryParam(value="endTimeAfter", converter= DateConverter.class)
+  public void setEndTimeAfter(Date endTimeAfter) {
+    this.endTimeAfter = endTimeAfter;
+  }
+
   @CamundaQueryParam("activityId")
   public void setActivityId(String activityId) {
     this.activityId = activityId;
+  }
+
+  @CamundaQueryParam("failedActivityId")
+  public void setFailedActivityId(String activityId) {
+    this.failedActivityId = activityId;
   }
 
   @CamundaQueryParam("causeIncidentId")
@@ -213,8 +259,14 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
     if (incidentMessage != null) {
       query.incidentMessage(incidentMessage);
     }
+    if (incidentMessageLike != null) {
+      query.incidentMessageLike(incidentMessageLike);
+    }
     if (processDefinitionId != null) {
       query.processDefinitionId(processDefinitionId);
+    }
+    if (processDefinitionKey != null) {
+      query.processDefinitionKey(processDefinitionKey);
     }
     if (processDefinitionKeyIn != null && processDefinitionKeyIn.length > 0) {
       query.processDefinitionKeyIn(processDefinitionKeyIn);
@@ -225,8 +277,23 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
     if (executionId != null) {
       query.executionId(executionId);
     }
+    if (createTimeBefore != null) {
+      query.createTimeBefore(createTimeBefore);
+    }
+    if (createTimeAfter != null) {
+      query.createTimeAfter(createTimeAfter);
+    }
+    if (endTimeBefore != null) {
+      query.endTimeBefore(endTimeBefore);
+    }
+    if (endTimeAfter != null) {
+      query.endTimeAfter(endTimeAfter);
+    }
     if (activityId != null) {
       query.activityId(activityId);
+    }
+    if (failedActivityId != null) {
+      query.failedActivityId(failedActivityId);
     }
     if (causeIncidentId != null) {
       query.causeIncidentId(causeIncidentId);
@@ -278,6 +345,8 @@ public class HistoricIncidentQueryDto extends AbstractQueryDto<HistoricIncidentQ
       query.orderByActivityId();
     } else if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_ID)) {
       query.orderByProcessInstanceId();
+    } else if (sortBy.equals(SORT_BY_PROCESS_DEFINITION_KEY)) {
+      query.orderByProcessDefinitionKey();
     } else if (sortBy.equals(SORT_BY_PROCESS_DEFINITION_ID)) {
       query.orderByProcessDefinitionId();
     } else if (sortBy.equals(SORT_BY_CAUSE_INCIDENT_ID)) {

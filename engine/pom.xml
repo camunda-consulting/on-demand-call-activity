@@ -9,7 +9,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
     <relativePath>../database</relativePath>
-    <version>7.12.0</version>
+    <version>7.14.0-SNAPSHOT</version>
   </parent>
 
   <dependencies>
@@ -42,6 +42,20 @@
           <groupId>de.odysseus.juel</groupId>
           <artifactId>juel-impl</artifactId>
         </exclusion>
+        <!-- these exclusions are needed when building with Maven >= 3.3
+          see CAM-11822 for details -->
+        <exclusion>
+          <groupId>org.camunda.feel</groupId>
+          <artifactId>feel-engine</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.scala-lang.modules</groupId>
+          <artifactId>scala-parser-combinators_2.13</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.scala-lang</groupId>
+          <artifactId>scala-library</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
 
@@ -73,7 +87,6 @@
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
-      <scope>compile</scope>
     </dependency>
 
     <!-- provided dependencies -->
@@ -91,11 +104,11 @@
     </dependency>
 
     <dependency>
-      <groupId>javax.persistence</groupId>
-      <artifactId>persistence-api</artifactId>
+      <groupId>org.hibernate.javax.persistence</groupId>
+      <artifactId>hibernate-jpa-2.0-api</artifactId>
       <scope>provided</scope>
     </dependency>
-
+    
     <dependency>
       <groupId>org.apache.geronimo.specs</groupId>
       <artifactId>geronimo-jta_1.1_spec</artifactId>
@@ -257,6 +270,10 @@
     <mail.server.port>5025</mail.server.port>
     <authorizationCheckRevokes>auto</authorizationCheckRevokes>
     <jdbcBatchProcessing>true</jdbcBatchProcessing>
+    
+    <!-- We shade artifacts into the jar, so we need to generate a dependency BOM
+    for the license book -->
+    <skip-third-party-bom>false</skip-third-party-bom>
 
     <camunda.artifact>
       org.camunda.bpm
@@ -307,6 +324,7 @@
           <include>**/camunda.cfg.db.xml</include>
           <include>**/camunda.cfg.plugins.xml</include>
           <include>**/camunda.cfg.prefix.xml</include>
+          <include>**/camunda.cfg.invocationsPerJobByBatchType.xml</include>
         </includes>
       </testResource>
     </testResources>
@@ -361,9 +379,10 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-shade-plugin</artifactId>
         <configuration>
-          <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
+          <promoteTransitiveDependencies>false</promoteTransitiveDependencies>
           <createSourcesJar>true</createSourcesJar>
-          <createDependencyReducedPom>false</createDependencyReducedPom>
+          <createDependencyReducedPom>true</createDependencyReducedPom>
+          <keepDependenciesWithProvidedScope>true</keepDependenciesWithProvidedScope>
           <artifactSet>
             <excludes>
               <exclude>org.camunda.bpm.model:*</exclude>
@@ -550,28 +569,6 @@
     </profile>
 
     <profile>
-      <id>oracle-10</id>
-      <build>
-        <plugins>
-          <plugin>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <failIfNoTests>false</failIfNoTests>
-              <trimStackTrace>false</trimStackTrace>
-              <redirectTestOutputToFile>true</redirectTestOutputToFile>
-              <excludes>
-                <exclude>**/ManagementServiceTest.java</exclude>
-
-                <exclude>**/*TestCase.java</exclude>
-                <exclude>**/RepeatingServiceTaskTest.java</exclude>
-              </excludes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
       <id>mariadb-galera</id>
       <build>
         <plugins>
@@ -742,7 +739,7 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
-              <argLine>-XX:MaxPermSize=192m -Xmx512m</argLine>
+              <argLine>-Xmx700m</argLine>
             </configuration>
           </plugin>
         </plugins>
@@ -791,6 +788,7 @@
                 <exclude>**/CustomHistoryLevelIncidentTest.java</exclude>
                 <exclude>**/CustomHistoryLevelIdentityLinkTest.java</exclude>
                 <exclude>**/removaltime/cleanup/HistoryCleanupScheduler*Test.java</exclude>
+                <exclude>**/HistoryCleanupDisabledOnBootstrapTest.java</exclude>
                 <exclude>**/LoginAttemptsTest.java</exclude>
               </excludes>
             </configuration>

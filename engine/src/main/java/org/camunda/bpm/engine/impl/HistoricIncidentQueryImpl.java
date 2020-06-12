@@ -19,6 +19,7 @@ package org.camunda.bpm.engine.impl;
 import static org.camunda.bpm.engine.impl.util.EnsureUtil.ensureNotNull;
 
 import java.util.List;
+import java.util.Date;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.history.HistoricIncident;
@@ -26,7 +27,6 @@ import org.camunda.bpm.engine.history.HistoricIncidentQuery;
 import org.camunda.bpm.engine.history.IncidentState;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.runtime.IncidentQuery;
 
 /**
  * @author Roman Smirnov
@@ -39,10 +39,17 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
   protected String id;
   protected String incidentType;
   protected String incidentMessage;
+  protected String incidentMessageLike;
   protected String executionId;
   protected String activityId;
+  protected Date createTimeBefore;
+  protected Date createTimeAfter;
+  protected Date endTimeBefore;
+  protected Date endTimeAfter;
+  protected String failedActivityId;
   protected String processInstanceId;
   protected String processDefinitionId;
+  protected String processDefinitionKey;
   protected String[] processDefinitionKeys;
   protected String causeIncidentId;
   protected String rootCauseIncidentId;
@@ -78,15 +85,51 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
     return this;
   }
 
+  public HistoricIncidentQuery incidentMessageLike(String incidentMessageLike) {
+    ensureNotNull("incidentMessageLike", incidentMessageLike);
+    this.incidentMessageLike = incidentMessageLike;
+    return this;
+  }
+
   public HistoricIncidentQuery executionId(String executionId) {
     ensureNotNull("executionId", executionId);
     this.executionId = executionId;
     return this;
   }
 
+  public HistoricIncidentQuery createTimeBefore(Date createTimeBefore) {
+    ensureNotNull("createTimeBefore", createTimeBefore);
+    this.createTimeBefore = createTimeBefore;
+    return this;
+  }
+
+  public HistoricIncidentQuery createTimeAfter(Date createTimeAfter) {
+    ensureNotNull("createTimeAfter", createTimeAfter);
+    this.createTimeAfter = createTimeAfter;
+    return this;
+  }
+
+  public HistoricIncidentQuery endTimeBefore(Date endTimeBefore) {
+    ensureNotNull("endTimeBefore", endTimeBefore);
+    this.endTimeBefore = endTimeBefore;
+    return this;
+  }
+
+  public HistoricIncidentQuery endTimeAfter(Date endTimeAfter) {
+    ensureNotNull("endTimeAfter", endTimeAfter);
+    this.endTimeAfter = endTimeAfter;
+    return this;
+  }
+
   public HistoricIncidentQuery activityId(String activityId) {
     ensureNotNull("activityId", activityId);
     this.activityId = activityId;
+    return this;
+  }
+
+  public HistoricIncidentQuery failedActivityId(String activityId) {
+    ensureNotNull("failedActivityId", activityId);
+    this.failedActivityId = activityId;
     return this;
   }
 
@@ -99,6 +142,12 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
   public HistoricIncidentQuery processDefinitionId(String processDefinitionId) {
     ensureNotNull("processDefinitionId", processDefinitionId);
     this.processDefinitionId = processDefinitionId;
+    return this;
+  }
+
+  public HistoricIncidentQuery processDefinitionKey(String processDefinitionKey) {
+    ensureNotNull("processDefinitionKey", processDefinitionKey);
+    this.processDefinitionKey = processDefinitionKey;
     return this;
   }
 
@@ -221,6 +270,11 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
     return this;
   }
 
+  public HistoricIncidentQuery orderByProcessDefinitionKey() {
+    orderBy(HistoricIncidentQueryProperty.PROCESS_DEFINITION_KEY);
+    return this;
+  }
+
   public HistoricIncidentQuery orderByProcessDefinitionId() {
     orderBy(HistoricIncidentQueryProperty.PROCESS_DEFINITION_ID);
     return this;
@@ -292,6 +346,10 @@ public class HistoricIncidentQueryImpl extends AbstractVariableQueryImpl<Histori
 
   public String getActivityId() {
     return activityId;
+  }
+
+  public String getFailedActivityId() {
+    return failedActivityId;
   }
 
   public String getProcessInstanceId() {
