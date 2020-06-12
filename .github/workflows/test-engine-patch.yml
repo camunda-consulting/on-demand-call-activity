@@ -30,8 +30,12 @@ jobs:
         key: ${{ runner.os }}-SUPPORT-7897-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-SUPPORT-7897-maven-
+    - name: maven-settings-xml-action
+      uses: whelk-io/maven-settings-xml-action@v4
+      with:
+        repositories: '[{ "id": "camunda-bpm-nexus", "name": "camunda-bpm-nexus", "url": "https://app.camunda.com/nexus/content/groups/public", "releases": { "enabled": "true" }, "snapshots": { "enabled": "true" } }]'
     - name: Build engine
-      run: mvn --file pom.xml --projects engine --also-make-dependents --batch-mode install -DskipTests=true
+      run: mvn --file pom.xml --projects engine --batch-mode install -DskipTests=true
     - uses: actions/checkout@v2
       with:
         ref: call-activity-history
