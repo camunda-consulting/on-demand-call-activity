@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.camunda.bpm.engine.impl.json.JsonObjectConverter;
 import com.google.gson.Gson;
@@ -310,12 +311,13 @@ public final class JsonUtil {
     return list;
   }
 
-  public static <T> List<T> asList(JsonArray jsonArray, JsonObjectConverter<T> converter) {
+  @SuppressWarnings("unchecked")
+  public static <T, S extends List<T>> S asList(JsonArray jsonArray, JsonObjectConverter<T> converter, Supplier<S> listSupplier) {
     if (jsonArray == null || converter == null) {
-      return Collections.emptyList();
+      return (S) Collections.emptyList();
     }
 
-    List<T> list = new ArrayList<T>();
+    S list = listSupplier.get();
 
     for (JsonElement element : jsonArray) {
       JsonObject jsonObject = null;
@@ -337,6 +339,10 @@ public final class JsonUtil {
     }
 
     return list;
+  }
+
+  public static <T> List<T> asList(JsonArray jsonArray, JsonObjectConverter<T> converter) {
+    return asList(jsonArray, converter, ArrayList::new);
   }
 
   public static List<Object> asList(JsonElement jsonElement) {
@@ -430,28 +436,16 @@ public final class JsonUtil {
   }
 
   public static String asString(Map<String, Object> properties) {
+    String stringValue = createObject().toString();
     if (properties != null) {
 
       JsonObject jsonObject = asObject(properties);
       if (jsonObject != null) {
-
-        String stringValue = jsonObject.toString();
-        if (stringValue != null) {
-          return stringValue;
-
-        } else {
-          return "";
-
-        }
-      } else {
-        return "";
-
+        stringValue = jsonObject.toString();
       }
-
-    } else {
-      return "";
-
     }
+
+    return stringValue;
   }
 
   public static JsonArray asArray(List<String> list) {
