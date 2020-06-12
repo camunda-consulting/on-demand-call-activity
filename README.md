@@ -16,8 +16,12 @@ Besides the code in the master branch there are several test branches using the 
 1. Pull new version `git pull camunda-bpm-platform 7.13.0`
 1. If needed edit conflicts `git mergetool` and commit `git commit`
 1. Push new branch to GitHub `git push --set-upstream origin engine-test-suite-with-child-processes-7.13.0` (old versions branches should be kept)
+1. Create 2nd scenario branch for new version `git checkout -b engine-test-suite-without-child-processes-7.13.0` (replace 7.13.0 with the [version](https://github.com/camunda/camunda-bpm-platform/tags) you're updating to)
+1. TODO: Is it better to merge the engine twice to have less effort with the modified tests (the way described here will allways be and update from 7.12 all the way up to the target version; basing it on the branch of the last version might be easier, because it's a smaller delta and the changes from the last update are carried over)? Merge 2nd scenario `git merge engine-test-suite-without-child-processes`
 1. Switch to master branch `git checkout master`
-1. Edit [.github/workflows/maven.yml](https://github.com/camunda-consulting/on-demand-call-activity/edit/master/.github/workflows/maven.yml) and add new branch to the matrix of the `test` job, e.g.
+1. If needed edit conflicts `git mergetool` and commit `git commit`
+1. Push new branch to GitHub `git push --set-upstream origin engine-test-suite-without-child-processes-7.13.0` (old versions branches should be kept)
+1. Edit [.github/workflows/maven.yml](https://github.com/camunda-consulting/on-demand-call-activity/edit/master/.github/workflows/maven.yml) and add new branches to the matrix of the `test` job, e.g.
 ```yaml
   test:
     needs: build
