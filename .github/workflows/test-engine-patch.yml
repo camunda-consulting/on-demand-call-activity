@@ -38,9 +38,9 @@ jobs:
       run: mvn --file pom.xml --projects engine --batch-mode install -Dmaven.test.skip=true -DskipTests=true
     - uses: actions/checkout@v2
       with:
-        ref: call-activity-history
+        ref: call-activity-history-test
         path: 'on-demand-call-activity'
     - name: Build with Maven
       run: mvn --file on-demand-call-activity/pom.xml --batch-mode install
     - name: Test with Maven
-      run: mvn --file pom.xml --projects engine --batch-mode test
+      run: mvn --file pom.xml --projects engine --activate-profiles on-demand-call-activity --batch-mode test
