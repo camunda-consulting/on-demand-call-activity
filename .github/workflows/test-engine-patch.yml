@@ -35,7 +35,7 @@ jobs:
       with:
         repositories: '[{ "id": "camunda-bpm-nexus", "name": "camunda-bpm-nexus", "url": "https://app.camunda.com/nexus/content/groups/public", "releases": { "enabled": "true" }, "snapshots": { "enabled": "true" } }]'
     - name: Build engine
-      run: mvn --file pom.xml --projects engine --batch-mode install -DskipTests=true
+      run: mvn --file pom.xml --projects engine --batch-mode install -Dmaven.test.skip
     - uses: actions/checkout@v2
       with:
         ref: call-activity-history
