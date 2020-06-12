@@ -5,9 +5,9 @@ name: Test Engine Patch
 
 on:
   push:
-    branches: [ engine-test-suite-with-child-processes-SUPPORT-7897 ]
+    branches: [ engine-test-suite-without-child-processes-SUPPORT-7897 ]
   pull_request:
-    branches: [ engine-test-suite-with-child-processes-SUPPORT-7897 ]
+    branches: [ engine-test-suite-without-child-processes-SUPPORT-7897 ]
 
 jobs:
   test:
