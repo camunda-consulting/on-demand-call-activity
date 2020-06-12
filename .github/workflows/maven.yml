@@ -47,6 +47,7 @@ jobs:
         - engine-test-suite-without-child-processes-7.13.0
         - engine-test-suite-with-child-processes-7.14.0-SNAPSHOT
         - engine-test-suite-without-child-processes-7.14.0-SNAPSHOT
+      fail-fast: false
 
     runs-on: ubuntu-latest
 
@@ -84,4 +85,3 @@ jobs:
       run: mvn --batch-mode org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file -Dfile=staging/engine-plugin-on-demand-call-activity.jar
     - name: Test with Maven
       run: mvn --projects engine --batch-mode test --file pom.xml
-      continue-on-error: true
