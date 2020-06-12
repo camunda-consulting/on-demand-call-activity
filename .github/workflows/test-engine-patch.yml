@@ -30,17 +30,17 @@ jobs:
         key: ${{ runner.os }}-SUPPORT-7897-maven-${{ hashFiles('**/pom.xml') }}
         restore-keys: |
           ${{ runner.os }}-SUPPORT-7897-maven-
-    - name: maven-settings-xml-action
+    - name: Enable snapshots in Maven settings
       uses: whelk-io/maven-settings-xml-action@v4
       with:
         repositories: '[{ "id": "camunda-bpm-nexus", "name": "camunda-bpm-nexus", "url": "https://app.camunda.com/nexus/content/groups/public", "releases": { "enabled": "true" }, "snapshots": { "enabled": "true" } }]'
-    - name: Build engine
+    - name: Build engine with Maven
       run: mvn --file pom.xml --projects engine --batch-mode install -Dmaven.test.skip=true -DskipTests=true
     - uses: actions/checkout@v2
       with:
         ref: call-activity-history-test
         path: 'on-demand-call-activity'
-    - name: Build with Maven
+    - name: Build engine plugin with Maven
       run: mvn --file on-demand-call-activity/pom.xml --batch-mode install
-    - name: Test with Maven
+    - name: Test engine+plugin with Maven
       run: mvn --file pom.xml --projects engine --activate-profiles on-demand-call-activity --batch-mode test
