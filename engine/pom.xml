@@ -257,6 +257,7 @@
       <groupId>org.camunda.bpm.extension.bpmn.callactivity.ondemand</groupId>
       <artifactId>engine-plugin-on-demand-call-activity</artifactId>
       <version>0.0.1-SNAPSHOT</version>
+      <scope>test</scope>
     </dependency>
 
   </dependencies>
