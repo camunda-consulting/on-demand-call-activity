@@ -43,7 +43,9 @@ jobs:
         branch:
         - engine-test-suite-with-child-processes
         - engine-test-suite-without-child-processes
-    
+        - engine-test-suite-with-child-processes-7.13.0
+        - engine-test-suite-without-child-processes-7.13.0
+
     runs-on: ubuntu-latest
 
     steps:
