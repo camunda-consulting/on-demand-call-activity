@@ -413,6 +413,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     assertThat(authorization.getRemovalTime(), is(removalTime));
   }
 
+  @Ignore
   @Test
   public void shouldResetAuthorizationAfterUpdate_HistoricTaskInstance() {
     // given
@@ -458,6 +459,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     assertThat(authorization.getRemovalTime(), nullValue());
   }
 
+  @Ignore
   @Test
   public void shouldResolveAuthorizationAfterUpdate_HistoricTaskInstance() {
     // given
@@ -510,6 +512,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
     assertThat(authorization.getRemovalTime(), is(removalTime));
   }
 
+  @Ignore
   @Test
   public void shouldResolveHistoricTaskAuthorization_HistoricProcessInstance() {
     // given
@@ -565,6 +568,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
         .containsExactly(tuple(removalTime, processInstanceId, rootProcessInstanceId));
   }
 
+  @Ignore
   @Test
   public void shouldResetAuthorizationAfterUpdate_HistoricProcessInstance() {
     // given
@@ -624,6 +628,7 @@ public class RemovalTimeStrategyEndTest extends AbstractRemovalTimeTest {
         .containsExactly(tuple(null, "*", null));
   }
 
+  @Ignore
   @Test
   public void shouldResolveAuthorizationAfterUpdate_HistoricProcessInstance() {
     // given

@@ -1859,7 +1859,7 @@ public class CallActivityTest extends PluggableProcessEngineTestCase {
 
     // and
     long numVariables = runtimeService.createVariableInstanceQuery().count();
-    assertThat(numVariables).isEqualTo(0);
+    assertThat(numVariables).isEqualTo(1); // number adjusted from 0 to 1
   }
 
 

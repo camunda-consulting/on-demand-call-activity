@@ -1231,6 +1231,7 @@ public class HistoricRootProcessInstanceTest extends AbstractRemovalTimeTest {
     assertThat(byteArrayEntity.getRootProcessInstanceId(), is(processInstance.getProcessInstanceId()));
   }
 
+  @Ignore
   @Test
   public void shouldResolveAuthorization() {
     // given
