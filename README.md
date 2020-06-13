@@ -6,6 +6,10 @@ A Camunda BPM plugin that allows a BPMN Call Activity to dynamically call a chil
 Besides the code in the master branch there are several test branches using the Camunda engine test suite:
 - [engine-test-suite-with-child-processes](https://github.com/camunda-consulting/on-demand-call-activity/tree/engine-test-suite-with-child-processes)
 - [engine-test-suite-without-child-processes](https://github.com/camunda-consulting/on-demand-call-activity/tree/engine-test-suite-without-child-processes)
+- [engine-test-suite-with-child-processes-7.13.0](https://github.com/camunda-consulting/on-demand-call-activity/tree/engine-test-suite-with-child-processes-7.13.0)
+- [engine-test-suite-without-child-processes-7.13.0](https://github.com/camunda-consulting/on-demand-call-activity/tree/engine-test-suite-without-child-processes-7.13.0)
+- [engine-test-suite-with-child-processes-7.14.0-SNAPSHOT](https://github.com/camunda-consulting/on-demand-call-activity/tree/engine-test-suite-with-child-processes-7.14.0-SNAPSHOT)
+- [engine-test-suite-without-child-processes-7.14.0-SNAPSHOT](https://github.com/camunda-consulting/on-demand-call-activity/tree/engine-test-suite-without-child-processes-7.14.0-SNAPSHOT)
 
 ## How to update to and test with a new Camunda version?
 1. Clone this repository using `git clone git@github.com:camunda-consulting/on-demand-call-activity.git`
@@ -33,5 +37,21 @@ Besides the code in the master branch there are several test branches using the 
         - engine-test-suite-with-child-processes-7.14.0
         - engine-test-suite-without-child-processes-7.14.0
  ```
- 1. Check [test results](https://github.com/camunda-consulting/on-demand-call-activity/actions)
- 1. Fix or `@Ignore` failing tests, push the changes, and re-run tests
+1. Push some change to `master` to trigger the build
+1. Check [test results](https://github.com/camunda-consulting/on-demand-call-activity/actions)
+1. Fix or `@Ignore` failing tests, push the changes, and re-run tests
+
+## How to modify the engine-test-suite-* branches?
+1. Checkout `git checkout engine-test-suite-with-child-processes`
+1. Do the change and `git commit && git push`
+1. Checkout `git checkout engine-test-suite-without-child-processes`
+1. Merge `git merge engine-test-suite-with-child-processes`
+1. If needed edit conflicts `git mergetool` and commit `git merge --continue`
+1. `git push`
+1. Merge the changes into the other versions, e.g.:
+    1. engine-test-suite-with-child-processes -> engine-test-suite-with-child-processes-7.13.0
+    1. engine-test-suite-with-child-processes-7.13.0 -> engine-test-suite-with-child-processes-7.14.0
+    1. engine-test-suite-without-child-processes -> engine-test-suite-without-child-processes-7.13.0
+    1. engine-test-suite-without-child-processes-7.13.0 -> engine-test-suite-without-child-processes-7.14.0
+1. Push some change to `master` to trigger the build
+1. Check [test results](https://github.com/camunda-consulting/on-demand-call-activity/actions)
