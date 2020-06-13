@@ -29,6 +29,7 @@
       <list>
         <bean class="org.camunda.bpm.application.impl.event.ProcessApplicationEventListenerPlugin" />
         <bean class="org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.OnDemandCallActivityProcessEnginePlugin" />
+        <bean class="org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.test.NullCallActivityProcessEnginePlugin" />
       </list>
     </property>
 
