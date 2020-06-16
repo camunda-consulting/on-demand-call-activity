@@ -40,8 +40,15 @@ jobs:
     needs: build
     strategy:
       matrix:
-        branch: [ engine-test-suite-with-child-processes, engine-test-suite-without-child-processes ]
-    
+        branch:
+        - engine-test-suite-with-child-processes
+        - engine-test-suite-without-child-processes
+        - engine-test-suite-with-child-processes-7.13.0
+        - engine-test-suite-without-child-processes-7.13.0
+        - engine-test-suite-with-child-processes-7.14.0-SNAPSHOT
+        - engine-test-suite-without-child-processes-7.14.0-SNAPSHOT
+      fail-fast: false
+
     runs-on: ubuntu-latest
 
     steps:
@@ -56,6 +63,11 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
+    - name: Enable snapshots in Maven settings
+      if: endsWith(matrix.branch, 'SNAPSHOT')
+      uses: whelk-io/maven-settings-xml-action@v4
+      with:
+        repositories: '[{ "id": "camunda-bpm-nexus", "name": "camunda-bpm-nexus", "url": "https://app.camunda.com/nexus/content/groups/public", "releases": { "enabled": "true" }, "snapshots": { "enabled": "true" } }]'
     - uses: actions/cache@v2
       with:
         path: ~/.m2/repository
@@ -73,4 +85,3 @@ jobs:
       run: mvn --batch-mode org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file -Dfile=staging/engine-plugin-on-demand-call-activity.jar
     - name: Test with Maven
       run: mvn --projects engine --batch-mode test --file pom.xml
-      continue-on-error: true
