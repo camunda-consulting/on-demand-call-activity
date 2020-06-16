@@ -53,22 +53,22 @@ import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
  * engine transaction.</p>
  *  
  */
-public class AsynchronousServiceTask extends AbstractBpmnActivityBehavior {
+public abstract class AsynchronousServiceTask extends AbstractBpmnActivityBehavior implements AsynchronousJavaDelegate {
 
-  protected AsynchronousJavaDelegate delegate;
-
-  public AsynchronousServiceTask(AsynchronousJavaDelegate delegate) {
-    this.delegate = delegate;
-  }
   
-	public void execute(final ActivityExecution execution) throws Exception {
-	  delegate.execute(execution);
+    @Override
+	final public void execute(final ActivityExecution execution) throws Exception {
+	  execute(new ThreadSaveExecution(execution));
 	}
 
-
-	public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
+    @Override   
+	final public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
 	  
 	  // leave the service task activity:
 	  leave(execution);
 	}
+
+
+  @Override
+  abstract public void execute(ThreadSaveExecution execution) throws Exception;
 }

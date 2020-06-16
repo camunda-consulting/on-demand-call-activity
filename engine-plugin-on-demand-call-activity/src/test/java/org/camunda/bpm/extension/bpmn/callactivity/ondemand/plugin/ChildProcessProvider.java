@@ -5,6 +5,8 @@ import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.variable.VariableMap;
+import org.camunda.bpm.extension.bpmn.servicetask.asynchronous.AsynchronousJavaDelegate;
+import org.camunda.bpm.extension.bpmn.servicetask.asynchronous.ThreadSaveExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,23 +20,23 @@ import static org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.util.O
 import static org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.CompletableFutureJava8Compatibility.delayedExecutor;
 
 
-public class ChildProcessProvider {
+public class ChildProcessProvider implements AsynchronousJavaDelegate {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
 
-    public String getChildProcessDefinitionKey(DelegateExecution execution) {
+    public String getChildProcessDefinitionKey(DelegateExecution execution) throws Exception {
         logger.info("Running childProcessProvider...");
         
-        String childProcess = getChildProcess(execution);
+        String childProcess = decideOnChildProcess(execution);
         if (childProcess == null || childProcess.isEmpty()) {
-          execute(execution);
+          execute(new ThreadSaveExecution(execution));
           return null;
         } else {
           return childProcess;
         }
     }
 
-    private String getChildProcess(DelegateExecution execution) {
+    private String decideOnChildProcess(DelegateExecution execution) {
       Boolean retProcess = (Boolean) execution.getVariable("retProcess");
       // example on how to skip execution completely, e.g. during a retry after some manual fix
       if (execution.hasVariable(getSkipVarName(execution))) {
@@ -59,25 +61,20 @@ public class ChildProcessProvider {
       }
     }
 
-    private void execute(DelegateExecution execution) {
-      VariableMap inputVariables = execution.getVariablesTyped();
-      VariableMap inputVariablesLocal = execution.getVariablesLocalTyped();
+    public void execute(ThreadSaveExecution execution) {
 
-      String executionId = execution.getId();
-
-      Boolean doThrowException = (Boolean) execution.getVariable("doThrowException");
 
       // TODO handle exceptions during request creation? Only needed during reactive REST calls
       
       // Publish a task to a scheduled executor. This method returns after the task has
       // been put into the executor. The actual service implementation (lambda) will not yet
       // be invoked:
-      RuntimeService runtimeService = execution.getProcessEngineServices().getRuntimeService();
       CompletableFuture.runAsync(() -> { // simulates the sending of a non-blocking REST request
           // the code inside this lambda runs in a separate thread outside the TX
           // this will not work: execution.setVariable("foo", "bar");
           // THE EXECUTION IS NOT THREAD-SAFE
           try {
+              Boolean doThrowException = (Boolean) execution.getVariable("doThrowException");
               logger.info("Do throw exception: "+doThrowException);
               if (doThrowException) {
                 throw new Exception("Exception!");
@@ -87,7 +84,7 @@ public class ChildProcessProvider {
               Map<String, Object> newVariables = new HashMap<>();
               newVariables.put("outputVar", "someValue");
               //TODO: IS RUNTIME SERVICE THREAD SAFE? => Thorben says yes!
-              runtimeService.signal(executionId, newVariables);
+              execution.signal(executionId, newVariables);
           } catch (Exception exception) {
             exception.printStackTrace();
             Map<String, Object> processVariables = new HashMap<>();

@@ -43,6 +43,12 @@
       <artifactId>camunda-engine</artifactId>
       <scope>provided</scope>
     </dependency>
+    
+    <dependency>
+		  <groupId>org.camunda.bpm.extension.engine.delegate.abstract</groupId>
+		  <artifactId>abstract-delegate-execution</artifactId>
+		  <version>0.0.1-SNAPSHOT</version>
+    </dependency>
 
     <dependency>
       <!-- AssertJ Testing Library -->
