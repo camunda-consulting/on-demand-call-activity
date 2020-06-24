@@ -8,11 +8,16 @@
   <name>Abstract Delegate Execution</name>
   <description>An abstract base class for DelegateExecution implementations for execution a JavaDelegate.</description>
 
+  <!-- Camunda-maintained build settings, plugin versions and release profiles -->
+  <parent>
+    <groupId>org.camunda</groupId>
+    <artifactId>camunda-release-parent</artifactId>
+    <version>3.7</version>
+    <relativePath />
+  </parent>
+
   <properties>
     <camunda.version>7.7.0</camunda.version>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <dependencyManagement>
