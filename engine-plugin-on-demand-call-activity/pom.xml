@@ -44,8 +44,8 @@
     </dependency>
 
     <dependency>
-      <groupId>org.camunda.bpm.extension.bpmn.servicetask.asynchronous</groupId>
-      <artifactId>asynchronous-service-task</artifactId>
+		  <groupId>org.camunda.bpm.extension.bpmn.callactivity.ondemand</groupId>
+		  <artifactId>asynchronous-service-task</artifactId>
       <version>0.0.1-SNAPSHOT</version>
       <type>war</type>
     </dependency>
