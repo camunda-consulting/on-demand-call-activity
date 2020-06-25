@@ -4,79 +4,57 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineServices;
+import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.FlowElement;
 
 /**
- * Abstract base class for implementing a {@link DelegateExecution} for
- * executing a {@link JavaDelegate} without being forced to implement all
- * methods provided, which makes the implementation more robust to future
- * changes.
+ * Abstract DelegateExecution that can be used for as base for DelegateExecution
+ * implementations for executing a JavaDelegate.
  * 
+ * It contains all methods that have to be implemented with additional REST API
+ * calls or wrapper classes that emulate the Camunda Java API. 
+ *
  * @author Falko Menge (Camunda)
  */
-public class AbstractDelegateExecution extends SimpleVariableScope implements DelegateExecution {
+public abstract class AbstractRemoteDelegateExecution extends SimpleVariableScope implements DelegateExecution {
 
   private static final long serialVersionUID = 1L;
 
-  public AbstractDelegateExecution() {
+  protected RepositoryService repositoryService;
+
+  public AbstractRemoteDelegateExecution() {
     super();
   }
 
-  public AbstractDelegateExecution(Map<String, ? extends Object> variables) {
+  public AbstractRemoteDelegateExecution(Map<String, ? extends Object> variables) {
     super(variables);
   }
 
   @Override
-  public String getId() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public String getProcessInstanceId() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public String getProcessDefinitionId() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public String getCurrentActivityId() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public String getActivityInstanceId() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
-  public String getTenantId() {
-    throw new UnsupportedOperationException();
-  }
-  @Override
   public String getCurrentActivityName() {
-    throw new UnsupportedOperationException();
+    return getBpmnModelElementInstance().getName();
   }
 
   @Override
   public FlowElement getBpmnModelElementInstance() {
-    throw new UnsupportedOperationException();
+    return getBpmnModelInstance().getModelElementById(getCurrentActivityId());
   }
 
   @Override
   public BpmnModelInstance getBpmnModelInstance() {
     throw new UnsupportedOperationException();
+    // TODO get XML from file in classpath 
+    // see BPMN Model API https://github.com/camunda/camunda-bpmn-model
+//    return repositoryService.getBpmnModelInstance(getProcessDefinitionId());
   }
 
   @Override
   public ProcessEngineServices getProcessEngineServices() {
     throw new UnsupportedOperationException();
+    // TODO return own wrapper that talks to REST API for selected operations
   }
 
   /**
@@ -85,6 +63,7 @@ public class AbstractDelegateExecution extends SimpleVariableScope implements De
 //  @Override
   public ProcessEngine getProcessEngine() {
     throw new UnsupportedOperationException();
+    // TODO return own wrapper that talks to REST API for selected operations
   }
 
   @Override
@@ -99,12 +78,13 @@ public class AbstractDelegateExecution extends SimpleVariableScope implements De
 
   @Override
   public String getEventName() {
-    throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException("This DelegateExecution implementation is not meant to be used for ExecutionListeners");
+    // TODO add support for ExecutionListeners
   }
 
   @Override
   public String getCurrentTransitionId() {
-    throw new UnsupportedOperationException();
+    throw new UnsupportedOperationException("This DelegateExecution implementation is not meant to be used for ExecutionListeners");
   }
 
   @Override
@@ -128,6 +108,7 @@ public class AbstractDelegateExecution extends SimpleVariableScope implements De
 //  @Override
   public Incident createIncident(String incidentType, String configuration) {
     throw new UnsupportedOperationException();
+    // TODO via REST
   }
 
   /**
@@ -136,6 +117,7 @@ public class AbstractDelegateExecution extends SimpleVariableScope implements De
 //  @Override
   public Incident createIncident(String incidentType, String configuration, String message) {
     throw new UnsupportedOperationException();
+    // TODO via REST
   }
 
   /**
@@ -144,6 +126,7 @@ public class AbstractDelegateExecution extends SimpleVariableScope implements De
 //  @Override
   public void resolveIncident(String incidentId) {
     throw new UnsupportedOperationException();
+    // TODO via REST
   }
 
   @Override
@@ -162,6 +145,7 @@ public class AbstractDelegateExecution extends SimpleVariableScope implements De
 //  @Override
   public void setProcessBusinessKey(String businessKey) {
     throw new UnsupportedOperationException();
+    // TODO via REST API, if that is supported by Camunda one day
   }
 
   @Override

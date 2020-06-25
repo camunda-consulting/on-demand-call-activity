@@ -36,6 +36,13 @@
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+    	<groupId>junit</groupId>
+    	<artifactId>junit</artifactId>
+    	<version>4.13</version>
+    	<scope>test</scope>
     </dependency>
   </dependencies>
 </project>
