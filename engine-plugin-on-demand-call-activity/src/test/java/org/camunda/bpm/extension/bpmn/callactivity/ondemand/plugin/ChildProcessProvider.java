@@ -1,7 +1,6 @@
 package org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin;
 
 import static org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.CompletableFutureJava8Compatibility.delayedExecutor;
-import static org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.util.OnDemandCallActivityUtil.getAsyncServiceCallVarName;
 import static org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.util.OnDemandCallActivityUtil.getSkipVarName;
 
 import java.util.concurrent.CompletableFuture;
@@ -14,25 +13,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class ChildProcessProvider implements AsynchronousJavaDelegate {
+public class ChildProcessProvider extends AbstractChildProcessProvider implements AsynchronousJavaDelegate {
 
-    private Logger logger = LoggerFactory.getLogger(getClass());
-
-    public String getChildProcessDefinitionKey(DelegateExecution execution) throws Exception {
-        logger.info("Running childProcessProvider...");
-        
-        String childProcess = decideOnChildProcess(execution);
-        if (childProcess == null || childProcess.isEmpty()) {
-          execute(new ThreadSaveExecution(execution));
-          // TODO is this the right place to set this variable?
-          execution.setVariableLocal(getAsyncServiceCallVarName(execution), true);
-          return null;
-        } else {
-          return childProcess;
-        }
-    }
-
-    private String decideOnChildProcess(DelegateExecution execution) {
+    @Override
+    public String decideOnChildProcess(DelegateExecution execution) {
       Boolean retProcess = (Boolean) execution.getVariable("retProcess");
       // example on how to skip execution completely, e.g. during a retry after some manual fix
       if (execution.hasVariable(getSkipVarName(execution))) {
@@ -57,6 +41,7 @@ public class ChildProcessProvider implements AsynchronousJavaDelegate {
       }
     }
 
+    @Override
     public void execute(ThreadSaveExecution execution) {
 
 
