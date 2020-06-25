@@ -1,23 +1,17 @@
 package org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin;
 
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.delegate.BpmnError;
+import static org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.CompletableFutureJava8Compatibility.delayedExecutor;
+import static org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.util.OnDemandCallActivityUtil.getAsyncServiceCallVarName;
+import static org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.util.OnDemandCallActivityUtil.getSkipVarName;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
-import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.extension.bpmn.servicetask.asynchronous.AsynchronousJavaDelegate;
 import org.camunda.bpm.extension.bpmn.servicetask.asynchronous.ThreadSaveExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-
-import static org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.util.OnDemandCallActivityUtil.getAsyncServiceCallVarName;
-import static org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.util.OnDemandCallActivityUtil.getSkipVarName;
-import static org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.CompletableFutureJava8Compatibility.delayedExecutor;
 
 
 public class ChildProcessProvider implements AsynchronousJavaDelegate {
@@ -30,6 +24,8 @@ public class ChildProcessProvider implements AsynchronousJavaDelegate {
         String childProcess = decideOnChildProcess(execution);
         if (childProcess == null || childProcess.isEmpty()) {
           execute(new ThreadSaveExecution(execution));
+          // TODO is this the right place to set this variable?
+          execution.setVariableLocal(getAsyncServiceCallVarName(execution), true);
           return null;
         } else {
           return childProcess;
@@ -81,15 +77,14 @@ public class ChildProcessProvider implements AsynchronousJavaDelegate {
               }
               Logger logger = LoggerFactory.getLogger(getClass());
               logger.info("Executing async block...");
-              Map<String, Object> newVariables = new HashMap<>();
-              newVariables.put("outputVar", "someValue");
+
+              execution.setVariable("outputVar", "someValue");
               //TODO: IS RUNTIME SERVICE THREAD SAFE? => Thorben says yes!
-              execution.signal(executionId, newVariables);
+              execution.signal();
           } catch (Exception exception) {
             exception.printStackTrace();
-            Map<String, Object> processVariables = new HashMap<>();
-            processVariables.put("firstTryHasFailed", true); // TODO make variable name more unique and delete after use
-            runtimeService.signal(executionId, null, exception, processVariables);
+            execution.setVariable("firstTryHasFailed", true); // TODO make variable name more unique and delete after use
+            execution.signal(exception);
             // sketch for self healing
 //                  try {
 //                    // synchronously call self-healing µs
@@ -109,8 +104,6 @@ public class ChildProcessProvider implements AsynchronousJavaDelegate {
           }
           //INCIDENT AND BPMN ERROR
       }, delayedExecutor(250L, TimeUnit.MILLISECONDS));
-      // TODO prepare REST request using input variables
 
-      execution.setVariableLocal(getAsyncServiceCallVarName(execution), true);
     }
 }
