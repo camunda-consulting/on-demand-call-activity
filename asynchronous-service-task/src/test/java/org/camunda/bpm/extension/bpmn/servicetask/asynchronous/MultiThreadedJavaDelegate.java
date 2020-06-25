@@ -19,6 +19,13 @@ public class MultiThreadedJavaDelegate extends AsynchronousServiceTask {
       Map<String, Object> newVariables = new HashMap<>();
       newVariables.put("foo", "bar");
 
+      LoggerDelegate loggerDelegate = new LoggerDelegate();
+      try {
+        loggerDelegate.execute(execution);
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+      
       // signal must be called in another threads and
       // with enough delay to let the engine commit the TX
       execution.signal(newVariables);
