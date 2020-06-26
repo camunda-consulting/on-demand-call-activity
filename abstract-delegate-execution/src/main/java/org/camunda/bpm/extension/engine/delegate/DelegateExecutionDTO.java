@@ -2,7 +2,16 @@ package org.camunda.bpm.extension.engine.delegate;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 
-public class DelegateExecutionDTO extends AbstractDelegateExecution {
+/**
+ * An implementation of {@link DelegateExecution} that copies all data from a
+ * given execution object into local fields and can therefore safely be passed
+ * as a Local DTO to another thread.
+ * 
+ * Variables can be set and modified but will not be saved back into the engine.
+ *
+ * @author Falko Menge (Camunda)
+ */
+public class DelegateExecutionDTO extends AbstractDelegateExecution implements DelegateExecution {
 
   private static final long serialVersionUID = 1L;
 

@@ -1,12 +1,20 @@
 package org.camunda.bpm.extension.engine.delegate;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineServices;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
+import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
+import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
+import org.camunda.bpm.engine.impl.javax.el.ELContext;
 import org.camunda.bpm.engine.runtime.Incident;
+import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
+import org.camunda.bpm.engine.variable.value.TypedValue;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.FlowElement;
 
@@ -15,6 +23,8 @@ import org.camunda.bpm.model.bpmn.instance.FlowElement;
  * executing a {@link JavaDelegate} without being forced to implement all
  * methods provided, which makes the implementation more robust to future
  * changes.
+ * 
+ * Variables can be set and modified but will not be saved back into the engine.
  * 
  * @author Falko Menge (Camunda)
  */
@@ -169,4 +179,115 @@ public class AbstractDelegateExecution extends SimpleVariableScope implements De
     throw new UnsupportedOperationException();
   }
 
+  // disable public methods inherited from AbstractVariableScope
+  // that don't belong to DelegateExecution
+
+  /**
+   * @throws UnsupportedOperationException
+   */
+  @Deprecated
+  @Override
+  public void collectVariables(VariableMapImpl resultVariables, Collection<String> variableNames, boolean isLocal,
+      boolean deserializeValues) {
+    super.collectVariables(resultVariables, variableNames, isLocal, deserializeValues);
+  }
+  
+  /**
+   * @throws UnsupportedOperationException
+   */
+  @Deprecated
+  @Override
+  public void dispatchEvent(VariableEvent variableEvent) {
+    super.dispatchEvent(variableEvent);
+  }
+  
+  /**
+   * @throws UnsupportedOperationException
+   */
+  @Deprecated
+  @Override
+  public ELContext getCachedElContext() {
+    return super.getCachedElContext();
+  }
+  
+  /**
+   * @throws UnsupportedOperationException
+   */
+  @Deprecated
+  @Override
+  public AbstractVariableScope getParentVariableScope() {
+    return super.getParentVariableScope();
+  }
+  
+  /**
+   * @throws UnsupportedOperationException
+   */
+  @Deprecated
+  @Override
+  public Object getVariable(String variableName, boolean deserializeObjectValue) {
+    return super.getVariable(variableName, deserializeObjectValue);
+  }
+  
+  /**
+   * @throws UnsupportedOperationException
+   */
+  @Deprecated
+  @Override
+  public CoreVariableInstance getVariableInstance(String variableName) {
+    return super.getVariableInstance(variableName);
+  }
+  
+  /**
+   * @throws UnsupportedOperationException
+   */
+  @Deprecated
+  @Override
+  public CoreVariableInstance getVariableInstanceLocal(String name) {
+    return super.getVariableInstanceLocal(name);
+  }
+  
+  /**
+   * @throws UnsupportedOperationException
+   */
+  @Deprecated
+  @Override
+  public List<CoreVariableInstance> getVariableInstancesLocal() {
+    return super.getVariableInstancesLocal();
+  }
+  
+  /**
+   * @throws UnsupportedOperationException
+   */
+  @Deprecated
+  @Override
+  public Object getVariableLocal(String variableName, boolean deserializeObjectValue) {
+    return super.getVariableLocal(variableName, deserializeObjectValue);
+  }
+  
+  /**
+   * @throws UnsupportedOperationException
+   */
+  @Deprecated
+  @Override
+  public void setCachedElContext(ELContext cachedElContext) {
+    super.setCachedElContext(cachedElContext);
+  }
+  
+  /**
+   * @throws UnsupportedOperationException
+   */
+  @Deprecated
+  @Override
+  public void setVariableLocal(String variableName, TypedValue value, AbstractVariableScope sourceActivityExecution) {
+    super.setVariableLocal(variableName, value, sourceActivityExecution);
+  }
+  
+  /**
+   * @throws UnsupportedOperationException
+   */
+  @Deprecated
+  @Override
+  public void setVariableLocalTransient(String variableName, Object value) {
+    super.setVariableLocalTransient(variableName, value);
+  }
 }

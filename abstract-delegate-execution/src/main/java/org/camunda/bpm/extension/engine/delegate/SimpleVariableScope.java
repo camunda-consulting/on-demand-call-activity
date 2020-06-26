@@ -16,6 +16,8 @@ import org.camunda.bpm.engine.impl.core.variable.scope.VariableStore;
  * Simple VariableScope implementation that can be initialized with a Map and
  * provides all variable methods required for implementing a DelegateExecution.
  *
+ * Variables can be set and modified but will not be saved back into the engine.
+ * 
  * @author Falko Menge (Camunda)
  */
 public abstract class SimpleVariableScope extends AbstractVariableScope {
