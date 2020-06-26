@@ -2,15 +2,15 @@ package org.camunda.bpm.extension.engine.delegate;
 
 import java.util.Map;
 
-public class TestAbstractRemoteDelegateExecution extends AbstractRemoteDelegateExecution {
+public class AbstractRemoteDelegateExecutionTestImpl extends AbstractRemoteDelegateExecution {
 
   private static final long serialVersionUID = 1L;
 
-  public TestAbstractRemoteDelegateExecution() {
+  public AbstractRemoteDelegateExecutionTestImpl() {
     super();
   }
 
-  public TestAbstractRemoteDelegateExecution(Map<String, ? extends Object> variables) {
+  public AbstractRemoteDelegateExecutionTestImpl(Map<String, ? extends Object> variables) {
     super(variables);
   }
 

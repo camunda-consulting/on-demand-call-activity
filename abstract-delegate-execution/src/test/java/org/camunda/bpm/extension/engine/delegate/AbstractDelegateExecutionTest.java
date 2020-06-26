@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,20 +22,19 @@ public class AbstractDelegateExecutionTest {
   public void setUpBeforeTest() throws Exception {
     variables = new HashMap<String, Object>();
     variables.put("myBoolean", true);
-    execution = new TestAbstractDelegateExecution(variables);
+    execution = new AbstractDelegateExecutionTestImpl(variables);
   }
 
   @Test
-  public void testAbstractDelegateExecution() {
-    AbstractDelegateExecution execution = new TestAbstractDelegateExecution();
+  public void testDefaultConstructor() {
+    DelegateExecution execution = new AbstractDelegateExecutionTestImpl();
     assertNotNull(execution);
   }
 
   @Test
-  public void testAbstractDelegateExecutionMapOfStringObject() {
+  public void testConstructorMapOfStringObject() {
     assertNotNull(execution);
   }
-
 
   @Test(expected = UnsupportedOperationException.class)
   public void testGetProcessInstanceId() {
@@ -159,7 +158,7 @@ public class AbstractDelegateExecutionTest {
 
   @Test
   public void testGetVariables() {
-    VariableMapImpl variables2 = execution.getVariables();
+    Map<String, Object> variables2 = execution.getVariables();
     assertEquals(1, variables2.size());
     assertTrue((Boolean) variables2.get("myBoolean"));
   }
@@ -262,12 +261,6 @@ public class AbstractDelegateExecutionTest {
   public void testSetVariableLocalStringObject() {
     execution.setVariableLocal("myBoolean", false);
     assertFalse((Boolean) execution.getVariables().get("myBoolean"));
-  }
-
-  @Test
-  public void testSetVariableLocalTransient() {
-    execution.setVariableLocalTransient("myTransientBoolean", false);
-    assertFalse((Boolean) execution.getVariables().get("myTransientBoolean"));
   }
 
   @Test

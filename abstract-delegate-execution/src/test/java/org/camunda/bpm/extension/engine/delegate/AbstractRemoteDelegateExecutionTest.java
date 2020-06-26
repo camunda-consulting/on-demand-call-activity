@@ -10,20 +10,31 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.junit.Before;
 import org.junit.Test;
 
 public class AbstractRemoteDelegateExecutionTest {
 
-  private static AbstractRemoteDelegateExecution execution;
+  private static AbstractDelegateExecution execution;
   private Map<String, Object> variables;
 
   @Before
   public void setUpBeforeTest() throws Exception {
     variables = new HashMap<String, Object>();
     variables.put("myBoolean", true);
-    execution = new TestAbstractRemoteDelegateExecution(variables);
+    execution = new AbstractRemoteDelegateExecutionTestImpl(variables);
+  }
+
+  @Test
+  public void testDefaultConstructor() {
+    DelegateExecution execution = new AbstractRemoteDelegateExecutionTestImpl();
+    assertNotNull(execution);
+  }
+
+  @Test
+  public void testConstructorMapOfStringObject() {
+    assertNotNull(execution);
   }
 
   @Test
@@ -54,17 +65,6 @@ public class AbstractRemoteDelegateExecutionTest {
   @Test
   public void testGetId() {
     assertNull(execution.getId());
-  }
-
-  @Test
-  public void testAbstractDelegateExecution() {
-    AbstractDelegateExecution execution = new TestAbstractDelegateExecution();
-    assertNotNull(execution);
-  }
-
-  @Test
-  public void testAbstractDelegateExecutionMapOfStringObject() {
-    assertNotNull(execution);
   }
 
   @Test(expected = UnsupportedOperationException.class)
@@ -159,7 +159,7 @@ public class AbstractRemoteDelegateExecutionTest {
 
   @Test
   public void testGetVariables() {
-    VariableMapImpl variables2 = execution.getVariables();
+    Map<String, Object> variables2 = execution.getVariables();
     assertEquals(1, variables2.size());
     assertTrue((Boolean) variables2.get("myBoolean"));
   }
@@ -262,12 +262,6 @@ public class AbstractRemoteDelegateExecutionTest {
   public void testSetVariableLocalStringObject() {
     execution.setVariableLocal("myBoolean", false);
     assertFalse((Boolean) execution.getVariables().get("myBoolean"));
-  }
-
-  @Test
-  public void testSetVariableLocalTransient() {
-    execution.setVariableLocalTransient("myTransientBoolean", false);
-    assertFalse((Boolean) execution.getVariables().get("myTransientBoolean"));
   }
 
   @Test
