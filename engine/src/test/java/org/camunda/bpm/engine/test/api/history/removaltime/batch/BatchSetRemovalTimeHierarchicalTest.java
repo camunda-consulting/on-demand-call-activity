@@ -45,10 +45,8 @@ import org.camunda.bpm.engine.history.UserOperationLogEntry;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInputInstanceEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricDecisionOutputInstanceEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricJobLogEventEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.*;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.task.Attachment;
 import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.test.Deployment;
@@ -68,6 +66,8 @@ import org.junit.rules.RuleChain;
 import java.io.ByteArrayInputStream;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
@@ -115,6 +115,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
   })
+  // Ignored because the decision is inside a call activity
   public void shouldSetRemovalTime_DecisionInstance() {
     // given
     testRule.process()
@@ -202,7 +203,6 @@ public class BatchSetRemovalTimeHierarchicalTest {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
   })
-  @Ignore
   public void shouldSetRemovalTimeToStandaloneDecision_ChildDecisionInstance() {
     // given
     decisionService.evaluateDecisionByKey("dish-decision")
@@ -245,6 +245,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
     "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
   })
   @Ignore
+  // Ignored because it depends on a call activity
   public void shouldSetRemovalTime_DecisionInputInstance() {
     // given
     testRule.process()
@@ -394,6 +395,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
     "org/camunda/bpm/engine/test/dmn/deployment/drdDish.dmn11.xml"
   })
   @Ignore
+  // Ignored because the decision is inside a call activity
   public void shouldSetRemovalTime_DecisionOutputInstance() {
     // given
     testRule.process()
@@ -537,7 +539,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
   }
 
   @Test
-  @Ignore
+  // Adjusted to consider only the root process
   public void shouldSetRemovalTime_ProcessInstance() {
     // given
     testRule.process().call().userTask().deploy().start();
@@ -564,11 +566,12 @@ public class BatchSetRemovalTimeHierarchicalTest {
 
     // then
     assertThat(historicProcessInstances.get(0).getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
-    assertThat(historicProcessInstances.get(1).getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
+    //assertThat(historicProcessInstances.get(1).getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
   }
 
   @Test
   @Ignore
+  // Ignored because it depends on a user task inside of a call activity
   public void shouldSetRemovalTime_ActivityInstance() {
     // given
     testRule.process().call().userTask().deploy().start();
@@ -603,6 +606,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
 
   @Test
   @Ignore
+  // Ignored because it depends on a user task inside of a call activity
   public void shouldSetRemovalTime_TaskInstance() {
     // given
     testRule.process().call().userTask().deploy().start();
@@ -632,6 +636,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
   }
 
   @Test
+  @Ignore
+  // Ignored because it has a user task that depends on a call activity
   public void shouldSetRemovalTime_HistoricTaskInstanceAuthorization() {
     // given
     testRule.getProcessEngineConfiguration()
@@ -671,6 +677,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
   }
 
   @Test
+  @Ignore
+  // Ignored because it depends on a user task inside the call activity
   public void shouldNotSetRemovalTime_HistoricTaskInstancePermissionsDisabled() {
     // given
     testRule.getProcessEngineConfiguration()
@@ -707,6 +715,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
   }
 
   @Test
+  @Ignore
+  // Ignored because it has a user task that depends on a call activity
   public void shouldSetRemovalTime_HistoricProcessInstanceAuthorization() {
     // given
     testRule.getProcessEngineConfiguration()
@@ -761,6 +771,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
   }
 
   @Test
+  @Ignore
+  // Ignored because it has a user task that depends on a call activity
   public void shouldNotSetRemovalTime_HistoricProcessInstancePermissionsDisabled() {
     // given
     testRule.getProcessEngineConfiguration()
@@ -814,7 +826,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
   }
 
   @Test
-  @Ignore
+  // Adjusted to consider only variable "avariableName". On-demand-call-activity plugin uses an additional variable for control
   public void shouldSetRemovalTime_VariableInstance() {
     // given
     testRule.process().call().userTask().deploy()
@@ -822,7 +834,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
         Variables.createVariables()
           .putValue("aVariableName", "aVariableValue"));
 
-    HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery().singleResult();
+    HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery().variableName("aVariableName").singleResult();
 
     // assume
     assertThat(historicVariableInstance.getRemovalTime()).isNull();
@@ -840,14 +852,14 @@ public class BatchSetRemovalTimeHierarchicalTest {
         .executeAsync()
     );
 
-    historicVariableInstance = historyService.createHistoricVariableInstanceQuery().singleResult();
+    historicVariableInstance = historyService.createHistoricVariableInstanceQuery().variableName("aVariableName").singleResult();
 
     // then
     assertThat(historicVariableInstance.getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
   }
 
   @Test
-  @Ignore
+  // Adjusted to consider only variable "avariableName". On-demand-call-activity plugin uses an additional variable for control.
   public void shouldSetRemovalTime_Detail() {
     // given
     testRule.process().call().userTask().deploy()
@@ -855,7 +867,8 @@ public class BatchSetRemovalTimeHierarchicalTest {
         Variables.createVariables()
           .putValue("aVariableName", "aVariableValue"));
 
-    HistoricDetail historicDetail = historyService.createHistoricDetailQuery().singleResult();
+    HistoricVariableInstance historicVariable = historyService.createHistoricVariableInstanceQuery().variableName("aVariableName").singleResult();
+    HistoricDetail historicDetail = historyService.createHistoricDetailQuery().variableInstanceId(historicVariable.getId()).singleResult();
 
     // assume
     assertThat(historicDetail.getRemovalTime()).isNull();
@@ -873,7 +886,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
         .executeAsync()
     );
 
-    historicDetail = historyService.createHistoricDetailQuery().singleResult();
+    historicDetail = historyService.createHistoricDetailQuery().variableInstanceId(historicVariable.getId()).singleResult();
 
     // then
     assertThat(historicDetail.getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
@@ -881,6 +894,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
 
   @Test
   @Ignore
+  // Ignored because it depends on an external task inside the call activity
   public void shouldSetRemovalTime_ExternalTaskLog() {
     // given
     testRule.process().call().externalTask().deploy().start();
@@ -911,6 +925,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
 
   @Test
   @Ignore
+  // Ignored because the async user task is inside the call activity
   public void shouldSetRemovalTime_JobLog() {
     // given
     testRule.process().call().async().userTask().deploy().start();
@@ -945,6 +960,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
 
   @Test
   @Ignore
+  // Ignored because it depends in a user task with async before inside the call activity
   public void shouldSetRemovalTime_Incident() {
     // given
     String rootProcessInstanceId = testRule.process().call().async().userTask().deploy().start();
@@ -1021,6 +1037,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
 
   @Test
   @Ignore
+  // Ignored because it depends in a user task inside the call activity
   public void shouldSetRemovalTime_IdentityLinkLog() {
     // given
     testRule.process().call().userTask().deploy().start();
@@ -1051,6 +1068,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
 
   @Test
   @Ignore
+  // Ignored because it depends in a user task inside the call activity
   public void shouldSetRemovalTime_CommentByTaskId() {
     // given
     testRule.process().call().userTask().deploy().start();
@@ -1089,7 +1107,6 @@ public class BatchSetRemovalTimeHierarchicalTest {
   }
 
   @Test
-  @Ignore
   public void shouldSetRemovalTime_CommentByProcessInstanceId() {
     // given
     String processInstanceId = testRule.process().call().userTask().deploy().start();
@@ -1122,6 +1139,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
 
   @Test
   @Ignore
+  //Ignored because it depends in a user task inside the call activity
   public void shouldSetRemovalTime_AttachmentByTaskId() {
     // given
     testRule.process().call().userTask().deploy().start();
@@ -1157,7 +1175,6 @@ public class BatchSetRemovalTimeHierarchicalTest {
   }
 
   @Test
-  @Ignore
   public void shouldSetRemovalTime_AttachmentByProcessInstanceId() {
     // given
     String processInstanceId = testRule.process().call().userTask().deploy().start();
@@ -1189,6 +1206,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
 
   @Test
   @Ignore
+  // Ignored because it depends in a user task inside the call activity
   public void shouldSetRemovalTime_ByteArray_AttachmentByTaskId() {
     // given
     testRule.process().call().userTask().deploy().start();
@@ -1260,7 +1278,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
   }
 
   @Test
-  @Ignore
+  // Adjusted to consider only variable "avariableName". On-demand-call-activity plugin uses an additional variable for control.
   public void shouldSetRemovalTime_ByteArray_Variable() {
     // given
     testRule.process().call().userTask().deploy()
@@ -1270,7 +1288,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
             Variables.fileValue("file.xml")
               .file("<root />".getBytes())));
 
-    HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery().singleResult();
+    HistoricVariableInstance historicVariableInstance = historyService.createHistoricVariableInstanceQuery().variableName("aVariableName").singleResult();
 
     String byteArrayId = ((HistoricVariableInstanceEntity) historicVariableInstance).getByteArrayId();
 
@@ -1300,6 +1318,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
 
   @Test
   @Ignore
+  // Ignored because the async before script task is inside the call activity
   public void shouldSetRemovalTime_ByteArray_JobLog() {
     // given
     testRule.process().call().async().scriptTask().deploy().start();
@@ -1343,6 +1362,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
 
   @Test
   @Ignore
+  // Ignored because the external task is inside teh call activity
   public void shouldSetRemovalTime_ByteArray_ExternalTaskLog() {
     // given
     testRule.process().call().externalTask().deploy().start();
@@ -1391,6 +1411,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
     "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml"
   })
   @Ignore
+  // Ignored because it has tasks that depends on a call activity
   public void shouldSetRemovalTime_ByteArray_DecisionInputInstance() {
     // given
     testRule.process()
@@ -1529,6 +1550,7 @@ public class BatchSetRemovalTimeHierarchicalTest {
     "org/camunda/bpm/engine/test/api/history/testDmnWithPojo.dmn11.xml"
   })
   @Ignore
+  // Ignored because the decision is inside the call activity
   public void shouldSetRemovalTime_ByteArray_DecisionOutputInstance() {
     // given
     testRule.process()
@@ -1661,5 +1683,4 @@ public class BatchSetRemovalTimeHierarchicalTest {
     // then
     assertThat(byteArrayEntity.getRemovalTime()).isEqualTo(addDays(CURRENT_DATE, 5));
   }
-
 }
