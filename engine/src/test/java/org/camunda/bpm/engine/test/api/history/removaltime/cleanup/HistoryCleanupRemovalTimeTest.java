@@ -641,6 +641,8 @@ public class HistoryCleanupRemovalTimeTest {
   }
 
   @Test
+  @Ignore
+  // Ignored because it depends on a user task inside the call activity
   public void shouldCleanupTaskInstanceAuthorization() {
     // given
     engineConfiguration.setEnableHistoricInstancePermissions(true);
@@ -1337,6 +1339,8 @@ public class HistoryCleanupRemovalTimeTest {
   }
 
   @Test
+  @Ignore
+  // Ignored because it depends on a user task inside the call activity
   public void shouldDistributeWorkForAuthorizations() {
     // given
     engineConfiguration.setEnableHistoricInstancePermissions(true);
