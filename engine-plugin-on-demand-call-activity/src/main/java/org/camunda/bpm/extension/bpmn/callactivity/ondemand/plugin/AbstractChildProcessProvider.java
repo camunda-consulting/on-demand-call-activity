@@ -19,7 +19,10 @@ public abstract class AbstractChildProcessProvider implements AsynchronousJavaDe
   public abstract String decideOnChildProcess(DelegateExecution execution);
 
   public abstract void execute(ThreadSaveExecution execution);
-
+  
+  /**
+   * This method should be invoked by the calledElement expression of a Call Activity
+   */
   public String getChildProcessDefinitionKey(DelegateExecution execution) throws Exception {
     logger.info("Running childProcessProvider...");
     
