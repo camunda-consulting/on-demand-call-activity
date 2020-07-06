@@ -15,6 +15,9 @@ import org.slf4j.LoggerFactory;
 
 public class ChildProcessProvider extends AbstractChildProcessProvider implements AsynchronousJavaDelegate {
 
+    /**
+     * If this method returns null execute will be invoked
+     */
     @Override
     public String decideOnChildProcess(DelegateExecution execution) {
       Boolean retProcess = (Boolean) execution.getVariable("retProcess");
@@ -64,12 +67,11 @@ public class ChildProcessProvider extends AbstractChildProcessProvider implement
               logger.info("Executing async block...");
 
               execution.setVariable("outputVar", "someValue");
-              //TODO: IS RUNTIME SERVICE THREAD SAFE? => Thorben says yes!
-              execution.signal();
+              execution.complete();
           } catch (Exception exception) {
             exception.printStackTrace();
             execution.setVariable("firstTryHasFailed", true); // TODO make variable name more unique and delete after use
-            execution.signal(exception);
+            execution.handleFailure(exception);
             // sketch for self healing
 //                  try {
 //                    // synchronously call self-healing µs

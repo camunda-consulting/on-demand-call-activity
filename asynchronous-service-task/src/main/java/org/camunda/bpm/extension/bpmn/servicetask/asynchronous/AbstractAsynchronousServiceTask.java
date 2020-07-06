@@ -53,7 +53,7 @@ import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
  * engine transaction.</p>
  *  
  */
-public abstract class AsynchronousServiceTask extends AbstractBpmnActivityBehavior implements AsynchronousJavaDelegate {
+public abstract class AbstractAsynchronousServiceTask extends AbstractBpmnActivityBehavior implements AsynchronousJavaDelegate {
 
   
     @Override
@@ -69,6 +69,9 @@ public abstract class AsynchronousServiceTask extends AbstractBpmnActivityBehavi
 	}
 
 
+  /**
+   * Must not throw exceptions
+   */
   @Override
-  abstract public void execute(ThreadSaveExecution execution) throws Exception;
+  abstract public void execute(ThreadSaveExecution execution);
 }
