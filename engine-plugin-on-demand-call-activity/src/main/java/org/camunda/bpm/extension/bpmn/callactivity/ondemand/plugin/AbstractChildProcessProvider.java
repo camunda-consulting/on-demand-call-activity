@@ -29,7 +29,6 @@ public abstract class AbstractChildProcessProvider implements AsynchronousJavaDe
     String childProcess = decideOnChildProcess(execution);
     if (childProcess == null || childProcess.isEmpty()) {
       execute(new ThreadSaveExecution(execution));
-      // TODO is this the right place to set this variable?
       execution.setVariableLocal(getAsyncServiceCallVarName(execution), true);
       return null;
     } else {

@@ -1,7 +1,6 @@
 package org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin;
 
 import static org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.CompletableFutureJava8Compatibility.delayedExecutor;
-import static org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.util.OnDemandCallActivityUtil.getSkipVarName;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -21,12 +20,7 @@ public class ChildProcessProvider extends AbstractChildProcessProvider implement
     @Override
     public String decideOnChildProcess(DelegateExecution execution) {
       Boolean retProcess = (Boolean) execution.getVariable("retProcess");
-      // example on how to skip execution completely, e.g. during a retry after some manual fix
-      if (execution.hasVariable(getSkipVarName(execution))) {
-        execution.setVariable(getSkipVarName(execution), null);
-        return null;
-      }
-      
+      // hand over to child process for error handling
       if (execution.hasVariable("firstTryHasFailed")) {
         return "process-child"; // process definition key
         // maybe also another process for repair or self-healing
