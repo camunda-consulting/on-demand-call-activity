@@ -41,13 +41,30 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
     runtimeService = execution.getProcessEngineServices().getRuntimeService();
   }
 
+  /**
+   * Complete the work that was done asynchronously in a separate thread by
+   * invoking {@link RuntimeService#signal(String, Map)} using this execution's 
+   * id and variables.
+   *
+   * The invocation of this method requires the execution to be in a wait state
+   * and committed to the database.
+   */
   public void complete() {
+    // TODO catch and retry on exceptions indicating that the transaction was not yet committed 
     runtimeService.signal(getId(), getVariables());
   }
 
+  /**
+   * Signals that the work that was tried asynchronously in a separate thread
+   * could not be successfully executed.
+   *
+   * {@link OnDemandCallActivityBehavior#signal()} has an error handling that
+   * gets triggered if an Exception is passed as signalData to
+   * {@link RuntimeService#signal(String, String, Object, Map)}.
+   *
+   * @param exception the {@link Exception} that was caught by the thread.
+   */
   public void handleFailure(final Exception exception) {
-    // TODO maybe support local variables: runtimeService.setVariablesLocal(getId(), getVariablesLocal());
-    // or prevent setting local variables by UnsupportedOperationExceptions
     runtimeService.signal(getId(), null, exception, getVariables());
   }
 
