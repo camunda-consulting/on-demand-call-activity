@@ -32,6 +32,6 @@ Built and tested against Camunda BPM version 7.11.0.
     <td>A Plugin for [Camunda BPM](http://docs.camunda.org) that allows to skip the invocation of a sub-process.</td>
   </tr>
 -->
-<!-- Tweet
-New @CamundaBPM example: On-demand Call Activity Plugin - A Plugin for [Camunda BPM](http://docs.camunda.org) that allows to skip the invocation of a sub-process. https://github.com/camunda/camunda-consulting/tree/master/snippets/engine-plugin-on-demand-call-activity
+<!-- Tweet 
+    New @CamundaBPM example: On-demand Call Activity Plugin - A Plugin for [Camunda BPM](http://docs.camunda.org) that allows to skip the invocation of a sub-process. https://github.com/camunda/camunda-consulting/tree/master/snippets/engine-plugin-on-demand-call-activity
 -->
