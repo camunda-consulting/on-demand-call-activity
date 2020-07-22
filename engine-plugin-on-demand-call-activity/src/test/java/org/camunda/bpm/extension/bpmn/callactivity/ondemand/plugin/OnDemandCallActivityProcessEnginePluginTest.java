@@ -1,13 +1,8 @@
 package org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin;
 
 import org.apache.ibatis.logging.LogFactory;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.mock.Mocks;
 import org.junit.Before;
@@ -16,12 +11,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.camunda.bpm.engine.impl.test.TestHelper.createSchema;
-import static org.camunda.bpm.engine.impl.test.TestHelper.dropSchema;
-import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
-import static org.camunda.bpm.engine.test.assertions.bpmn.AbstractAssertions.processEngine;
 import static org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.TestUtil.cleanUpAndCreateEngine;
-import static org.junit.Assert.assertNotNull;
+import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
+import static org.junit.Assert.*;
 
 /**
  * Test case starting an in-memory database-backed Process Engine.
