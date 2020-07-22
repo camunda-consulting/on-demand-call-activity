@@ -29,6 +29,8 @@ jobs:
     - name: Build with Maven
       run: mvn -B package --file pom.xml
     - run: mkdir staging && cp engine-plugin-on-demand-call-activity/target/*.jar staging/engine-plugin-on-demand-call-activity.jar
+    - run: cp asynchronous-service-task/target/*.jar staging/asynchronous-service-task.jar
+    - run: cp abstract-delegate-execution/target/*.jar staging/abstract-delegate-execution.jar
     - uses: actions/upload-artifact@v1
       with:
         name: Package
@@ -81,6 +83,10 @@ jobs:
         name: Package
         # Destination path
         path: staging
+    - name: Install abstract-delegate-execution
+      run: mvn --batch-mode org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file -Dfile=staging/abstract-delegate-execution.jar
+    - name: Install asynchronous-service-task
+      run: mvn --batch-mode org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file -Dfile=staging/asynchronous-service-task.jar
     - name: Install On-demand Call Activity Plugin
       run: mvn --batch-mode org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file -Dfile=staging/engine-plugin-on-demand-call-activity.jar
     - name: Test with Maven
