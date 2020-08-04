@@ -3,13 +3,24 @@ A Camunda BPM plugin that allows a BPMN Call Activity to dynamically call a chil
 
 [![Java CI with Maven](https://github.com/camunda-consulting/on-demand-call-activity/workflows/Java%20CI%20with%20Maven/badge.svg)](https://github.com/camunda-consulting/on-demand-call-activity/actions)
 
-Besides the code in the master branch there are several test branches using the Camunda engine test suite:
+You can find the plugin code on the master branch.
+
+## How to test an engine plugin against the process engine test suite
+To check if the plugin has some unexpected side effects to the process engine, you can run the complete engine test suite against a process engine that contains your plugin.
+
+To do this, add the camunda-bpm-platform repository as a remote branch to your repository. Then add your plugin in all variants of `camunda.cfg.xml` to the engine(s) under test. You can find all configurations in subfolders on `src/test/resources` with the pattern `*camunda*.cfg*.xml`.
+
+The steps to do the git branching are listed in details below.
+
+There are several test branches using the Camunda engine test suite:
 - [engine-test-suite-with-child-processes](https://github.com/camunda-consulting/on-demand-call-activity/tree/engine-test-suite-with-child-processes)
 - [engine-test-suite-without-child-processes](https://github.com/camunda-consulting/on-demand-call-activity/tree/engine-test-suite-without-child-processes)
 - [engine-test-suite-with-child-processes-7.13.0](https://github.com/camunda-consulting/on-demand-call-activity/tree/engine-test-suite-with-child-processes-7.13.0)
 - [engine-test-suite-without-child-processes-7.13.0](https://github.com/camunda-consulting/on-demand-call-activity/tree/engine-test-suite-without-child-processes-7.13.0)
 - [engine-test-suite-with-child-processes-7.14.0-SNAPSHOT](https://github.com/camunda-consulting/on-demand-call-activity/tree/engine-test-suite-with-child-processes-7.14.0-SNAPSHOT)
 - [engine-test-suite-without-child-processes-7.14.0-SNAPSHOT](https://github.com/camunda-consulting/on-demand-call-activity/tree/engine-test-suite-without-child-processes-7.14.0-SNAPSHOT)
+
+A GitHub action under [maven.yml](https://github.com/camunda-consulting/on-demand-call-activity/edit/master/.github/workflows/maven.yml) builds the plugin and runs all tests on GitHub after pushing any change.
 
 ## How to update to and test with a new Camunda version?
 1. Clone this repository using `git clone git@github.com:camunda-consulting/on-demand-call-activity.git`

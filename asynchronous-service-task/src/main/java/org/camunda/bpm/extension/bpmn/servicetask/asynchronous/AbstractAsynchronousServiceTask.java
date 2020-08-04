@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
 /**
  * <p>This is a simple implementation of the {@link SignallableActivityBehavior}
  * interface.</p> 
- * 
+ *
  * <p>The {@link SignallableActivityBehavior} provides two methods:
  * <ul>
  * 
@@ -37,7 +37,7 @@ import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
  *   responsible for leaving the service task activity.</li>
  * </ul>
  * </p>
- *    
+ *
  * <p>The asynchronous nature of the invocation decouples the process engine from
  * the service implementation. The process engine does not propagate any thread context
  * to the service implementation. Most prominently, the service implementation is not 
@@ -46,14 +46,15 @@ import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
  * wait state: after the execute()-Method returns, the process engine will stop execution,
  * flush out the sate of the execution to the database and wait for the callback to 
  * occur.</p>
- * 
+ *
  * <p>If a failure occurs in the service implementation, the failure will not cause the 
  * process engine to roll back. The reason is that the service implementation is not 
  * directly invoked by the process engine and does not participate in the process 
  * engine transaction.</p>
- *  
+ *
+ * @author Falko Menge (Camunda)
  */
-public abstract class AbstractAsynchronousServiceTask extends AbstractBpmnActivityBehavior implements AsynchronousJavaDelegate {
+public abstract class AbstractAsynchronousServiceTask extends AbstractBpmnActivityBehavior {
 
   
     @Override
@@ -70,8 +71,11 @@ public abstract class AbstractAsynchronousServiceTask extends AbstractBpmnActivi
 
 
   /**
-   * Must not throw exceptions
+   * <p>This method's implementation must call {@link ThreadSaveExecution#complete()}
+   * in a separate thread and with enough delay to let the engine commit the TX.
+   *
+   * <p>Exceptions must be caught by the implementation and reported back to the
+   * BPMN process using process variables that, e.g., a Gateway can react to.
    */
-  @Override
   abstract public void execute(ThreadSaveExecution execution);
 }
