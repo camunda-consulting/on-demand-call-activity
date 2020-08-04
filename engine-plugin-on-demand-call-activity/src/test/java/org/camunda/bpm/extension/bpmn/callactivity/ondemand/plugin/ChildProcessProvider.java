@@ -6,13 +6,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.extension.bpmn.servicetask.asynchronous.AsynchronousJavaDelegate;
-import org.camunda.bpm.extension.bpmn.servicetask.asynchronous.ThreadSaveExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class ChildProcessProvider extends AbstractChildProcessProvider implements AsynchronousJavaDelegate {
+public class ChildProcessProvider extends AbstractChildProcessProvider {
 
     /**
      * If this method returns null execute will be invoked
@@ -39,7 +37,7 @@ public class ChildProcessProvider extends AbstractChildProcessProvider implement
     }
 
     @Override
-    public void execute(ThreadSaveExecution execution) {
+    public void execute(OnDemandCallActivityExecution execution) {
 
 
       // TODO handle exceptions during request creation? Only needed during reactive REST calls

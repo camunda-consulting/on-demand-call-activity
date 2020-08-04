@@ -55,20 +55,6 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
   }
 
   /**
-   * Signals that the work that was tried asynchronously in a separate thread
-   * could not be successfully executed.
-   *
-   * {@link OnDemandCallActivityBehavior#signal()} has an error handling that
-   * gets triggered if an Exception is passed as signalData to
-   * {@link RuntimeService#signal(String, String, Object, Map)}.
-   *
-   * @param exception the {@link Exception} that was caught by the thread.
-   */
-  public void handleFailure(final Exception exception) {
-    runtimeService.signal(getId(), null, exception, getVariables());
-  }
-
-  /**
    * Setting local variables is not supported by
    * {@link RuntimeService#signal(String, Map)}.
    *
