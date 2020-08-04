@@ -712,8 +712,8 @@ public class HistoryCleanupRemovalTimeTest {
     List<HistoricVariableInstance> historicVariableInstances = historyService.createHistoricVariableInstanceQuery().list();
 
     // assume
-    // OnDemandCallActivity generates two more variables...
-    assertThat(historicVariableInstances.size(), is(1 + 2));
+    // OnDemandCallActivity generates one more variable...
+    assertThat(historicVariableInstances.size(), is( 2));
 
     ClockUtil.setCurrentTime(addDays(END_DATE, 5));
 

@@ -1024,10 +1024,10 @@ public class BoundaryConditionalEventTest extends AbstractConditionalEventTestCa
     //then out mapping of call activity sets a variable
     //-> non interrupting conditional event is triggered
 
-    /* Changed the number of tasks due to the fact that the conditional event triggers 3 times, since we have three variables
+    /* Changed the number of tasks due to the fact that the conditional event triggers 2 times, since we have two variables
     and the conditional event is not filtering any variables */
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(4, tasksAfterVariableIsSet.size());
+    assertEquals(3, tasksAfterVariableIsSet.size());
     assertEquals(0, conditionEventSubscriptionQuery.count());
   }
 
