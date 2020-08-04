@@ -838,10 +838,10 @@ public class MixedConditionalEventTest extends AbstractConditionalEventTestCase 
 
     //then out mapping of call activity sets a variable
     //-> all non interrupting conditional events are triggered
-    /* Changed the number of tasks due to the fact that the conditional event triggers 3 times, since we have three variables
+    /* Changed the number of tasks due to the fact that the conditional event triggers 2 times, since we have two variables
     and the conditional event is not filtering any variables */
     tasksAfterVariableIsSet = taskQuery.list();
-    assertEquals(7, tasksAfterVariableIsSet.size());
+    assertEquals(6, tasksAfterVariableIsSet.size());
     //three subscriptions: event sub process in sub process and on process instance level and boundary event of sub process
     assertEquals(3, conditionEventSubscriptionQuery.count());
   }
