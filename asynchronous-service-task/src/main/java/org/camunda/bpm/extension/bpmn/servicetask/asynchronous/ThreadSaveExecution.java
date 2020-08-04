@@ -3,6 +3,8 @@ package org.camunda.bpm.extension.bpmn.servicetask.asynchronous;
 import java.util.Collection;
 import java.util.Map;
 
+import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.extension.engine.delegate.DelegateExecutionDTO;
@@ -52,6 +54,48 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
   public void complete() {
     // TODO catch and retry on exceptions indicating that the transaction was not yet committed 
     runtimeService.signal(getId(), getVariables());
+  }
+
+  /**
+   * Obtain the value of a variable in a given process instance or execution
+   * using {@link RuntimeService#getVariable(String, String)}.
+   *
+   * Searching for the variable is done in all scopes that are visible to the given execution (including parent scopes).
+   * Returns null when no variable value is found with the given name or when the value is set to null.
+   *
+   * @param executionId id of process instance or execution, cannot be null.
+   * @param variableName name of variable, cannot be null.
+   *
+   * @return the variable value or null if the variable is undefined or the value of the variable is null.
+   *
+   * @throws ProcessEngineException
+   *          when no execution is found for the given executionId.
+   * @throws AuthorizationException
+   *          when permission are missing. See {@link RuntimeService#getVariable(String, String)}.
+   */
+  public Object getVariable(final String executionId, final String variableName) {
+    // TODO write test case for this
+    return runtimeService.getVariable(executionId, variableName);
+  }
+
+  /**
+   * Update or create a variable for a given process instance or execution.  If the variable does not already exist
+   * somewhere in the execution hierarchy (i.e. the specified execution or any ancestor),
+   * it will be created in the process instance (which is the root execution).
+   *
+   * @param executionId id of process instance or execution to set variable in, cannot be null.
+   * @param variableName name of variable to set, cannot be null.
+   * @param value value to set. When null is passed, the variable is not removed,
+   * only it's value will be set to null.
+   *
+   * @throws ProcessEngineException
+   *          when no execution is found for the given executionId.
+   * @throws AuthorizationException
+   *          when permission are missing. See {@link RuntimeService#setVariable(String, String, Object)}.
+   */
+  public void setVariable(final String executionId, final String variableName, Object value) {
+    // TODO write test case for this
+    runtimeService.setVariable(executionId, variableName, value);
   }
 
   /**
