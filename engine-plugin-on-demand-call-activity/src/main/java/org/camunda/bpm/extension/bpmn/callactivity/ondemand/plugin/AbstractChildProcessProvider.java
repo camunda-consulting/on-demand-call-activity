@@ -7,6 +7,12 @@ import org.camunda.bpm.extension.bpmn.servicetask.asynchronous.ThreadSaveExecuti
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Abstract base class for child process providers to be used together with
+ * {@link OnDemandCallActivityBehavior}.
+ *
+ * @author Falko Menge (Camunda)
+ */
 public abstract class AbstractChildProcessProvider {
 
   protected Logger logger = LoggerFactory.getLogger(getClass());
@@ -15,6 +21,15 @@ public abstract class AbstractChildProcessProvider {
     super();
   }
 
+  /**
+   * This method's implementation decides whether a regular BPMN child process
+   * or an asynchronous service task implementation should be invoked.
+   *
+   * @param execution
+   * @return Process definition key of the child process to be invoked or null
+   *         to indicate that {@link #execute(OnDemandCallActivityExecution)}
+   *         should be invoked instead.
+   */
   public abstract String decideOnChildProcess(DelegateExecution execution);
 
   /**

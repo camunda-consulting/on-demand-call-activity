@@ -10,7 +10,14 @@ import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEnginePlugin;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
+import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 
+/**
+ * A {@link ProcessEnginePlugin} that replaces the {@link ActivityBehavior} of
+ * BPMN Call Activities with {@link OnDemandCallActivityBehavior}.
+ *
+ * @author Falko Menge (Camunda)
+ */
 public class OnDemandCallActivityProcessEnginePlugin implements ProcessEnginePlugin {
 
   @Override

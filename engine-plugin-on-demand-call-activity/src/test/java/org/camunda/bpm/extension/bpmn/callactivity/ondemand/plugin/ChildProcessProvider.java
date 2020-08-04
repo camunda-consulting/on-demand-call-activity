@@ -9,7 +9,12 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+/**
+ * Sample implementation of {@link AbstractChildProcessProvider} to test and
+ * illustrate usage.
+ *
+ * @author Falko Menge (Camunda)
+ */
 public class ChildProcessProvider extends AbstractChildProcessProvider {
 
     /**

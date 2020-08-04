@@ -5,6 +5,12 @@ import static org.camunda.bpm.extension.bpmn.servicetask.asynchronous.Completabl
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Sample implementation of {@link AbstractAsynchronousServiceTask} to test and
+ * illustrate usage.
+ *
+ * @author Falko Menge (Camunda)
+ */
 public class MultiThreadedJavaDelegate extends AbstractAsynchronousServiceTask {
 
   @Override
