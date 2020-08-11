@@ -30,6 +30,7 @@ public class ChildProcessProvider extends AbstractChildProcessProvider {
       }
       
       if (retProcess) {
+          execution.setVariable("variableSetByChildProcessProvider", true);
           return "process-child"; // process definition key
 //        } else if (isGlobalTaskSupported) {
 //            return "global-service-task";

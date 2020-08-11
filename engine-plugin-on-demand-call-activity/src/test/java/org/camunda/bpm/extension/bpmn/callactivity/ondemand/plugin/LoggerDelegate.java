@@ -12,5 +12,9 @@ public class LoggerDelegate implements JavaDelegate {
     @Override
     public void execute(DelegateExecution execution) throws Exception {
         logger.info("Running logger delegate...");
+        logger.info("variableSetByChildProcessProvider from parent: "
+            + execution.getSuperExecution().getVariable("variableSetByChildProcessProvider"));
+        logger.info("variableSetByChildProcessProvider from child: "
+            + execution.getVariable("variableSetByChildProcessProvider"));
     }
 }

@@ -46,7 +46,15 @@ public class OnDemandCallActivityProcessEnginePluginTest {
     public void testWithCallActivity() {
         ProcessInstance processInstance = processEngine().getRuntimeService()
                 .startProcessInstanceByKey(PROCESS_DEFINITION_KEY, withVariables("retProcess", true));
-        //assertThat(processInstance).calledProcessInstance().hasPassed("CallLoggerTask").isEnded();
+        // FIXME test with 7.14.0-alpha1
+//        assertThat(processInstance).calledProcessInstance().hasPassed("CallLoggerTask").isEnded();
+        assertEquals(2, historyService().createHistoricProcessInstanceQuery().count());
+        assertEquals(2, historyService().createHistoricVariableInstanceQuery()
+            .variableName("retProcess")
+            .count());
+        assertEquals(1, historyService().createHistoricVariableInstanceQuery()
+            .variableName("variableSetByChildProcessProvider")
+            .count());
         assertThat(processInstance).isEnded();
     }
 
