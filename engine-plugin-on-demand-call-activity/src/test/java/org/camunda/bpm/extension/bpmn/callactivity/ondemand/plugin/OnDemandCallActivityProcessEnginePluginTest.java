@@ -25,6 +25,7 @@ public class OnDemandCallActivityProcessEnginePluginTest {
 
     private static final String PROCESS_DEFINITION_KEY = "engine-plugin-on-demand-call-activity";
     private static final String PROCESS_DEFINITION_KEY_WITH_INOUTMAPPING = "engine-plugin-on-demand-call-activity-with-mapping";
+    private static final String PROCESS_DEFINITION_KEY_EXCEPTION = "engine-plugin-on-demand-call-activity-exception";
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -36,7 +37,7 @@ public class OnDemandCallActivityProcessEnginePluginTest {
 
     @Before
     public void setup() {
-        rule = cleanUpAndCreateEngine("camunda_on_demand_call_activity_test.cfg.xml", "process.bpmn", "process_child.bpmn", "process_with_mapping.bpmn");
+        rule = cleanUpAndCreateEngine("camunda_on_demand_call_activity_test.cfg.xml", "process.bpmn", "process_child.bpmn", "process_with_mapping.bpmn", "process_exception.bpmn");
         Mocks.register("childProcessProvider", new ChildProcessProvider());
         Mocks.register("loggerDelegate", new LoggerDelegate());
         init(rule.getProcessEngine());
@@ -150,5 +151,14 @@ public class OnDemandCallActivityProcessEnginePluginTest {
     }
     
     // TODO: test all operations that should normally work with a call activity (see engine test suite)
-
+    @Test
+    public void testWithoutCallActivityOptimisticLockingException() throws InterruptedException {
+        ProcessInstance processInstance = processEngine().getRuntimeService()
+                .startProcessInstanceByKey(PROCESS_DEFINITION_KEY_EXCEPTION, withVariables("retProcess", false
+                        , "doThrowException", false));
+        //assertThat(processInstance).calledProcessInstance("process-child").isNull();
+        Thread.sleep(6000L);
+        //assertThat(processInstance).isEnded();
+        //assertThat(processInstance).job().isNull();
+    }
 }
