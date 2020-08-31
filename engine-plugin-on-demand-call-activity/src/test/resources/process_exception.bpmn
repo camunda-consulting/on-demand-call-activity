@@ -14,6 +14,9 @@
         <camunda:in variables="all" />
         <camunda:out variables="all" />
         <camunda:in businessKey="#{execution.processBusinessKey}" />
+        <camunda:inputOutput>
+          <camunda:inputParameter name="delay">1500</camunda:inputParameter>
+        </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow1</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_14t5oxg</bpmn:outgoing>
@@ -23,6 +26,9 @@
         <camunda:in variables="all" />
         <camunda:out variables="all" />
         <camunda:in businessKey="#{execution.processBusinessKey}" />
+        <camunda:inputOutput>
+          <camunda:inputParameter name="delay">500</camunda:inputParameter>
+        </camunda:inputOutput>
       </bpmn:extensionElements>
       <bpmn:incoming>SequenceFlow_14t5oxg</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_0miacin</bpmn:outgoing>

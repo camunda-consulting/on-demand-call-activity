@@ -6,6 +6,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.test.mock.Mocks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,17 +46,31 @@ public class ChildProcessProvider extends AbstractChildProcessProvider {
     @Override
     public void execute(OnDemandCallActivityExecution execution) {
 
-
+      long delay = 250L;
+      Boolean optimisticLockingException = execution.hasVariable("optimisticLockingException") && (Boolean) execution.getVariable("optimisticLockingException");
+      if(optimisticLockingException) {
+    	  delay = Long.valueOf(execution.getVariable("delay").toString());
+    	  logger.info("ChildProcessProvider delay : {}", delay);
+      }
+    	
+      // When connected to postgres db, send signal fails with exception as it takes time to commit the execution. works fine with delay of 5000L  
+      Boolean badUserRequestException = execution.hasVariable("badUserRequestException") && (Boolean) execution.getVariable("badUserRequestException");
+      if(badUserRequestException) {
+    	  delay = 250L; //1500L
+      }
+    	
       // TODO handle exceptions during request creation? Only needed during reactive REST calls
       
       // Publish a task to a scheduled executor. This method returns after the task has
       // been put into the executor. The actual service implementation (lambda) will not yet
       // be invoked:
+      logger.info("ChildProcessProvider execute : {}", Thread.currentThread().getId());
       CompletableFuture.runAsync(() -> { // simulates the sending of a non-blocking REST request
           // the code inside this lambda runs in a separate thread outside the TX
           // this will not work: execution.setVariable("foo", "bar");
           // THE EXECUTION IS NOT THREAD-SAFE
           try {
+        	  logger.info("ChildProcessProvider try : {}", Thread.currentThread().getId());
               Boolean doThrowException = (Boolean) execution.getVariable("doThrowException");
               logger.info("Do throw exception: "+doThrowException);
               if (doThrowException) {
@@ -65,7 +80,9 @@ public class ChildProcessProvider extends AbstractChildProcessProvider {
               logger.info("Executing async block...");
 
               execution.setVariable("outputVar", "someValue");
+              Mocks.register("childProcessProvider", this);
               execution.complete();
+              logger.info("Signal Sent : {}", execution.getCurrentActivityId()); 
           } catch (Exception exception) {
             exception.printStackTrace();
             execution.setVariable("firstTryHasFailed", true); // TODO make variable name more unique and delete after use
@@ -88,7 +105,7 @@ public class ChildProcessProvider extends AbstractChildProcessProvider {
 //                  }
           }
           //INCIDENT AND BPMN ERROR
-      }, delayedExecutor(250L, TimeUnit.MILLISECONDS));
+      }, delayedExecutor(delay, TimeUnit.MILLISECONDS));
 
     }
 }

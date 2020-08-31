@@ -5,6 +5,13 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
   <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
+    
+    <!-- <property name="databaseSchemaUpdate" value="false" />
+	<property name="jdbcDriver" value="org.postgresql.Driver"/>
+	<property name="jdbcUrl" value="jdbc:postgresql://10.76.129.140:32768/cc_postgres?reWriteBatchedInserts=true"/>
+	<property name="jdbcUsername" value="postgres"/>
+	<property name="jdbcPassword" value="abcde"/> -->
+    
     <property name="history" value="full" />
     <property name="expressionManager">
         <bean class="org.camunda.bpm.engine.test.mock.MockExpressionManager"/>
