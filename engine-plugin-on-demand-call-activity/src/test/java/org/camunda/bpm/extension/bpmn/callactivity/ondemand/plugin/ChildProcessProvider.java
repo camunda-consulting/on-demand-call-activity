@@ -56,6 +56,11 @@ public class ChildProcessProvider extends AbstractChildProcessProvider {
           // this will not work: execution.setVariable("foo", "bar");
           // THE EXECUTION IS NOT THREAD-SAFE
           try {
+        	  Object setParentVar = execution.getVariableFromExecution(execution.getId(), "setParentVar");
+        	  if (setParentVar != null && (Boolean) setParentVar) {
+        		execution.setVariableInExecution(execution.getId(), "parentVar", "aParentVar");
+        	  }
+        	  
               Boolean doThrowException = (Boolean) execution.getVariable("doThrowException");
               logger.info("Do throw exception: "+doThrowException);
               if (doThrowException) {

@@ -149,6 +149,18 @@ public class OnDemandCallActivityProcessEnginePluginTest {
         assertThat(processInstance).variables().containsEntry("output", "someValue");
     }
     
+	@Test
+	public void testOnDemandCallActivityWithParentVariableAccess() throws InterruptedException {
+		ProcessInstance processInstance = processEngine().getRuntimeService().startProcessInstanceByKey(
+				PROCESS_DEFINITION_KEY,
+				withVariables("retProcess", false, "doThrowException", false, "setParentVar", true));
+		assertThat(processInstance).calledProcessInstance("process-child").isNull();
+		Thread.sleep(sleepTime);
+		assertThat(processInstance).hasPassed("EndEventProcessEnded");
+		assertThat(processInstance).isEnded();
+		assertThat(processInstance).variables().containsEntry("parentVar", "aParentVar");
+	}
+    
     // TODO: test all operations that should normally work with a call activity (see engine test suite)
 
 }
