@@ -106,6 +106,7 @@ public class ChildProcessProvider extends AbstractChildProcessProvider {
           }
           //INCIDENT AND BPMN ERROR
       }, delayedExecutor(delay, TimeUnit.MILLISECONDS));
+      logger.info("ChildProcessProvider execute finished: {}", Thread.currentThread().getId());
 
     }
 }
