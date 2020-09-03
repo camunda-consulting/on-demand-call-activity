@@ -73,7 +73,7 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
    * @throws AuthorizationException
    *          when permission are missing. See {@link RuntimeService#getVariable(String, String)}.
    */
-  public Object getVariable(final String executionId, final String variableName) {
+  public Object getVariableFromExecution(final String executionId, final String variableName) {
     // TODO write test case for this
     return runtimeService.getVariable(executionId, variableName);
   }
@@ -93,7 +93,7 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
    * @throws AuthorizationException
    *          when permission are missing. See {@link RuntimeService#setVariable(String, String, Object)}.
    */
-  public void setVariable(final String executionId, final String variableName, Object value) {
+  public void setVariableInExecution(final String executionId, final String variableName, Object value) {
     // TODO write test case for this
     runtimeService.setVariable(executionId, variableName, value);
   }
