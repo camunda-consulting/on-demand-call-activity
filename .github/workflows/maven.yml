@@ -31,7 +31,7 @@ jobs:
     - run: mkdir staging && cp engine-plugin-on-demand-call-activity/target/*.jar staging/engine-plugin-on-demand-call-activity.jar
     - run: cp asynchronous-service-task/target/*.jar staging/asynchronous-service-task.jar
     - run: cp abstract-delegate-execution/target/*.jar staging/abstract-delegate-execution.jar
-    - uses: actions/upload-artifact@v2.1.3
+    - uses: actions/upload-artifact@v2.1.4
       with:
         name: Package
         path: staging
