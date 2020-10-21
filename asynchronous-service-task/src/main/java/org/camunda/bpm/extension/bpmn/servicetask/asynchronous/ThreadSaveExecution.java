@@ -57,6 +57,15 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
   }
 
   /**
+   * This method sends the signal for the signalName passed
+   * 
+   * @param signalName
+   */
+  public void createSignalEventAndSend(String signalName) {
+	  runtimeService.createSignalEvent(signalName).send();
+  }
+  
+  /**
    * Obtain the value of a variable in a given process instance or execution
    * using {@link RuntimeService#getVariable(String, String)}.
    *
