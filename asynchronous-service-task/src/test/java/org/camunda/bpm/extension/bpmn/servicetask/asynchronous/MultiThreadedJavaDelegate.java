@@ -30,6 +30,9 @@ public class MultiThreadedJavaDelegate extends AbstractAsynchronousServiceTask {
       LoggerDelegate loggerDelegate = new LoggerDelegate();
       try {
         loggerDelegate.execute(execution);
+        if ((boolean) execution.getVariable("triggerBpmnSignal")) {
+          execution.signalEventReceived("Signal_AsyncServiceTaskInvoked");
+        }
         execution.setVariable("isSuccess", true);
       } catch (Exception exception) {
         // you MUST catch any exception and handle it

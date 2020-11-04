@@ -6,6 +6,8 @@ import java.util.Map;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.extension.engine.delegate.DelegateExecutionDTO;
 
@@ -57,12 +59,25 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
   }
 
   /**
-   * This method sends the signal for the signalName passed
-   * 
+   * Triggers a BPMN Signal by invoking {@link RuntimeService#signalEventReceived(String)}.
+   *
+   * Notifies the process engine that a signal event of name 'signalName' has
+   * been received. Delivers the signal to all executions waiting on
+   * the signal and to all process definitions that can started by this signal. <p/>
+   *
+   * <strong>NOTE:</strong> Notification and instantiation happen synchronously.
+   *
    * @param signalName
+   *          the name of the signal event
+   *
+   * @throws AuthorizationException
+   *          <li>if notify an execution and the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.</li>
+   *          <li>if start a new process instance and the user has no {@link Permissions#CREATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.</li>
    */
-  public void createSignalEventAndSend(String signalName) {
-	  runtimeService.createSignalEvent(signalName).send();
+  public void signalEventReceived(String signalName) {
+	  runtimeService.signalEventReceived(signalName);
   }
   
   /**

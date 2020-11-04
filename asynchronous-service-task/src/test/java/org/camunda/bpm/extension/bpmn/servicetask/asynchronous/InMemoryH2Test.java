@@ -40,5 +40,21 @@ public class InMemoryH2Test {
 	Thread.sleep(1000L);
     assertThat(processInstance).isEnded();
   }
+  
+  @Test
+  @Deployment(resources = "process.bpmn")
+  public void testBpmnSignalEvent() throws InterruptedException {
+    ProcessInstance processInstance = runtimeService()
+        .createProcessInstanceByKey(PROCESS_DEFINITION_KEY)
+        .setVariable("triggerBpmnSignal", true)
+        .execute();
+    assertThat(processInstance).isWaitingAt("AsynchronousServiceTask");
+    Thread.sleep(1000L);
+    assertThat(processInstance).isNotEnded()
+      .job()
+        .hasActivityId("SignalEvent_AsyncServiceTaskInvoked");
+    execute(job());
+    assertThat(processInstance).isEnded();
+  }
 
 }
