@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.2.0">
+  <bpmn:signal id="Signal_1ei9kj3" name="Signal_AsyncServiceTaskInvoked" />
+  <bpmn:collaboration id="Collaboration_09z6zh1">
+    <bpmn:participant id="Participant_0pb3wgt" name="Process with Asynchronous Service Task" processRef="asynchronous-service-task" />
+    <bpmn:participant id="Participant_07kuve1" name="Process Started By Signal" processRef="ProcessStartedBySignal" />
+    <bpmn:textAnnotation id="TextAnnotation_0p63uwl">
+      <bpmn:text>BPMN Signal sent by Service Task implementation</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_1fiwb44" sourceRef="AsynchronousServiceTask" targetRef="TextAnnotation_0p63uwl" />
+  </bpmn:collaboration>
   <bpmn:process id="asynchronous-service-task" name="asynchronous-service-task" isExecutable="true">
     <bpmn:startEvent id="StartEventProcessStarted" name="Process&#10;started">
       <bpmn:outgoing>SequenceFlow1</bpmn:outgoing>
@@ -7,8 +16,6 @@
     <bpmn:endEvent id="EndEventProcessEnded" name="Process&#10;ended">
       <bpmn:incoming>Flow_0j3c5zd</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="SequenceFlow1" sourceRef="StartEventProcessStarted" targetRef="AsynchronousServiceTask" />
-    <bpmn:sequenceFlow id="SequenceFlow_1atxxsq" sourceRef="AsynchronousServiceTask" targetRef="Gateway_0ltg8qf" />
     <bpmn:serviceTask id="AsynchronousServiceTask" name="Asynchronous Service Task" camunda:class="org.camunda.bpm.extension.bpmn.servicetask.asynchronous.MultiThreadedJavaDelegate">
       <bpmn:incoming>SequenceFlow1</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_1atxxsq</bpmn:outgoing>
@@ -18,29 +25,39 @@
       <bpmn:outgoing>Flow_0j3c5zd</bpmn:outgoing>
       <bpmn:outgoing>Flow_19eyegz</bpmn:outgoing>
     </bpmn:exclusiveGateway>
-    <bpmn:sequenceFlow id="Flow_0j3c5zd" name="yes" sourceRef="Gateway_0ltg8qf" targetRef="EndEventProcessEnded">
-      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${isSuccess}</bpmn:conditionExpression>
-    </bpmn:sequenceFlow>
     <bpmn:endEvent id="Event_0ynt9m1" name="Not successful">
       <bpmn:incoming>Flow_19eyegz</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="Flow_19eyegz" name="no" sourceRef="Gateway_0ltg8qf" targetRef="Event_0ynt9m1">
       <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${not isSuccess}</bpmn:conditionExpression>
     </bpmn:sequenceFlow>
-    <bpmn:subProcess id="Activity_0iy17ps" triggeredByEvent="true">
-      <bpmn:startEvent id="SignalEvent_AsyncServiceTaskInvoked" name="Asyncchronous Service Task invoked" camunda:asyncBefore="true" isInterrupting="false">
-        <bpmn:outgoing>Flow_0o0kdk2</bpmn:outgoing>
-        <bpmn:signalEventDefinition id="SignalEventDefinition_1u9bqjm" signalRef="Signal_1ei9kj3" />
-      </bpmn:startEvent>
-      <bpmn:sequenceFlow id="Flow_0o0kdk2" sourceRef="SignalEvent_AsyncServiceTaskInvoked" targetRef="Event_02tno0k" />
-      <bpmn:endEvent id="Event_02tno0k" name="Signal handling completed">
-        <bpmn:incoming>Flow_0o0kdk2</bpmn:incoming>
-      </bpmn:endEvent>
-    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="Flow_0j3c5zd" name="yes" sourceRef="Gateway_0ltg8qf" targetRef="EndEventProcessEnded">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${isSuccess}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_1atxxsq" sourceRef="AsynchronousServiceTask" targetRef="Gateway_0ltg8qf" />
+    <bpmn:sequenceFlow id="SequenceFlow1" sourceRef="StartEventProcessStarted" targetRef="AsynchronousServiceTask" />
   </bpmn:process>
-  <bpmn:signal id="Signal_1ei9kj3" name="Signal_AsyncServiceTaskInvoked" />
+  <bpmn:process id="ProcessStartedBySignal" name="Process Started By Signal" isExecutable="true">
+    <bpmn:endEvent id="Event_02tno0k" name="Signal handling completed">
+      <bpmn:incoming>Flow_145qgc5</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:startEvent id="SignalEvent_AsyncServiceTaskInvoked" name="Asyncchronous Service Task invoked" camunda:asyncBefore="true">
+      <bpmn:outgoing>Flow_0o0kdk2</bpmn:outgoing>
+      <bpmn:signalEventDefinition id="SignalEventDefinition_008amtz" signalRef="Signal_1ei9kj3" />
+    </bpmn:startEvent>
+    <bpmn:userTask id="Activity_088q0po" name="Wait">
+      <bpmn:incoming>Flow_0o0kdk2</bpmn:incoming>
+      <bpmn:outgoing>Flow_145qgc5</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_145qgc5" sourceRef="Activity_088q0po" targetRef="Event_02tno0k" />
+    <bpmn:sequenceFlow id="Flow_0o0kdk2" sourceRef="SignalEvent_AsyncServiceTaskInvoked" targetRef="Activity_088q0po" />
+    <bpmn:association id="Association_1ef4u15" sourceRef="SignalEvent_AsyncServiceTaskInvoked" targetRef="TextAnnotation_0p63uwl" />
+  </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="asynchronous-service-task">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_09z6zh1">
+      <bpmndi:BPMNShape id="Participant_0pb3wgt_di" bpmnElement="Participant_0pb3wgt" isHorizontal="true">
+        <dc:Bounds x="123" y="50" width="467" height="230" />
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_19eyegz_di" bpmnElement="Flow_19eyegz">
         <di:waypoint x="440" y="145" />
         <di:waypoint x="440" y="202" />
@@ -68,6 +85,9 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEventProcessStarted">
         <dc:Bounds x="173" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="171" y="138" width="41" height="27" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="EndEvent_0fkea3f_di" bpmnElement="EndEventProcessEnded">
         <dc:Bounds x="521" y="102" width="36" height="36" />
@@ -90,25 +110,43 @@
           <dc:Bounds x="404" y="245" width="72" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1solvrm_di" bpmnElement="Activity_0iy17ps" isExpanded="true">
-        <dc:Bounds x="260" y="310" width="190" height="120" />
+      <bpmndi:BPMNShape id="Participant_07kuve1_di" bpmnElement="Participant_07kuve1" isHorizontal="true">
+        <dc:Bounds x="230" y="360" width="360" height="150" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_0o0kdk2_di" bpmnElement="Flow_0o0kdk2">
-        <di:waypoint x="326" y="350" />
-        <di:waypoint x="392" y="350" />
+      <bpmndi:BPMNEdge id="Flow_145qgc5_di" bpmnElement="Flow_145qgc5">
+        <di:waypoint x="470" y="430" />
+        <di:waypoint x="512" y="430" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNShape id="Event_0ic0arh_di" bpmnElement="SignalEvent_AsyncServiceTaskInvoked">
-        <dc:Bounds x="290" y="332" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="270" y="375" width="76" height="40" />
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0o0kdk2_di" bpmnElement="Flow_0o0kdk2">
+        <di:waypoint x="328" y="430" />
+        <di:waypoint x="370" y="430" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="Event_02tno0k_di" bpmnElement="Event_02tno0k">
-        <dc:Bounds x="392" y="332" width="36" height="36" />
+        <dc:Bounds x="512" y="412" width="36" height="36" />
         <bpmndi:BPMNLabel>
-          <dc:Bounds x="373" y="375" width="76" height="27" />
+          <dc:Bounds x="493" y="455" width="76" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0lnq9oc_di" bpmnElement="SignalEvent_AsyncServiceTaskInvoked">
+        <dc:Bounds x="292" y="412" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="272" y="455" width="76" height="40" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0drhzia_di" bpmnElement="Activity_088q0po">
+        <dc:Bounds x="370" y="390" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_1ef4u15_di" bpmnElement="Association_1ef4u15">
+        <di:waypoint x="310" y="412" />
+        <di:waypoint x="310" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_0p63uwl_di" bpmnElement="TextAnnotation_0p63uwl">
+        <dc:Bounds x="307" y="300" width="163" height="40" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_1fiwb44_di" bpmnElement="Association_1fiwb44">
+        <di:waypoint x="310" y="160" />
+        <di:waypoint x="310" y="300" />
+      </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </bpmn:definitions>
