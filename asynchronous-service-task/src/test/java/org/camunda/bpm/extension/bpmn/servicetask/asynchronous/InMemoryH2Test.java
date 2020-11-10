@@ -53,8 +53,9 @@ public class InMemoryH2Test {
     assertEquals(1, processInstanceQuery().count());
     Thread.sleep(1000L);
     assertThat(processInstance).isEnded();
-    assertEquals(1, processInstanceQuery().count());
-    assertEquals(1, taskService().createTaskQuery().count());
+    assertEquals(1, processInstanceQuery().processDefinitionKey("ProcessStartedBySignal").count());
+    execute(jobQuery().singleResult());
+    assertEquals(0, processInstanceQuery().count());
   }
 
 }
