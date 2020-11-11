@@ -13,6 +13,12 @@ import org.junit.Test;
 
 import static org.camunda.bpm.extension.bpmn.servicetask.asynchronous.ProcessConstants.*;
 import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.assertThat;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.execute;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.executionQuery;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.jobQuery;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.processInstanceQuery;
+import static org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests.runtimeService;
 import static org.junit.Assert.*;
 
 import java.util.List;
@@ -20,7 +26,7 @@ import java.util.List;
 /**
  * Test case starting an in-memory database-backed Process Engine.
  */
-public class InMemoryH2Test {
+public class InMemoryH2Test2EventSubProcess {
 
   @ClassRule
   @Rule
@@ -36,28 +42,18 @@ public class InMemoryH2Test {
   }
 
   @Test
-  @Deployment(resources = "process.bpmn")
-  public void testHappyPath() throws InterruptedException {
-    ProcessInstance processInstance = processEngine().getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
-    assertThat(processInstance).isWaitingAt("AsynchronousServiceTask");
-	Thread.sleep(1000L);
-    assertThat(processInstance).isEnded().hasPassed("EndEventProcessEnded");
-  }
-  
-  @Test
-  @Deployment(resources = "process.bpmn")
-  public void testBpmnSignalEvent() throws InterruptedException {
-    assertEquals(2, processDefinitionQuery().count());
+  @Deployment(resources = "process-with-event-handler.bpmn")
+  public void testBpmnSignalEventSubProcess() throws InterruptedException {
     ProcessInstance processInstance = runtimeService()
-        .createProcessInstanceByKey(PROCESS_DEFINITION_KEY)
+        .createProcessInstanceByKey(PROCESS_DEFINITION_KEY + "-with-event-handler")
         .setVariable("triggerBpmnSignal", true)
         .execute();
+    List<Execution> executions = executionQuery().list();
     assertThat(processInstance).isWaitingAt("AsynchronousServiceTask");
     Thread.sleep(1000L);
-    assertThat(processInstance).isEnded();
-    assertEquals(1, processInstanceQuery().processDefinitionKey("ProcessStartedBySignal").count());
+    assertEquals(1, processInstanceQuery().count());
     execute(jobQuery().singleResult());
-    assertEquals(0, processInstanceQuery().count());
+    assertThat(processInstance).isEnded();
   }
 
 }

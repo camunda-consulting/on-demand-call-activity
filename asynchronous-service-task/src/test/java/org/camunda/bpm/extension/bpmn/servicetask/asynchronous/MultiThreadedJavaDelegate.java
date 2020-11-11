@@ -30,7 +30,7 @@ public class MultiThreadedJavaDelegate extends AbstractAsynchronousServiceTask {
       LoggerDelegate loggerDelegate = new LoggerDelegate();
       try {
         loggerDelegate.execute(execution);
-        if ((boolean) execution.getVariable("triggerBpmnSignal")) {
+        if (Boolean.TRUE.equals(execution.getVariable("triggerBpmnSignal"))) {
           execution.signalEventReceived("Signal_AsyncServiceTaskInvoked");
         }
         execution.setVariable("isSuccess", true);
@@ -40,6 +40,7 @@ public class MultiThreadedJavaDelegate extends AbstractAsynchronousServiceTask {
         // TODO invoke any self-healing code that you may have
 
         // If needed, tell the process with a variable about the failure
+        exception.printStackTrace();
         execution.setVariable("exceptionMessage", exception.getMessage());
         execution.setVariable("isSuccess", false);
       }

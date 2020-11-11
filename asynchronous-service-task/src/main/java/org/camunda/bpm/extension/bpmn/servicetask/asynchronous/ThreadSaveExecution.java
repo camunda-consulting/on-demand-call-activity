@@ -1,6 +1,7 @@
 package org.camunda.bpm.extension.bpmn.servicetask.asynchronous;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.AuthorizationException;
@@ -9,6 +10,8 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.impl.pvm.PvmException;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.extension.engine.delegate.DelegateExecutionDTO;
 
 /**
@@ -55,7 +58,18 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
    */
   public void complete() {
     // TODO catch and retry on exceptions indicating that the transaction was not yet committed 
-    runtimeService.signal(getId(), getVariables());
+    try {
+      runtimeService.signal(getId(), getVariables());
+    } catch (PvmException e) {
+      if (e.getMessage().equals("cannot signal execution " + getId() + ": it has no current activity")) {
+        Execution execution = runtimeService.createExecutionQuery()
+          .activityId(getCurrentActivityId())
+          .singleResult();
+        runtimeService.signal(execution.getId(), getVariables());
+      } else {
+        throw e;
+      }
+    }
   }
 
   /**
@@ -77,7 +91,7 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
    *          and no {@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.</li>
    */
   public void signalEventReceived(String signalName) {
-	  runtimeService.signalEventReceived(signalName);
+    runtimeService.signalEventReceived(signalName);
   }
   
   /**
