@@ -26,7 +26,7 @@ A GitHub action under [maven.yml](https://github.com/camunda-consulting/on-deman
 1. Clone this repository using `git clone git@github.com:camunda-consulting/on-demand-call-activity.git`
 1. Add [Camunda BPM Platform](https://github.com/camunda/camunda-bpm-platform/) as remote `git remote add camunda-bpm-platform git@github.com:camunda/camunda-bpm-platform.git`
 1. Repeat the following steps for all engine test suite branch variations, which are currently `engine-test-suite-with-child-processes` and `engine-test-suite-without-child-processes` (replace the branch name and version numbers in the comands below):
-    1. Checkout branch `git checkout engine-test-suite-with-child-processes-7.13.0`
+    1. Checkout branch `git checkout engine-test-suite-with-child-processes-7.13.0` with the latest Camunda version
     1. Ensure it is up to date `git pull`
     1. Create branch for new version `git checkout -b engine-test-suite-with-child-processes-7.14.0` (replace 7.14.0 with the [version](https://github.com/camunda/camunda-bpm-platform/tags) you're updating to)
     1. Pull new version `git pull camunda-bpm-platform 7.14.0`
