@@ -24,40 +24,63 @@ import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.externalT
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.externalTaskByProcessInstanceId;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.inverted;
 import static org.camunda.bpm.engine.test.api.runtime.TestOrderingUtil.verifySorting;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.externaltask.ExternalTask;
 import org.camunda.bpm.engine.externaltask.ExternalTaskQuery;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.camunda.bpm.model.bpmn.Bpmn;
+import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
+public class ExternalTaskQueryTest extends PluggableProcessEngineTest {
 
   protected static final String WORKER_ID = "aWorkerId";
   protected static final String TOPIC_NAME = "externalTaskTopic";
   protected static final String ERROR_MESSAGE = "error";
 
-  protected void setUp() throws Exception {
+  @Before
+  public void setUp() throws Exception {
     ClockUtil.setCurrentTime(new Date());
   }
 
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     ClockUtil.reset();
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  @Test
   public void testSingleResult() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
@@ -81,18 +104,21 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  @Test
   public void testList() {
     startInstancesByKey("oneExternalTaskProcess", 5);
     assertEquals(5, externalTaskService.createExternalTaskQuery().list().size());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  @Test
   public void testCount() {
     startInstancesByKey("oneExternalTaskProcess", 5);
     assertEquals(5, externalTaskService.createExternalTaskQuery().count());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  @Test
   public void testQueryByLockState() {
     // given
     startInstancesByKey("oneExternalTaskProcess", 5);
@@ -115,6 +141,7 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  @Test
   public void testQueryByProcessDefinitionId() {
     // given
     org.camunda.bpm.engine.repository.Deployment secondDeployment = repositoryService
@@ -153,6 +180,7 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/parallelExternalTaskProcess.bpmn20.xml")
+  @Test
   public void testQueryByActivityId() {
     // given
     startInstancesByKey("parallelExternalTaskProcess", 3);
@@ -171,6 +199,7 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/parallelExternalTaskProcess.bpmn20.xml")
+  @Test
   public void testQueryByActivityIdIn() {
     // given
     startInstancesByKey("parallelExternalTaskProcess", 3);
@@ -190,6 +219,7 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testFailQueryByActivityIdInNull() {
     try {
       externalTaskService.createExternalTaskQuery()
@@ -200,6 +230,7 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/parallelExternalTaskProcess.bpmn20.xml")
+  @Test
   public void testQueryByTopicName() {
     // given
     startInstancesByKey("parallelExternalTaskProcess", 3);
@@ -218,6 +249,7 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  @Test
   public void testQueryByProcessInstanceId() {
     // given
     List<ProcessInstance> processInstances = startInstancesByKey("oneExternalTaskProcess", 3);
@@ -233,7 +265,14 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(processInstances.get(0).getId(), task.getProcessInstanceId());
   }
 
+  /**
+   * Excluded on CRDB since the problem does not occur on it. The test execution also times out
+   * during test cleanup, on DELETE-ing the deployments, due the the slowness of the SQL statements on CRDB.
+   * See CAM-12239 for the performance issue.
+   */
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  @Test
+  @RequiredDatabase(excludes = DbSqlSessionFactory.CRDB)
   public void testQueryByLargeListOfProcessInstanceIdIn() {
     // given
     List<String> processInstances = new ArrayList<>();
@@ -256,6 +295,7 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  @Test
   public void testQueryByProcessInstanceIdIn() {
     // given
     List<ProcessInstance> processInstances = startInstancesByKey("oneExternalTaskProcess", 3);
@@ -276,6 +316,7 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testQueryByNonExistingProcessInstanceId() {
     ExternalTaskQuery query = externalTaskService
         .createExternalTaskQuery()
@@ -284,6 +325,7 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(0, query.count());
   }
 
+  @Test
   public void testQueryByProcessInstanceIdNull() {
     try {
       externalTaskService.createExternalTaskQuery()
@@ -295,6 +337,7 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  @Test
   public void testQueryByExecutionId() {
     // given
     List<ProcessInstance> processInstances = startInstancesByKey("oneExternalTaskProcess", 3);
@@ -318,6 +361,7 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  @Test
   public void testQueryByWorkerId() {
     // given
     startInstancesByKey("oneExternalTaskProcess", 10);
@@ -338,6 +382,7 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  @Test
   public void testQueryByLockExpirationTime() {
     // given
     startInstancesByKey("oneExternalTaskProcess", 10);
@@ -370,73 +415,75 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
   public void testQueryWithNullValues() {
     try {
       externalTaskService.createExternalTaskQuery().externalTaskId(null).list();
       fail("expected exception");
     } catch (NullValueException e) {
-      assertTextPresent("externalTaskId is null", e.getMessage());
+      testRule.assertTextPresent("externalTaskId is null", e.getMessage());
     }
 
     try {
       externalTaskService.createExternalTaskQuery().activityId(null).list();
       fail("expected exception");
     } catch (NullValueException e) {
-      assertTextPresent("activityId is null", e.getMessage());
+      testRule.assertTextPresent("activityId is null", e.getMessage());
     }
 
     try {
       externalTaskService.createExternalTaskQuery().executionId(null).list();
       fail("expected exception");
     } catch (NullValueException e) {
-      assertTextPresent("executionId is null", e.getMessage());
+      testRule.assertTextPresent("executionId is null", e.getMessage());
     }
 
     try {
       externalTaskService.createExternalTaskQuery().lockExpirationAfter(null).list();
       fail("expected exception");
     } catch (NullValueException e) {
-      assertTextPresent("lockExpirationAfter is null", e.getMessage());
+      testRule.assertTextPresent("lockExpirationAfter is null", e.getMessage());
     }
 
     try {
       externalTaskService.createExternalTaskQuery().lockExpirationBefore(null).list();
       fail("expected exception");
     } catch (NullValueException e) {
-      assertTextPresent("lockExpirationBefore is null", e.getMessage());
+      testRule.assertTextPresent("lockExpirationBefore is null", e.getMessage());
     }
 
     try {
       externalTaskService.createExternalTaskQuery().processDefinitionId(null).list();
       fail("expected exception");
     } catch (NullValueException e) {
-      assertTextPresent("processDefinitionId is null", e.getMessage());
+      testRule.assertTextPresent("processDefinitionId is null", e.getMessage());
     }
 
     try {
       externalTaskService.createExternalTaskQuery().processInstanceId(null).list();
       fail("expected exception");
     } catch (NullValueException e) {
-      assertTextPresent("processInstanceId is null", e.getMessage());
+      testRule.assertTextPresent("processInstanceId is null", e.getMessage());
     }
 
     try {
       externalTaskService.createExternalTaskQuery().topicName(null).list();
       fail("expected exception");
     } catch (NullValueException e) {
-      assertTextPresent("topicName is null", e.getMessage());
+      testRule.assertTextPresent("topicName is null", e.getMessage());
     }
 
     try {
       externalTaskService.createExternalTaskQuery().workerId(null).list();
       fail("expected exception");
     } catch (NullValueException e) {
-      assertTextPresent("workerId is null", e.getMessage());
+      testRule.assertTextPresent("workerId is null", e.getMessage());
     }
   }
 
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml",
     "org/camunda/bpm/engine/test/api/externaltask/twoExternalTaskProcess.bpmn20.xml"})
+  @Test
   public void testQuerySorting() {
 
     startInstancesByKey("oneExternalTaskProcess", 5);
@@ -489,6 +536,7 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  @Test
   public void testQueryBySuspensionState() {
     // given
     startInstancesByKey("oneExternalTaskProcess", 5);
@@ -512,6 +560,7 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  @Test
   public void testQueryByRetries() {
     // given
     startInstancesByKey("oneExternalTaskProcess", 5);
@@ -539,6 +588,7 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  @Test
   public void testQueryById() {
     // given
     startInstancesByKey("oneExternalTaskProcess", 2);
@@ -556,6 +606,7 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  @Test
   public void testQueryByIds() {
     // given
     startInstancesByKey("oneExternalTaskProcess", 3);
@@ -569,6 +620,7 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  @Test
   public void testQueryByIdsWithNull() {
     // given
     Set<String> ids = null;
@@ -582,6 +634,7 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  @Test
   public void testQueryByIdsWithEmptyList() {
     // given
     Set<String> ids = new HashSet<>();
@@ -595,6 +648,7 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  @Test
   public void testQueryByBusinessKey() {
     // given
     String businessKey = "theUltimateKey";
@@ -609,6 +663,7 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/api/externaltask/oneExternalTaskProcess.bpmn20.xml")
+  @Test
   public void testQueryListByBusinessKey() {
     for (int i = 0; i < 5; i++) {
       runtimeService.startProcessInstanceByKey("oneExternalTaskProcess", "businessKey" + i);
@@ -621,6 +676,24 @@ public class ExternalTaskQueryTest extends PluggableProcessEngineTestCase {
     }
   }
 
+  @Test
+  public void shouldCheckPresenceOfVersionTag() {
+    BpmnModelInstance process = Bpmn.createExecutableProcess("process")
+        .camundaVersionTag("1.2.3.4")
+        .startEvent()
+        .serviceTask()
+          .camundaExternalTask("my-topic")
+        .endEvent()
+        .done();
+
+    testRule.deploy(process);
+
+    startInstancesByKey("process", 1);
+
+    ExternalTask task = externalTaskService.createExternalTaskQuery().singleResult();
+
+    assertThat(task.getProcessDefinitionVersionTag()).isEqualTo("1.2.3.4");
+  }
 
   protected List<ProcessInstance> startInstancesByKey(String processDefinitionKey, int number) {
     List<ProcessInstance> processInstances = new ArrayList<>();

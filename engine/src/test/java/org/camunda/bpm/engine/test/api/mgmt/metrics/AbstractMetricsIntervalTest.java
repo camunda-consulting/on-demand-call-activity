@@ -16,6 +16,11 @@
  */
 package org.camunda.bpm.engine.test.api.mgmt.metrics;
 
+import java.util.Collection;
+import java.util.Date;
+import java.util.Random;
+import java.util.Set;
+
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -31,11 +36,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
-
-import java.util.Collection;
-import java.util.Date;
-import java.util.Random;
-import java.util.Set;
 
 /**
  * Represents the abstract metrics interval test class, which contains methods
@@ -70,7 +70,7 @@ public abstract class AbstractMetricsIntervalTest {
 
   protected void generateMeterData(long dataCount, long interval) {
     //set up for randomnes
-    Set<String> metricNames = metricsRegistry.getMeters().keySet();
+    Set<String> metricNames = metricsRegistry.getDbMeters().keySet();
     metricsCount = metricNames.size();
 
     //start date is the default interval since mariadb can't set 0 as timestamp
@@ -94,7 +94,7 @@ public abstract class AbstractMetricsIntervalTest {
   }
 
   protected void reportMetrics() {
-    for (String metricName : metricsRegistry.getMeters().keySet()) {
+    for (String metricName : metricsRegistry.getDbMeters().keySet()) {
       //mark random occurence
       long occurence = (long) (rand.nextInt((MAX_OCCURENCE - MIN_OCCURENCE) + 1) + MIN_OCCURENCE);
       metricsRegistry.markOccurrence(metricName, occurence);
@@ -109,7 +109,7 @@ public abstract class AbstractMetricsIntervalTest {
   }
 
   protected void clearLocalMetrics() {
-    Collection<Meter> meters = processEngineConfiguration.getMetricsRegistry().getMeters().values();
+    Collection<Meter> meters = processEngineConfiguration.getMetricsRegistry().getDbMeters().values();
     for (Meter meter : meters) {
       meter.getAndClear();
     }

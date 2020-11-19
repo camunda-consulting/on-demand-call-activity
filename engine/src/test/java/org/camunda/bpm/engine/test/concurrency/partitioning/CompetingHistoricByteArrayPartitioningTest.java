@@ -16,6 +16,9 @@
  */
 package org.camunda.bpm.engine.test.concurrency.partitioning;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
@@ -23,10 +26,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.variable.Variables;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.junit.Test;
 
 /**
  * @author Tassilo Weidner
@@ -38,7 +38,8 @@ public class CompetingHistoricByteArrayPartitioningTest extends AbstractPartitio
   final protected String VARIABLE_VALUE = "aVariableValue";
   final protected String ANOTHER_VARIABLE_VALUE = "anotherVariableValue";
 
-  public void testConcurrentFetchAndDelete() {
+  @Test
+  public void shouldSuppressOleOnConcurrentFetchAndDelete() {
     // given
     final String processInstanceId = deployAndStartProcess(PROCESS_WITH_USERTASK,
       Variables.createVariables().putValue(VARIABLE_NAME,
@@ -46,43 +47,37 @@ public class CompetingHistoricByteArrayPartitioningTest extends AbstractPartitio
       .getId();
 
     final String[] historicByteArrayId = new String[1];
-    commandExecutor.execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
+    commandExecutor.execute((Command<Void>) commandContext -> {
 
-        ExecutionEntity execution = commandContext.getExecutionManager().findExecutionById(processInstanceId);
+      ExecutionEntity execution = commandContext.getExecutionManager().findExecutionById(processInstanceId);
 
-        VariableInstanceEntity varInstance = (VariableInstanceEntity) execution.getVariableInstance(VARIABLE_NAME);
-        HistoricVariableInstanceEntity historicVariableInstance = commandContext.getHistoricVariableInstanceManager()
-          .findHistoricVariableInstanceByVariableInstanceId(varInstance.getId());
+      VariableInstanceEntity varInstance = (VariableInstanceEntity) execution.getVariableInstance(VARIABLE_NAME);
+      HistoricVariableInstanceEntity historicVariableInstance = commandContext.getHistoricVariableInstanceManager()
+        .findHistoricVariableInstanceByVariableInstanceId(varInstance.getId());
 
-        historicByteArrayId[0] = historicVariableInstance.getByteArrayValueId();
+      historicByteArrayId[0] = historicVariableInstance.getByteArrayValueId();
 
-        return null;
-      }
+      return null;
     });
 
     ThreadControl asyncThread = executeControllableCommand(new AsyncThread(processInstanceId, historicByteArrayId[0]));
-
+    asyncThread.reportInterrupts();
     asyncThread.waitForSync();
 
-    commandExecutor.execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
+    commandExecutor.execute((Command<Void>) commandContext -> {
 
-        commandContext.getByteArrayManager()
-          .deleteByteArrayById(historicByteArrayId[0]);
+      commandContext.getByteArrayManager()
+        .deleteByteArrayById(historicByteArrayId[0]);
 
-        return null;
-      }
+      return null;
     });
 
-    commandExecutor.execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
+    commandExecutor.execute((Command<Void>) commandContext -> {
 
-        // assume
-        assertThat(commandContext.getDbEntityManager().selectById(ByteArrayEntity.class, historicByteArrayId[0]), nullValue());
+      // assume
+      assertThat(commandContext.getDbEntityManager().selectById(ByteArrayEntity.class, historicByteArrayId[0])).isNull();
 
-        return null;
-      }
+      return null;
     });
 
     // when
@@ -90,8 +85,13 @@ public class CompetingHistoricByteArrayPartitioningTest extends AbstractPartitio
     asyncThread.waitUntilDone();
 
     // then
-    assertThat(runtimeService.createVariableInstanceQuery().singleResult().getName(), is(VARIABLE_NAME));
-    assertThat(new String((byte[]) runtimeService.createVariableInstanceQuery().singleResult().getValue()), is(ANOTHER_VARIABLE_VALUE));
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
+      assertThat(runtimeService.createVariableInstanceQuery().singleResult().getName()).isEqualTo(VARIABLE_NAME);
+      assertThat(new String((byte[]) runtimeService.createVariableInstanceQuery().singleResult().getValue())).isEqualTo(ANOTHER_VARIABLE_VALUE);
+    } else {
+      // with CockroachDB, the OLE can't be ignored, the TX will fail and be rolled-back
+      assertThat(asyncThread.getException()).isInstanceOf(CrdbTransactionRetryException.class);
+    }
   }
 
   public class AsyncThread extends ControllableCommand<Void> {

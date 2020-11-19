@@ -16,9 +16,11 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
@@ -73,13 +75,11 @@ public class ConcurrentJobExecutorTest {
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
 
-
   protected RuntimeService runtimeService;
   protected RepositoryService repositoryService;
   protected ManagementService managementService;
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
-  protected Thread testThread = Thread.currentThread();
   protected static ControllableThread activeThread;
 
   protected static final BpmnModelInstance SIMPLE_ASYNC_PROCESS = Bpmn.createExecutableProcess("simpleAsyncProcess")
@@ -276,9 +276,18 @@ public class ConcurrentJobExecutorTest {
 
     // then the acquisition will not fail with optimistic locking
     assertNull(jobSuspensionThread.exception);
-    assertNull(acquisitionThread.exception);
-    // but the job will also not be acquired
-    assertEquals(0, acquisitionThread.acquiredJobs.size());
+
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
+      assertNull(acquisitionThread.exception);
+      // but the job will also not be acquired
+      assertEquals(0, acquisitionThread.acquiredJobs.size());
+    } else {
+      // on CockroachDB, the TX of the acquisition thread
+      // will fail with an un-ignorable OLE and needs to be retried
+      assertThat(acquisitionThread.exception, is(OptimisticLockingException.class));
+      // and no result will be returned
+      assertNull(acquisitionThread.acquiredJobs);
+    }
 
     //--------------------------------------------
 
@@ -368,11 +377,19 @@ public class ConcurrentJobExecutorTest {
     // and the execution thread can nevertheless successfully finish job execution
     executionThread.proceedAndWaitTillDone();
 
-    assertNull(executionThread.exception);
+    long remainingJobCount = managementService.createJobQuery().count();
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
+      assertNull(executionThread.exception);
 
-    // and ultimately only one job with an updated priority is left
-    Job remainingJob = managementService.createJobQuery().singleResult();
-    assertNotNull(remainingJob);
+      // and ultimately only one job with an updated priority is left
+      assertEquals(1L, remainingJobCount);
+    } else {
+      // on CockroachDB, the TX of the execution thread
+      // will fail with an un-ignorable OLE and needs to be retried
+      assertThat(executionThread.exception, is(OptimisticLockingException.class));
+      // and both jobs will remain available
+      assertEquals(2L, remainingJobCount);
+    }
   }
 
   @Test
@@ -473,11 +490,12 @@ public class ConcurrentJobExecutorTest {
       activeThread = this;
       super.startAndWaitUntilControlIsReturned();
     }
+
     @Override
     public void run() {
       try {
         processEngineConfiguration.getCommandExecutorTxRequired()
-          .execute(new ControlledCommand<Void>(activeThread, createSuspendJobCommand()));
+          .execute(new ControlledCommand<>(activeThread, createSuspendJobCommand()));
 
       } catch (OptimisticLockingException e) {
         this.exception = e;
@@ -507,11 +525,12 @@ public class ConcurrentJobExecutorTest {
       activeThread = this;
       super.startAndWaitUntilControlIsReturned();
     }
+
     @Override
     public void run() {
       try {
         processEngineConfiguration.getCommandExecutorTxRequired()
-          .execute(new ControlledCommand<Void>(activeThread, createSuspendJobCommand()));
+          .execute(new ControlledCommand<>(activeThread, createSuspendJobCommand()));
 
       } catch (OptimisticLockingException e) {
         this.exception = e;
@@ -542,11 +561,12 @@ public class ConcurrentJobExecutorTest {
       activeThread = this;
       super.startAndWaitUntilControlIsReturned();
     }
+
     @Override
     public void run() {
       try {
         processEngineConfiguration.getCommandExecutorTxRequired()
-          .execute(new ControlledCommand<Void>(activeThread, new SetJobDefinitionPriorityCmd(jobDefinitionId, priority, cascade)));
+          .execute(new ControlledCommand<>(activeThread, new SetJobDefinitionPriorityCmd(jobDefinitionId, priority, cascade)));
 
       } catch (OptimisticLockingException e) {
         this.exception = e;

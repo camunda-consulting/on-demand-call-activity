@@ -44,6 +44,7 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.Picture;
 import org.camunda.bpm.engine.identity.Tenant;
@@ -333,9 +334,8 @@ public class IdentityServiceTest {
   public void testCreateMembershipUnexistingGroup() {
     User johndoe = identityService.newUser("johndoe");
     identityService.saveUser(johndoe);
-
-    thrown.expect(ProcessEngineException.class);
-
+    thrown.expect(NullValueException.class);
+    thrown.expectMessage("No group found with id 'unexistinggroup'.: group is null");
     identityService.createMembership(johndoe.getId(), "unexistinggroup");
   }
 
@@ -343,9 +343,8 @@ public class IdentityServiceTest {
   public void testCreateMembershipUnexistingUser() {
     Group sales = identityService.newGroup("sales");
     identityService.saveGroup(sales);
-
-    thrown.expect(ProcessEngineException.class);
-
+    thrown.expect(NullValueException.class);
+    thrown.expectMessage("No user found with id 'unexistinguser'.: user is null");
     identityService.createMembership("unexistinguser", sales.getId());
   }
 
@@ -914,8 +913,10 @@ public class IdentityServiceTest {
   @Test
   public void testInvalidUserId() {
     String invalidId = "john doe";
+    User user = identityService.newUser(invalidId);
+
     try {
-      identityService.newUser(invalidId);
+      identityService.saveUser(user);
       fail("Invalid user id exception expected!");
     } catch (ProcessEngineException ex) {
       assertEquals(String.format(INVALID_ID_MESSAGE, "User", invalidId), ex.getMessage());
@@ -939,8 +940,9 @@ public class IdentityServiceTest {
   @Test
   public void testInvalidGroupId() {
     String invalidId = "john's group";
+    Group group = identityService.newGroup(invalidId);
     try {
-      identityService.newGroup(invalidId);
+      identityService.saveGroup(group);
       fail("Invalid group id exception expected!");
     } catch (ProcessEngineException ex) {
       assertEquals(String.format(INVALID_ID_MESSAGE, "Group", invalidId), ex.getMessage());
@@ -978,26 +980,34 @@ public class IdentityServiceTest {
     processEngine = ProcessEngineConfiguration
       .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/api/identity/custom.whitelist.camunda.cfg.xml")
       .buildProcessEngine();
+
+    IdentityService identityService = processEngine.getIdentityService();
+
     String invalidUserId = "johnDoe";
     String invalidGroupId = "johnsGroup";
     String invalidTenantId = "johnsTenant";
 
+    User user = identityService.newUser(invalidUserId);
+
     try {
-      processEngine.getIdentityService().newUser(invalidUserId);
+      identityService.saveUser(user);
       fail("Invalid user id exception expected!");
     } catch (ProcessEngineException ex) {
       assertEquals(String.format(INVALID_ID_MESSAGE, "User", invalidUserId), ex.getMessage());
     }
 
+    Group johnsGroup = identityService.newGroup("johnsGroup");
+
     try {
-      processEngine.getIdentityService().newGroup("johnsGroup");
+      identityService.saveGroup(johnsGroup);
       fail("Invalid group id exception expected!");
     } catch (ProcessEngineException ex) {
       assertEquals(String.format(INVALID_ID_MESSAGE, "Group", invalidGroupId), ex.getMessage());
     }
 
+    Tenant tenant = identityService.newTenant(invalidTenantId);
     try {
-      processEngine.getIdentityService().newTenant(invalidTenantId);
+      identityService.saveTenant(tenant);
       fail("Invalid tenant id exception expected!");
     } catch (ProcessEngineException ex) {
       assertEquals(String.format(INVALID_ID_MESSAGE, "Tenant", invalidTenantId), ex.getMessage());
@@ -1010,33 +1020,46 @@ public class IdentityServiceTest {
       .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/api/identity/custom.resource.whitelist.camunda.cfg.xml")
       .buildProcessEngine();
 
+    IdentityService identityService = processEngine.getIdentityService();
+
     String invalidUserId = "12345";
     String invalidGroupId = "johnsGroup";
     String invalidTenantId = "!@##$%";
 
+    User user = identityService.newUser(invalidUserId);
+
     // pattern: [a-zA-Z]+
     try {
-      processEngine.getIdentityService().newUser(invalidUserId);
+      identityService.saveUser(user);
       fail("Invalid user id exception expected!");
     } catch (ProcessEngineException ex) {
       assertEquals(String.format(INVALID_ID_MESSAGE, "User", invalidUserId), ex.getMessage());
     }
 
+    Group group = identityService.newGroup(invalidGroupId);
+
     // pattern: \d+
     try {
-      processEngine.getIdentityService().newGroup(invalidGroupId);
+      identityService.saveGroup(group);
       fail("Invalid group id exception expected!");
     } catch (ProcessEngineException ex) {
       assertEquals(String.format(INVALID_ID_MESSAGE, "Group", invalidGroupId), ex.getMessage());
     }
 
+    Tenant tenant = identityService.newTenant(invalidTenantId);
     // new general pattern (used for tenant whitelisting): [a-zA-Z0-9]+
     try {
-      processEngine.getIdentityService().newTenant(invalidTenantId);
+      identityService.saveTenant(tenant);
       fail("Invalid tenant id exception expected!");
     } catch (ProcessEngineException ex) {
       assertEquals(String.format(INVALID_ID_MESSAGE, "Tenant", invalidTenantId), ex.getMessage());
     }
+  }
+
+  @Test
+  public void shouldCreateUserWithEmptyUserId() {
+    User user = identityService.newUser("");
+    assertThat(user).isNotNull();
   }
 
   private Object createStringSet(String... strings) {

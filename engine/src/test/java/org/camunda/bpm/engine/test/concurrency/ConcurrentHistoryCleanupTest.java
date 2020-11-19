@@ -16,16 +16,26 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assume.assumeTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.sql.Connection;
 import java.util.List;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+
+import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.impl.cmd.HistoryCleanupCmd;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.test.util.DatabaseHelper;
+import org.junit.After;
+import org.junit.Test;
 
 /**
  * <p>Tests the call to history cleanup simultaneously.</p>
@@ -37,42 +47,33 @@ import org.camunda.bpm.engine.test.util.DatabaseHelper;
  */
 public class ConcurrentHistoryCleanupTest extends ConcurrencyTestCase {
 
-  @Override
+  @After
   public void tearDown() throws Exception {
-    ((ProcessEngineConfigurationImpl)processEngine.getProcessEngineConfiguration()).getCommandExecutorTxRequired().execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
+    processEngineConfiguration.getCommandExecutorTxRequired().execute((Command<Void>) commandContext -> {
 
-        List<Job> jobs = processEngine.getManagementService().createJobQuery().list();
-        if (jobs.size() > 0) {
-          String jobId = jobs.get(0).getId();
-          commandContext.getJobManager().deleteJob((JobEntity) jobs.get(0));
-          commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
-        }
-
-        return null;
+      List<Job> jobs = processEngine.getManagementService().createJobQuery().list();
+      if (jobs.size() > 0) {
+        String jobId = jobs.get(0).getId();
+        commandContext.getJobManager().deleteJob((JobEntity) jobs.get(0));
+        commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobId);
       }
+
+      return null;
     });
-    super.tearDown();
+
   }
 
-  @Override
-  protected void runTest() throws Throwable {
-    final Integer transactionIsolationLevel = DatabaseHelper.getTransactionIsolationLevel(processEngineConfiguration);
-    String databaseType = DatabaseHelper.getDatabaseType(processEngineConfiguration);
-
-    if (DbSqlSessionFactory.H2.equals(databaseType) || DbSqlSessionFactory.MARIADB.equals(databaseType) || (transactionIsolationLevel != null && !transactionIsolationLevel.equals(Connection.TRANSACTION_READ_COMMITTED))) {
-      // skip test method - if database is H2
-    } else {
-      // invoke the test method
-      super.runTest();
-    }
-  }
-
+  @Test
+  @RequiredDatabase(excludes = { DbSqlSessionFactory.MARIADB, DbSqlSessionFactory.H2 })
   public void testRunTwoHistoryCleanups() throws InterruptedException {
+    final Integer transactionIsolationLevel = DatabaseHelper.getTransactionIsolationLevel(processEngineConfiguration);
+    assumeTrue((transactionIsolationLevel != null && !transactionIsolationLevel.equals(Connection.TRANSACTION_READ_COMMITTED)));
+
     ThreadControl thread1 = executeControllableCommand(new ControllableHistoryCleanupCommand());
     thread1.waitForSync();
 
     ThreadControl thread2 = executeControllableCommand(new ControllableHistoryCleanupCommand());
+    thread2.reportInterrupts();
     thread2.waitForSync();
 
     thread1.makeContinue();
@@ -93,7 +94,11 @@ public class ConcurrentHistoryCleanupTest extends ConcurrencyTestCase {
     assertEquals(1, historyCleanupJobs.size());
 
     assertNull(thread1.getException());
-    assertNull(thread2.getException());
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
+      assertNull(thread2.getException());
+    } else {
+      assertThat(thread2.getException()).isInstanceOf(OptimisticLockingException.class);
+    }
 
   }
 

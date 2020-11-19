@@ -245,8 +245,14 @@
       <if test="query != null &amp;&amp; (query.candidateUser != null || query.candidateGroups != null || query.involvedUser != null || query.withCandidateGroups || query.withCandidateUsers)">
         <bind name="I_JOIN" value="true" />
       </if>
-      <if test="query != null &amp;&amp; (query.processDefinitionKey != null || query.processDefinitionName != null || query.processDefinitionNameLike != null ||
-              (query.processDefinitionKeys != null &amp;&amp; query.processDefinitionKeys.length > 0))">
+      <!-- the process definition table is joined if
+      1. a process-definition-related filter is used
+      2. authorization check is enabled (as permissions are defined per process definition) -->
+      <if test="query != null &amp;&amp; 
+        (query.processDefinitionKey != null || query.processDefinitionName != null || 
+        query.processDefinitionNameLike != null ||              
+        (query.processDefinitionKeys != null &amp;&amp; query.processDefinitionKeys.length > 0)) ||
+        authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
         <bind name="D_JOIN" value="true" />
       </if>
       <if test="query != null &amp;&amp; (query.processInstanceBusinessKey != null || query.processInstanceBusinessKeyLike != null ||
@@ -265,10 +271,26 @@
     </foreach>
 
     <if test="I_JOIN">
-      ${JOIN_TYPE} ${prefix}ACT_RU_IDENTITYLINK I on I.TASK_ID_ = RES.ID_
+      <!-- Identity links are always left-joined, because the involvedUser criterion
+        either requires an identity link or a not-null assignee or owner field (i.e.
+        it can be fulfilled without an identity link) -->
+      left join ${prefix}ACT_RU_IDENTITYLINK I on I.TASK_ID_ = RES.ID_
     </if>
     <if test="D_JOIN">
-      ${JOIN_TYPE} ${prefix}ACT_RE_PROCDEF D on RES.PROC_DEF_ID_ = D.ID_
+      <choose>
+        <!-- if we do not query for cmmn or standalone tasks, then an inner join is
+          always correct, regardless if it is an 'and' or 'or' query. Every task
+          references a process definition then. -->
+        <when test="queryForProcessTasksOnly">inner join</when>
+        <!-- If authorizations are enabled and we query for case tasks, it must always be a left join -->
+        <when test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
+          left join
+        </when>
+        <otherwise>
+          ${JOIN_TYPE}
+        </otherwise>
+      </choose>
+      ${prefix}ACT_RE_PROCDEF D on RES.PROC_DEF_ID_ = D.ID_
     </if>
     <if test="E_JOIN">
       ${JOIN_TYPE} ${prefix}ACT_RU_EXECUTION E on RES.PROC_INST_ID_ = E.ID_
@@ -284,11 +306,9 @@
     </if>
 
     <if test="authCheck.shouldPerformAuthorizatioCheck &amp;&amp; authCheck.authUserId != null">
-      left join ${prefix}ACT_RE_PROCDEF PROCDEF
-      on RES.PROC_DEF_ID_ = PROCDEF.ID_           
       <if test="!authCheck.revokeAuthorizationCheckEnabled">    
         <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheckJoinWithoutOnClause" /> 
-        AUTH ON (AUTH.RESOURCE_ID_ in (RES.ID_, PROCDEF.KEY_, '*'))      
+        AUTH ON (AUTH.RESOURCE_ID_ in (RES.ID_, D.KEY_, '*'))      
       </if>
     </if>
     
@@ -334,10 +354,11 @@
               ${queryType} UPPER(RES.NAME_) not like UPPER(#{query.nameNotLike}) ESCAPE ${escapeChar}
             </if>
             <if test="query.description != null">
-              ${queryType} RES.DESCRIPTION_ = #{query.description}
+              <!-- based on CAM-12186 description case insensitive -->
+              ${queryType} UPPER(RES.DESCRIPTION_) = UPPER(#{query.description})
             </if>
             <if test="query.descriptionLike != null">
-              ${queryType} RES.DESCRIPTION_ like #{query.descriptionLike} ESCAPE ${escapeChar}
+              ${queryType} UPPER(RES.DESCRIPTION_) like UPPER(#{query.descriptionLike}) ESCAPE ${escapeChar}
             </if>
             <if test="query.priority != null">
               ${queryType} RES.PRIORITY_ = #{query.priority}
@@ -596,7 +617,7 @@
             </if>
 
             <if test="query.involvedUser != null">
-              ${queryType} I.USER_ID_ = #{query.involvedUser}
+              ${queryType} (I.USER_ID_ = #{query.involvedUser} or RES.ASSIGNEE_ = #{query.involvedUser} or RES.OWNER_ = #{query.involvedUser})
             </if>
 
 
@@ -652,6 +673,9 @@
         )
       </foreach>
       
+      <!-- Task query does not use left join if cmmn is disabled, 
+        so we don't need to account for case tasks in this case. -->
+      <bind name="applyAuthorizationCheckForCaseInstances" value="authCheck.useLeftJoin" />
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.contextualAuthorizationCheck" /> 
       <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
  

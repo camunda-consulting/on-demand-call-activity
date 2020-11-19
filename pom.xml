@@ -4,14 +4,14 @@
   <parent>
     <groupId>org.camunda</groupId>
     <artifactId>camunda-bpm-release-parent</artifactId>
-    <version>2.1.0</version>
+    <version>2.2.1</version>
     <!-- do not remove empty tag - http://jira.codehaus.org/browse/MNG-4687 -->
     <relativePath />
   </parent>
 
   <groupId>org.camunda.bpm</groupId>
   <artifactId>camunda-root</artifactId>
-  <version>7.14.0-SNAPSHOT</version>
+  <version>7.14.0</version>
   <packaging>pom</packaging>
   <name>camunda BPM - Root Pom</name>
   <inceptionYear>2013</inceptionYear>
@@ -29,12 +29,11 @@
     <version.joda-time>2.1</version.joda-time>
     <version.uuid-generator>3.2.0</version.uuid-generator>
     <version.camunda.commons>1.9.0</version.camunda.commons>
-    <version.camunda.connect>1.4.0</version.camunda.connect>
-    <version.camunda.spin>1.9.0</version.camunda.spin>
+    <version.camunda.connect>1.5.0</version.camunda.connect>
+    <version.camunda.spin>1.10.0</version.camunda.spin>
     <version.camunda.template-engines>2.0.0</version.camunda.template-engines>
     <version.camunda.ee.xslt-plugin>1.1.0</version.camunda.ee.xslt-plugin>
-    <version.spring-boot>2.2.5.RELEASE</version.spring-boot>
-    <version.feel-scala>1.11.0</version.feel-scala>
+    <version.feel-scala>1.12.2</version.feel-scala>
   </properties>
 
   <build>
@@ -61,7 +60,7 @@
       </activation>
       <modules>
         <!-- This profile is run in the CI as the first step (platform-ASSEMBLY); It must not activate
-          any modules that have a dependency to the webapps. See also the referenced POMs, 
+          any modules that have a dependency to the webapps. See also the referenced POMs,
           they usually define which modules are covered by the distro profile -->
         <module>spring-boot-starter</module>
 
@@ -93,6 +92,7 @@
         <module>distro/sql-script</module>
         <module>distro/run</module>
 
+        <module>internal-dependencies</module>
         <module>database</module>
         <module>parent</module>
         <module>bom</module>
@@ -105,10 +105,10 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
-        <!-- This profile is run in the CI after the webapps were built (platform-DISTRO); 
+        <!-- This profile is run in the CI after the webapps were built (platform-DISTRO);
           It should activate any module that has a dependency to the webapps -->
         <module>spring-boot-starter</module>
-        
+
         <module>distro/license-book</module>
         <module>distro/jbossas7</module>
         <module>distro/tomcat</module>
@@ -134,6 +134,7 @@
 
         <module>distro/sql-script</module>
 
+        <module>internal-dependencies</module>
         <module>database</module>
         <module>parent</module>
         <module>bom</module>
@@ -214,6 +215,7 @@
         <module>engine-spring</module>
         <module>engine-rest</module>
 
+        <module>internal-dependencies</module>
         <module>database</module>
         <module>parent</module>
         <module>bom</module>
@@ -224,6 +226,7 @@
       <!-- profile for running webapp unit tests in QA -->
       <id>check-webapps</id>
       <modules>
+        <module>internal-dependencies</module>
         <module>parent</module>
         <module>bom</module>
       </modules>
@@ -249,6 +252,7 @@
 
         <module>distro/webjar</module>
 
+        <module>internal-dependencies</module>
         <module>database</module>
         <module>parent</module>
         <module>bom</module>
@@ -296,7 +300,7 @@
     <url>https://github.com/camunda/camunda-bpm-platform</url>
     <connection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</connection>
     <developerConnection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>7.14.0</tag>
   </scm>
 
   <issueManagement>

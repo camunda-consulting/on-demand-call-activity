@@ -19,9 +19,13 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import org.apache.ibatis.session.RowBounds;
 import org.camunda.bpm.engine.filter.Filter;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricCaseActivityInstance;
@@ -45,8 +49,15 @@ import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionEntity;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionRequirementsDefinitionEntity;
-import org.camunda.bpm.engine.impl.history.event.*;
+import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInputInstanceEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricDecisionInstanceEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricDecisionOutputInstanceEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricDetailEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricExternalTaskLogEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricIncidentEventEntity;
+import org.camunda.bpm.engine.impl.history.event.UserOperationLogEntryEventEntity;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
+import org.camunda.bpm.engine.impl.util.DatabaseUtil;
 import org.camunda.bpm.engine.management.TableMetaData;
 import org.camunda.bpm.engine.management.TablePage;
 import org.camunda.bpm.engine.repository.Deployment;
@@ -196,18 +207,17 @@ public class TableDataManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public TablePage getTablePage(TablePageQueryImpl tablePageQuery, int firstResult, int maxResults) {
+  public TablePage getTablePage(TablePageQueryImpl tablePageQuery) {
 
     TablePage tablePage = new TablePage();
 
     @SuppressWarnings("rawtypes")
-    List tableData = getDbSqlSession().getSqlSession()
-      .selectList("selectTableData", tablePageQuery, new RowBounds(firstResult, maxResults));
+    List tableData = getDbEntityManager().selectList("selectTableData", tablePageQuery);
 
     tablePage.setTableName(tablePageQuery.getTableName());
     tablePage.setTotal(getTableCount(tablePageQuery.getTableName()));
     tablePage.setRows(tableData);
-    tablePage.setFirstResult(firstResult);
+    tablePage.setFirstResult(tablePageQuery.getFirstResult());
 
     return tablePage;
   }
@@ -256,7 +266,7 @@ public class TableDataManager extends AbstractManager {
             .getConnection()
             .getMetaData();
 
-        if (DbSqlSessionFactory.POSTGRES.equals(getDbSqlSession().getDbSqlSessionFactory().getDatabaseType())) {
+        if (DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.POSTGRES, DbSqlSessionFactory.CRDB)) {
           tableName = tableName.toLowerCase();
         }
 

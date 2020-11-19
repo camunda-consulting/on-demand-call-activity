@@ -29,6 +29,7 @@
 
     <!-- turn off metrics reporter -->
     <property name="dbMetricsReporterActivate" value="false" />
+    <property name="telemetryReporterActivate" value="false" />
 
     <!-- mail server configurations -->
     <property name="mailServerPort" value="${mail.server.port}" />
@@ -39,6 +40,9 @@
     <!--<property name="idGenerator" ref="uuidGenerator" />-->
 
     <property name="databaseTablePrefix" value="SCHEMA1." />
+
+    <!-- telemetry configuration -->
+    <property name="telemetryEndpoint" value="http://localhost:8081/pings"/>
 
     <property name="processEnginePlugins">
       <list>

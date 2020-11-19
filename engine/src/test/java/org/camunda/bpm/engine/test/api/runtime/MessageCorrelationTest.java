@@ -16,6 +16,14 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -35,7 +43,6 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.exception.NullValueException;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.digest._apacheCommonsCodec.Base64;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.util.StringUtil;
@@ -49,6 +56,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.RequiredHistoryLevel;
 import org.camunda.bpm.engine.test.api.variables.FailingJavaSerializable;
 import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
 import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
@@ -57,6 +65,7 @@ import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 import org.camunda.bpm.engine.variable.Variables.SerializationDataFormats;
 import org.camunda.bpm.engine.variable.value.ObjectValue;
+import org.camunda.bpm.engine.variable.value.StringValue;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.junit.Assert;
@@ -68,28 +77,16 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 /**
  * @author Thorben Lindhauer
  */
 public class MessageCorrelationTest {
 
   @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule() {
-    public ProcessEngineConfiguration configureEngine(ProcessEngineConfigurationImpl configuration) {
-      configuration.setJavaSerializationFormatEnabled(true);
-      return configuration;
-    }
-  };
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration ->
+      configuration.setJavaSerializationFormatEnabled(true));
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
-  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
@@ -1699,6 +1696,43 @@ public class MessageCorrelationTest {
         .variableName(localVarName)
         .singleResult();
     assertNull(variableNonExisting);
+  }
+  
+
+  
+  @Test
+  @RequiredHistoryLevel(ProcessEngineConfiguration.HISTORY_FULL)
+  public void testCorrelationWithTransientLocalVariables() {
+    // given
+    BpmnModelInstance model = Bpmn.createExecutableProcess("process")
+        .startEvent()
+        .intermediateCatchEvent("message_1").message("message")
+        .userTask("UserTask_1")
+        .endEvent()
+        .done();
+
+    testRule.deploy(model);
+
+    runtimeService.startProcessInstanceByKey("process");
+
+    StringValue transientValue = Variables.stringValue("value", true);
+    
+    Map<String, Object> messageLocalPayload = new HashMap<>();
+    messageLocalPayload.put("var", transientValue);
+
+    // when
+    runtimeService
+        .createMessageCorrelation("message")
+        .setVariablesLocal(messageLocalPayload)
+        .correlate();
+
+    // then
+    long numHistoricVariables = 
+        engineRule.getHistoryService()
+          .createHistoricVariableInstanceQuery()
+          .count();
+    
+    assertThat(numHistoricVariables).isEqualTo(0);
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/runtime/MessageCorrelationTest.waitForMessageProcess.bpmn20.xml",

@@ -9,8 +9,30 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
     <relativePath>../database</relativePath>
-    <version>7.14.0-SNAPSHOT</version>
+    <version>7.14.0</version>
   </parent>
+
+  <dependencyManagement>
+    <dependencies>
+
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-core-internal-dependencies</artifactId>
+        <version>${project.version}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-framework-bom</artifactId>
+        <version>${version.spring.framework}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
 
@@ -88,6 +110,17 @@
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
     </dependency>
+
+    <dependency>
+      <groupId>org.camunda.connect</groupId>
+      <artifactId>camunda-connect-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.connect</groupId>
+      <artifactId>camunda-connect-connectors-all</artifactId>
+      <scope>runtime</scope>
+    </dependency> 
 
     <!-- provided dependencies -->
 
@@ -252,6 +285,11 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>com.github.tomakehurst</groupId>
+      <artifactId>wiremock</artifactId>
+      <scope>test</scope>
+    </dependency>
     <!-- https://github.com/camunda-consulting/code/tree/on-demand-call-activity/snippets/engine-plugin-on-demand-call-activity -->
     <dependency>
       <groupId>org.camunda.bpm.extension.bpmn.callactivity.ondemand</groupId>
@@ -321,10 +359,8 @@
         <includes>
           <include>**/camunda.cfg.xml</include>
           <include>**/*camunda.cfg.xml</include>
-          <include>**/camunda.cfg.db.xml</include>
-          <include>**/camunda.cfg.plugins.xml</include>
-          <include>**/camunda.cfg.prefix.xml</include>
-          <include>**/camunda.cfg.invocationsPerJobByBatchType.xml</include>
+          <include>**/camunda.cfg.*.xml</include>
+          <include>testconfig.properties</include>
         </includes>
       </testResource>
     </testResources>
@@ -388,6 +424,7 @@
               <exclude>org.camunda.bpm.model:*</exclude>
               <exclude>org.camunda.bpm.dmn:*</exclude>
               <exclude>org.camunda.commons:*</exclude>
+              <exclude>org.camunda.connect:*</exclude>
 
               <exclude>org.springframework:*</exclude>
               <exclude>org.slf4j:*</exclude>
@@ -629,6 +666,22 @@
       </build>
     </profile>
 
+    <profile>
+      <id>cockroachdb</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <failIfNoTests>false</failIfNoTests>
+              <trimStackTrace>false</trimStackTrace>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
     <!-- check for api differences between latest minor release -->
     <profile>
       <id>check-api-compatibility</id>
@@ -739,7 +792,7 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
-              <argLine>-Xmx700m</argLine>
+              <argLine>-Xmx968m</argLine>
             </configuration>
           </plugin>
         </plugins>
@@ -790,6 +843,8 @@
                 <exclude>**/removaltime/cleanup/HistoryCleanupScheduler*Test.java</exclude>
                 <exclude>**/HistoryCleanupDisabledOnBootstrapTest.java</exclude>
                 <exclude>**/LoginAttemptsTest.java</exclude>
+                <exclude>**/ConcurrentHistoryCleanupUpdateOfFailingJobTest.java</exclude>
+                <exclude>**/TelemetryTaskWorkerMetricsTest.java</exclude>
               </excludes>
             </configuration>
           </plugin>

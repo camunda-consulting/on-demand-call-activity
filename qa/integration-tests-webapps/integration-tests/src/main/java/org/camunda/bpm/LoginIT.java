@@ -58,15 +58,30 @@ public class LoginIT extends AbstractWebappUiIntegrationTest {
 
     wait.until(presenceOfElementLocated(By.cssSelector("button[type=\"submit\"]")))
         .submit();
+
+    wait.until(presenceOfElementLocated(By.cssSelector(".modal-close")))
+        .click();
   }
 
   @After
-  public void logout() {
-    wait.until(presenceOfElementLocated(By.cssSelector(".account .dropdown-toggle")))
-        .click();
+  public void logout() throws InterruptedException {
+    Thread.sleep(200);
 
-    wait.until(presenceOfElementLocated(By.cssSelector(".logout")))
-        .click();
+    if (appName.equals("cockpit")) {
+      wait.until(presenceOfElementLocated(By.cssSelector(".UserInformation .user")))
+          .click();
+
+      wait.until(presenceOfElementLocated(By.xpath("//button[text()='Log out']")))
+          .click();
+
+    } else {
+      wait.until(presenceOfElementLocated(By.cssSelector(".account .dropdown-toggle")))
+          .click();
+
+      wait.until(presenceOfElementLocated(By.cssSelector(".logout")))
+          .click();
+
+    }
   }
 
   @Test

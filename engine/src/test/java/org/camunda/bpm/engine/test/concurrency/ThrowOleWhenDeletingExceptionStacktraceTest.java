@@ -16,14 +16,16 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
-
-import java.util.concurrent.atomic.AtomicReference;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.After;
+import org.junit.Test;
 
 /**
  * @author Tassilo Weidner
@@ -32,31 +34,28 @@ public class ThrowOleWhenDeletingExceptionStacktraceTest extends ConcurrencyTest
 
   protected AtomicReference<JobEntity> job = new AtomicReference<>();
 
-  protected void tearDown() throws Exception {
+  @After
+  public void tearDown() throws Exception {
     if (job.get() != null) {
-      processEngineConfiguration.getCommandExecutorTxRequired().execute(new Command<Void>() {
-        public Void execute(CommandContext commandContext) {
-          JobEntity jobEntity = job.get();
+      processEngineConfiguration.getCommandExecutorTxRequired().execute((Command<Void>) commandContext -> {
+        JobEntity jobEntity = job.get();
 
-          jobEntity.setRevision(2);
+        jobEntity.setRevision(2);
 
-          commandContext.getJobManager().deleteJob(jobEntity);
-          commandContext.getByteArrayManager().deleteByteArrayById(jobEntity.getExceptionByteArrayId());
-          commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobEntity.getId());
+        commandContext.getJobManager().deleteJob(jobEntity);
+        commandContext.getByteArrayManager().deleteByteArrayById(jobEntity.getExceptionByteArrayId());
+        commandContext.getHistoricJobLogManager().deleteHistoricJobLogByJobId(jobEntity.getId());
 
-          return null;
-        }
+        return null;
       });
     }
-
-    super.tearDown();
   }
 
+  @Test
   public void testThrowOleWhenDeletingExceptionStacktraceTest() {
     // given
     processEngineConfiguration.getCommandExecutorTxRequired()
-      .execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
+      .execute((Command<Void>) commandContext -> {
         JobEntity jobEntity = new MessageEntity();
 
         jobEntity.setExceptionStacktrace("foo");
@@ -66,8 +65,7 @@ public class ThrowOleWhenDeletingExceptionStacktraceTest extends ConcurrencyTest
         job.set(jobEntity);
 
         return null;
-      }
-    });
+      });
 
     ThreadControl threadOne = executeControllableCommand(new ThreadOne());
 
@@ -87,7 +85,7 @@ public class ThrowOleWhenDeletingExceptionStacktraceTest extends ConcurrencyTest
     threadTwo.join();
 
     // then
-    assertThat(threadTwo.getException().getMessage()).contains("Entity was updated by another transaction concurrently.");
+    assertThat(threadTwo.getException().getMessage()).contains("Entity was updated by another transaction concurrently");
   }
 
   public class ThreadOne extends ControllableCommand<Void> {

@@ -35,6 +35,7 @@
       CASE_INST_ID_,
       CASE_EXECUTION_ID_,
       TASK_ID_,
+      BATCH_ID_,
       BYTEARRAY_ID_,
       DOUBLE_,
       LONG_,
@@ -56,6 +57,7 @@
       #{caseInstanceId, jdbcType=VARCHAR},
       #{caseExecutionId, jdbcType=VARCHAR},
       #{taskId, jdbcType=VARCHAR},
+      #{batchId, jdbcType=VARCHAR},
       #{byteArrayValueId, jdbcType=VARCHAR},
       #{doubleValue, jdbcType=DOUBLE},
       #{longValue, jdbcType=BIGINT},
@@ -107,6 +109,7 @@
       <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
       <result property="caseExecutionId" column="CASE_EXECUTION_ID_" jdbcType="VARCHAR" />
       <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
+      <result property="batchId" column="BATCH_ID_" jdbcType="VARCHAR" />
       <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
       <result property="activityId" column="ACTIVITY_ID_" jdbcType="VARCHAR" />
       <result property="isActive" column="IS_ACTIVE_" jdbcType="BOOLEAN" />
@@ -122,6 +125,10 @@
 	</resultMap>
 
   <!-- VARIABLE INSTANCE SELECT -->
+
+  <select id="selectVariableInstancesByBatchId" parameterType="string" resultMap="variableInstanceResultMap">
+    SELECT * FROM ${prefix}ACT_RU_VARIABLE RES WHERE VAR_SCOPE_ = #{parameter.batchId}
+  </select>
 
 	<select id="selectVariableInstance" parameterType="string" resultMap="variableInstanceResultMap">
 		SELECT
@@ -400,6 +407,15 @@
               </foreach>
             </if>
 
+            <!-- batchIds -->
+            <if test="batchIds != null &amp;&amp; batchIds.length > 0">
+              and RES.BATCH_ID_ in
+              <foreach item="item" index="index" collection="batchIds"
+                       open="(" separator="," close=")">
+                #{item}
+              </foreach>
+            </if>
+
             <!-- variableScopeIds -->
             <if test="variableScopeIds != null &amp;&amp; variableScopeIds.length > 0">
               and RES.VAR_SCOPE_ in
@@ -446,6 +462,7 @@
               </if>
             </foreach>
 
+            <bind name="applyAuthorizationCheckForCaseInstances" value="true" />
             <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.contextualAuthorizationCheck" />
             <include refid="org.camunda.bpm.engine.impl.persistence.entity.TenantEntity.queryTenantCheck" />
 
@@ -764,4 +781,17 @@
       1
     )
   </insert>
+
+<!--  MySQL specific configuration -->
+  <update id="updateByteArraysByBatchId_mysql"
+          parameterType="java.util.Map">
+    update ${prefix}ACT_GE_BYTEARRAY
+      set REMOVAL_TIME_ = #{removalTime, jdbcType=TIMESTAMP}
+      where ID_ IN (
+        SELECT JOB_EXCEPTION_STACK_ID_
+        FROM ${prefix}ACT_HI_JOB_LOG
+        WHERE JOB_DEF_CONFIGURATION_ = #{batchId, jdbcType=VARCHAR}
+          AND JOB_EXCEPTION_STACK_ID_ IS NOT NULL
+      )
+  </update>
 </mapper>

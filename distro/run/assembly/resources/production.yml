@@ -5,9 +5,24 @@
 camunda.bpm:
 # https://docs.camunda.org/manual/latest/user-guide/security/#http-header-security-in-webapps
 # https://docs.camunda.org/manual/latest/webapps/shared-options/header-security/
-  webapp.csrf:
-    enable-same-site-cookie: true
-    same-site-cookie-option: STRICT
+  webapp:
+    csrf:
+      enable-same-site-cookie: true
+      same-site-cookie-option: STRICT
+    header-security:
+      hsts-disabled: false
+      content-security-policy-value: base-uri 'self';
+        default-src 'self' 'unsafe-inline' 'unsafe-eval';
+        img-src 'self' data:;
+        block-all-mixed-content;
+        form-action 'self';
+        frame-ancestors 'none';
+        object-src 'none';
+        sandbox
+          allow-forms
+          allow-scripts
+          allow-same-origin
+          allow-popups
 
 # https://docs.camunda.org/manual/latest/user-guide/security/#authorization
 # https://docs.camunda.org/manual/latest/user-guide/process-engine/authorization-service/

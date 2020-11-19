@@ -16,14 +16,23 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
+import static org.assertj.core.api.Assumptions.assumeThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.sql.Connection;
 
+import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.impl.HistoryLevelSetupCommand;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.test.util.DatabaseHelper;
+import org.junit.Before;
+import org.junit.Test;
 
 /**
  * <p>Tests cluster scenario with two nodes trying to write the history level property in parallel.</p>
@@ -34,31 +43,22 @@ import org.camunda.bpm.engine.test.util.DatabaseHelper;
  */
 public class ConcurrentHistoryLevelTest extends ConcurrencyTestCase {
 
-  @Override
-  protected void setUp() throws Exception {
-    super.setUp();
+  @Before
+  public void setUp() throws Exception {
     TestHelper.deleteHistoryLevel(processEngineConfiguration);
   }
 
-  @Override
-  protected void runTest() throws Throwable {
-    final Integer transactionIsolationLevel = DatabaseHelper.getTransactionIsolationLevel(processEngineConfiguration);
-    String databaseType = DatabaseHelper.getDatabaseType(processEngineConfiguration);
-
-    if (DbSqlSessionFactory.H2.equals(databaseType) || DbSqlSessionFactory.MARIADB.equals(databaseType)
-        || (transactionIsolationLevel != null && !transactionIsolationLevel.equals(Connection.TRANSACTION_READ_COMMITTED))) {
-      // skip test method - if database is H2
-    } else {
-      // invoke the test method
-      super.runTest();
-    }
-  }
-
+  @Test
+  @RequiredDatabase(excludes = { DbSqlSessionFactory.H2, DbSqlSessionFactory.MARIADB })
   public void test() throws InterruptedException {
+    Integer transactionIsolationLevel = DatabaseHelper.getTransactionIsolationLevel(processEngineConfiguration);
+    assumeThat((transactionIsolationLevel != null && !transactionIsolationLevel.equals(Connection.TRANSACTION_READ_COMMITTED)));
     ThreadControl thread1 = executeControllableCommand(new ControllableUpdateHistoryLevelCommand());
+    thread1.reportInterrupts();
     thread1.waitForSync();
 
     ThreadControl thread2 = executeControllableCommand(new ControllableUpdateHistoryLevelCommand());
+    thread2.reportInterrupts();
     thread2.waitForSync();
 
     thread1.makeContinue();
@@ -73,8 +73,17 @@ public class ConcurrentHistoryLevelTest extends ConcurrencyTestCase {
     thread2.waitForSync();
     thread2.waitUntilDone();
 
-    assertNull(thread1.exception);
-    assertNull(thread2.exception);
+    assertNull(thread1.getException());
+    Throwable thread2Exception = thread2.getException();
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
+      assertNull(thread2Exception);
+    } else {
+      // on CRDB, the pessimistic lock is disabled and the concurrent transaction
+      // with fail with a CrdbTransactionRetryException and will be retried. However,
+      // by default, the CRDB-related `commandRetries` property is set to 0, so retryable commands
+      // will still re-throw the `CrdbTransactionRetryException` to the caller and fail.
+      assertThat(thread2Exception).isInstanceOf(CrdbTransactionRetryException.class);
+    }
     HistoryLevel historyLevel = processEngineConfiguration.getHistoryLevel();
     assertEquals("full", historyLevel.getName());
   }

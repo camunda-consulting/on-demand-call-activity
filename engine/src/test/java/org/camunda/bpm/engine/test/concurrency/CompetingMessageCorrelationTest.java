@@ -16,8 +16,15 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -31,13 +38,14 @@ import org.camunda.bpm.engine.impl.cmd.MessageEventReceivedCmd;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.runtime.Execution;
-import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.util.DatabaseHelper;
+import org.junit.After;
+import org.junit.Ignore;
+import org.junit.Test;
 
 /**
  * @author Thorben Lindhauer
@@ -45,7 +53,7 @@ import org.camunda.bpm.engine.test.util.DatabaseHelper;
  */
 public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
 
-  @Override
+  @After
   public void tearDown() throws Exception {
     ((ProcessEngineConfigurationImpl)processEngine.getProcessEngineConfiguration()).getCommandExecutorTxRequiresNew().execute(new Command<Void>() {
       public Void execute(CommandContext commandContext) {
@@ -60,23 +68,69 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     });
 
     assertEquals(0, processEngine.getHistoryService().createHistoricJobLogQuery().list().size());
-
-    super.tearDown();
   }
 
-  @Override
-  protected void runTest() throws Throwable {
-    String databaseType = DatabaseHelper.getDatabaseType(processEngineConfiguration);
+  /**
+   * On CockroachDB, exclusive message correlation is not supported since a concurrent transaction obtaining
+   * a pessimistic lock provided with a `SELECT FOR UPDATE` will not see the changed data until it commits.
+   *
+   * @throws InterruptedException
+   */
+  @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.catchMessageProcess.bpmn20.xml")
+  @Test
+  @RequiredDatabase(excludes = { DbSqlSessionFactory.H2, DbSqlSessionFactory.CRDB })
+  public void testConcurrentExclusiveCorrelation() throws InterruptedException {
+    InvocationLogListener.reset();
 
-    if (DbSqlSessionFactory.H2.equals(databaseType) && getName().equals("testConcurrentExclusiveCorrelation")) {
-      // skip test method - if database is H2
-    } else {
-      // invoke the test method
-      super.runTest();
-    }
+    // given a process instance
+    runtimeService.startProcessInstanceByKey("testProcess");
+
+    // and two threads correlating in parallel
+    ThreadControl thread1 = executeControllableCommand(new ControllableMessageCorrelationCommand("Message", true));
+    thread1.reportInterrupts();
+    ThreadControl thread2 = executeControllableCommand(new ControllableMessageCorrelationCommand("Message", true));
+    thread2.reportInterrupts();
+
+    // both threads open a transaction and wait before correlating the message
+    thread1.waitForSync();
+    thread2.waitForSync();
+
+    // thread one correlates and acquires the exclusive lock
+    thread1.makeContinue();
+    thread1.waitForSync();
+
+    // the service task was executed once
+    assertEquals(1, InvocationLogListener.getInvocations());
+
+    // thread two attempts to acquire the exclusive lock but can't since thread 1 hasn't released it yet
+    thread2.makeContinue();
+    Thread.sleep(2000);
+
+    // let the first thread ends its transaction
+    thread1.makeContinue();
+    assertNull(thread1.getException());
+
+    // thread 2 can't continue because the event subscription it tried to lock was deleted
+    thread2.waitForSync();
+    assertTrue(thread2.getException() != null);
+    assertTrue(thread2.getException() instanceof ProcessEngineException);
+    assertThat(thread2.getException().getMessage())
+        .contains("does not have a subscription to a message event with name 'Message'");
+
+    // the first thread ended successfully without an exception
+    thread1.join();
+    assertNull(thread1.getException());
+
+    // the follow-up task was reached
+    Task afterMessageTask = taskService.createTaskQuery().singleResult();
+    assertEquals(afterMessageTask.getTaskDefinitionKey(), "afterMessageUserTask");
+
+    // the service task was not executed a second time
+    assertEquals(1, InvocationLogListener.getInvocations());
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.catchMessageProcess.bpmn20.xml")
+  @Test
   public void testConcurrentCorrelationFailsWithOptimisticLockingException() {
     InvocationLogListener.reset();
 
@@ -116,58 +170,13 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     assertTrue(thread2.getException() instanceof OptimisticLockingException);
   }
 
+  /**
+   * On CockroachDB, exclusive message correlation is not supported since a concurrent transaction obtaining
+   * a pessimistic lock provided with a `SELECT FOR UPDATE` will not see the changed data until it commits.
+   */
   @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.catchMessageProcess.bpmn20.xml")
-  public void testConcurrentExclusiveCorrelation() throws InterruptedException {
-    InvocationLogListener.reset();
-
-    // given a process instance
-    runtimeService.startProcessInstanceByKey("testProcess");
-
-    // and two threads correlating in parallel
-    ThreadControl thread1 = executeControllableCommand(new ControllableMessageCorrelationCommand("Message", true));
-    thread1.reportInterrupts();
-    ThreadControl thread2 = executeControllableCommand(new ControllableMessageCorrelationCommand("Message", true));
-    thread2.reportInterrupts();
-
-    // both threads open a transaction and wait before correlating the message
-    thread1.waitForSync();
-    thread2.waitForSync();
-
-    // thread one correlates and acquires the exclusive lock
-    thread1.makeContinue();
-    thread1.waitForSync();
-
-    // the service task was executed once
-    assertEquals(1, InvocationLogListener.getInvocations());
-
-    // thread two attempts to acquire the exclusive lock but can't since thread 1 hasn't released it yet
-    thread2.makeContinue();
-    Thread.sleep(2000);
-
-    // let the first thread ends its transaction
-    thread1.makeContinue();
-    assertNull(thread1.getException());
-
-    // thread 2 can't continue because the event subscription it tried to lock was deleted
-    thread2.waitForSync();
-    assertTrue(thread2.getException() != null);
-    assertTrue(thread2.getException() instanceof ProcessEngineException);
-    assertTextPresent("does not have a subscription to a message event with name 'Message'",
-        thread2.getException().getMessage());
-
-    // the first thread ended successfully without an exception
-    thread1.join();
-    assertNull(thread1.getException());
-
-    // the follow-up task was reached
-    Task afterMessageTask = taskService.createTaskQuery().singleResult();
-    assertEquals(afterMessageTask.getTaskDefinitionKey(), "afterMessageUserTask");
-
-    // the service task was not executed a second time
-    assertEquals(1, InvocationLogListener.getInvocations());
-  }
-
-  @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.catchMessageProcess.bpmn20.xml")
+  @Test
+  @RequiredDatabase(excludes = DbSqlSessionFactory.CRDB)
   public void testConcurrentExclusiveCorrelationToDifferentExecutions() throws InterruptedException {
     InvocationLogListener.reset();
 
@@ -218,7 +227,9 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
    * Fails at least on mssql; mssql appears to lock more than the actual event subscription row
    */
   @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.catchMessageProcess.bpmn20.xml")
-  public void FAILING_testConcurrentExclusiveCorrelationToDifferentExecutionsCase2() throws InterruptedException {
+  @Ignore
+  @Test
+  public void testConcurrentExclusiveCorrelationToDifferentExecutionsCase2() throws InterruptedException {
     InvocationLogListener.reset();
 
     // given a process instance
@@ -262,8 +273,17 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
     assertEquals(2, taskService.createTaskQuery().taskDefinitionKey("afterMessageUserTask").count());
   }
 
+  /** On CockroachDB, the test will cause a hanging thread:
+   * 1. TX1 will perform a SELECT FOR UPDATE which behaves as a CRDB Write Intent
+   * 2. TX2 will attempt to SELECT the same ACT_RU_EVENT_SUBSCR row and will block in CRDB
+   *
+   * To make the test work on CRDB, TX1 needs to commit before TX2 executes the ACT_RU_EVENT_SUBSCR select,
+   * which orders the transactions and makes the test redundant.
+   */
+  @RequiredDatabase(excludes = DbSqlSessionFactory.CRDB)
   @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.catchMessageProcess.bpmn20.xml")
-  public void testConcurrentMixedCorrelation() throws InterruptedException {
+  @Test
+  public void testConcurrentMixedCorrelation() {
     InvocationLogListener.reset();
 
     // given a process instance
@@ -314,7 +334,9 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
    * @throws InterruptedException
    */
   @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.catchMessageProcess.bpmn20.xml")
-  public void FAILING_testConcurrentMixedCorrelationCase2() throws InterruptedException {
+  @Ignore("CAM-3636")
+  @Test
+  public void testConcurrentMixedCorrelationCase2() throws InterruptedException {
     InvocationLogListener.reset();
 
     // given a process instance
@@ -363,6 +385,7 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.eventSubprocess.bpmn")
+  @Test
   public void testEventSubprocess() {
     InvocationLogListener.reset();
 
@@ -397,6 +420,7 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
   }
 
   @Deployment
+  @Test
   public void testConcurrentMessageCorrelationAndTreeCompaction() {
     runtimeService.startProcessInstanceByKey("process");
 
@@ -426,6 +450,7 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingMessageCorrelationTest.testConcurrentMessageCorrelationAndTreeCompaction.bpmn20.xml")
+  @Test
   public void testConcurrentTreeCompactionAndMessageCorrelation() {
     runtimeService.startProcessInstanceByKey("process");
     List<Task> tasks = taskService.createTaskQuery().list();
@@ -451,6 +476,7 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
   }
 
   @Deployment
+  @Test
   public void testConcurrentMessageCorrelationTwiceAndTreeCompaction() {
     runtimeService.startProcessInstanceByKey("process");
 
@@ -483,6 +509,7 @@ public class CompetingMessageCorrelationTest extends ConcurrencyTestCase {
   }
 
   @Deployment
+  @Test
   public void testConcurrentEndExecutionListener() {
     InvocationLogListener.reset();
 
