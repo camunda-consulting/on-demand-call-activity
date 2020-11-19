@@ -16,16 +16,14 @@
  */
 package org.camunda.bpm.engine.test.concurrency.partitioning;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentEntity;
 import org.camunda.bpm.engine.task.Attachment;
-import org.camunda.bpm.engine.test.RequiredHistoryLevel;
-
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import org.junit.Test;
 
 /**
  * @author Tassilo Weidner
@@ -33,7 +31,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 public class CompetingHistoricAttachmentPartitioningTest extends AbstractPartitioningTest {
 
-  public void testConcurrentFetchAndDelete() {
+  @Test
+  public void shouldSuppressOleOnConcurrentFetchAndDelete() {
     // given
     String processInstanceId = deployAndStartProcess(PROCESS_WITH_USERTASK).getId();
 
@@ -41,19 +40,16 @@ public class CompetingHistoricAttachmentPartitioningTest extends AbstractPartiti
       "anAttachmentName", null, "http://camunda.com");
 
     ThreadControl asyncThread = executeControllableCommand(new AsyncThread(attachment.getId()));
-
-    // assume
-    assertThat(taskService.getAttachment(attachment.getId()), notNullValue());
-
+    asyncThread.reportInterrupts();
     asyncThread.waitForSync();
 
-    commandExecutor.execute(new Command<Void>() {
-      public Void execute(CommandContext commandContext) {
+    // assume
+    assertThat(taskService.getAttachment(attachment.getId())).isNotNull();
 
-        commandContext.getAttachmentManager().delete((AttachmentEntity) attachment);
+    commandExecutor.execute((Command<Void>) commandContext -> {
 
-        return null;
-      }
+      commandContext.getAttachmentManager().delete((AttachmentEntity) attachment);
+      return null;
     });
 
     // when
@@ -61,7 +57,12 @@ public class CompetingHistoricAttachmentPartitioningTest extends AbstractPartiti
     asyncThread.waitUntilDone();
 
     // then
-    assertThat(taskService.getAttachment(attachment.getId()), nullValue());
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
+      assertThat(taskService.getAttachment(attachment.getId())).isNull();
+    } else {
+      // with CockroachDB, the OLE can't be ignored, the TX will fail and be rolled-back
+      assertThat(asyncThread.getException()).isInstanceOf(CrdbTransactionRetryException.class);
+    }
   }
 
   public class AsyncThread extends ControllableCommand<Void> {

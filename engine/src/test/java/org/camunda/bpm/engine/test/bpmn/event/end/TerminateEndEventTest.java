@@ -16,23 +16,29 @@
  */
 package org.camunda.bpm.engine.test.bpmn.event.end;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.bpmn.executionlistener.RecorderExecutionListener;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Test;
 
 /**
  * @author Nico Rehwaldt
  */
-public class TerminateEndEventTest extends PluggableProcessEngineTestCase {
+public class TerminateEndEventTest extends PluggableProcessEngineTest {
 
   public static int serviceTaskInvokedCount = 0;
 
@@ -56,6 +62,7 @@ public class TerminateEndEventTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testProcessTerminate() throws Exception {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
 
@@ -65,10 +72,11 @@ public class TerminateEndEventTest extends PluggableProcessEngineTestCase {
     Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preTerminateTask").singleResult();
     taskService.complete(task.getId());
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testTerminateWithSubProcess() throws Exception {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
 
@@ -79,13 +87,14 @@ public class TerminateEndEventTest extends PluggableProcessEngineTestCase {
     Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preTerminateEnd").singleResult();
     taskService.complete(task.getId());
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment(resources={
     "org/camunda/bpm/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateWithCallActivity.bpmn",
     "org/camunda/bpm/engine/test/bpmn/event/end/TerminateEndEventTest.subProcessNoTerminate.bpmn"
   })
+  @Test
   public void testTerminateWithCallActivity() throws Exception {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
 
@@ -95,10 +104,11 @@ public class TerminateEndEventTest extends PluggableProcessEngineTestCase {
     Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preTerminateEnd").singleResult();
     taskService.complete(task.getId());
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testTerminateInSubProcess() throws Exception {
     serviceTaskInvokedCount = 0;
 
@@ -111,13 +121,14 @@ public class TerminateEndEventTest extends PluggableProcessEngineTestCase {
     Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preNormalEnd").singleResult();
     taskService.complete(task.getId());
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   /**
    * CAM-4067
    */
   @Deployment
+  @Test
   public void testTerminateInSubProcessShouldNotInvokeProcessEndListeners() {
     RecorderExecutionListener.clear();
 
@@ -138,6 +149,7 @@ public class TerminateEndEventTest extends PluggableProcessEngineTestCase {
    * CAM-4067
    */
   @Deployment
+  @Test
   public void testTerminateInSubProcessConcurrentShouldNotInvokeProcessEndListeners() {
     RecorderExecutionListener.clear();
 
@@ -158,12 +170,13 @@ public class TerminateEndEventTest extends PluggableProcessEngineTestCase {
    * CAM-4067
    */
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateInSubProcess.bpmn")
+  @Test
   public void testTerminateInSubProcessShouldNotEndProcessInstanceInHistory() throws Exception {
     // when process instance is started and terminate end event in subprocess executed
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
 
     // then the historic process instance should not appear ended
-    assertProcessNotEnded(pi.getId());
+    testRule.assertProcessNotEnded(pi.getId());
 
     if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       HistoricProcessInstance hpi = historyService.createHistoricProcessInstanceQuery().singleResult();
@@ -176,6 +189,7 @@ public class TerminateEndEventTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testTerminateInSubProcessConcurrent() throws Exception {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
 
@@ -185,19 +199,20 @@ public class TerminateEndEventTest extends PluggableProcessEngineTestCase {
     Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preNormalEnd").singleResult();
     taskService.complete(task.getId());
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   /**
    * CAM-4067
    */
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateInSubProcessConcurrent.bpmn")
+  @Test
   public void testTerminateInSubProcessConcurrentShouldNotEndProcessInstanceInHistory() throws Exception {
     // when process instance is started and terminate end event in subprocess executed
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
 
     // then the historic process instance should not appear ended
-    assertProcessNotEnded(pi.getId());
+    testRule.assertProcessNotEnded(pi.getId());
 
     if (processEngineConfiguration.getHistoryLevel().getId() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
       HistoricProcessInstance hpi = historyService.createHistoricProcessInstanceQuery().singleResult();
@@ -210,6 +225,7 @@ public class TerminateEndEventTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testTerminateInSubProcessConcurrentMultiInstance() throws Exception {
     serviceTaskInvokedCount = 0;
 
@@ -229,10 +245,11 @@ public class TerminateEndEventTest extends PluggableProcessEngineTestCase {
       taskService.complete(t.getId());
     }
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment
+  @Test
   public void testTerminateInSubProcessMultiInstance() throws Exception {
     serviceTaskInvokedCount = 0;
 
@@ -244,11 +261,12 @@ public class TerminateEndEventTest extends PluggableProcessEngineTestCase {
     Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preNormalEnd").singleResult();
     taskService.complete(task.getId());
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
 
   @Deployment
+  @Test
   public void testTerminateInSubProcessSequentialConcurrentMultiInstance() throws Exception {
     serviceTaskInvokedCount = 0;
     serviceTaskInvokedCount2 = 0;
@@ -268,7 +286,7 @@ public class TerminateEndEventTest extends PluggableProcessEngineTestCase {
     taskService.complete(task.getId());
 
     // last task remaining
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment(resources={
@@ -276,6 +294,7 @@ public class TerminateEndEventTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/event/end/TerminateEndEventTest.subProcessTerminate.bpmn"
   })
   // Adjusted to run the execution before the task check.
+  @Test
   public void testTerminateInCallActivity() throws Exception {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
 
@@ -289,7 +308,7 @@ public class TerminateEndEventTest extends PluggableProcessEngineTestCase {
     Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preNormalEnd").singleResult();
     taskService.complete(task.getId());
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment(resources={
@@ -297,6 +316,7 @@ public class TerminateEndEventTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/event/end/TerminateEndEventTest.subProcessTerminate.bpmn"
   })
   // Adjusted to run the executions of multi-instances before the task check.
+  @Test
   public void testTerminateInCallActivityMulitInstance() throws Exception {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
 
@@ -312,7 +332,7 @@ public class TerminateEndEventTest extends PluggableProcessEngineTestCase {
     Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preNormalEnd").singleResult();
     taskService.complete(task.getId());
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment(resources={
@@ -320,6 +340,7 @@ public class TerminateEndEventTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/event/end/TerminateEndEventTest.subProcessConcurrentTerminate.bpmn"
   })
   // Adjusted to run the execution before the task check.
+  @Test
   public void testTerminateInCallActivityConcurrent() throws Exception {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
 
@@ -333,7 +354,7 @@ public class TerminateEndEventTest extends PluggableProcessEngineTestCase {
     Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preNormalEnd").singleResult();
     taskService.complete(task.getId());
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 
   @Deployment(resources={
@@ -341,6 +362,7 @@ public class TerminateEndEventTest extends PluggableProcessEngineTestCase {
     "org/camunda/bpm/engine/test/bpmn/event/end/TerminateEndEventTest.subProcessConcurrentTerminate.bpmn"
   })
   // Adjusted to run the executions of multi-instances before the task check.
+  @Test
   public void testTerminateInCallActivityConcurrentMulitInstance() throws Exception {
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
 
@@ -356,6 +378,6 @@ public class TerminateEndEventTest extends PluggableProcessEngineTestCase {
     Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).taskDefinitionKey("preNormalEnd").singleResult();
     taskService.complete(task.getId());
 
-    assertProcessEnded(pi.getId());
+    testRule.assertProcessEnded(pi.getId());
   }
 }

@@ -36,6 +36,9 @@
     {"name": "Engine"},
     {"name": "Event Subscription"},
     {"name": "External Task"},
+    {"name": "Historic Activity Instance"},
+    {"name": "Historic Process Instance"},
+    {"name": "Incident"},
     {"name": "Message"},
     {"name": "Metrics"},
     {"name": "Process Definition"},
@@ -48,6 +51,7 @@
     {"name": "Task Identity Link"},
     {"name": "Task Local Variable"},
     {"name": "Task Variable"},
+    {"name": "Telemetry"},
     {"name": "User"},
     {"name": "Version"}
   ],

@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
     <artifactId>camunda-qa</artifactId>
-    <version>7.14.0-SNAPSHOT</version>
+    <version>7.14.0</version>
   </parent>
 
   <artifactId>camunda-qa-old-engine</artifactId>
@@ -102,7 +102,14 @@
             <scope>import</scope>
             <type>pom</type>
           </dependency>
-         </dependencies>
+          <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-framework-bom</artifactId>
+            <version>${version.spring.framework}</version>
+            <type>pom</type>
+            <scope>import</scope>
+          </dependency>
+        </dependencies>
       </dependencyManagement>
 
       <dependencies>
@@ -139,7 +146,6 @@
         <dependency>
           <groupId>org.apache.openjpa</groupId>
           <artifactId>openjpa</artifactId>
-          <version>1.2.3</version>
           <scope>test</scope>
         </dependency>
 

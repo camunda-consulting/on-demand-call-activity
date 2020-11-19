@@ -27,6 +27,7 @@ import java.util.concurrent.Callable;
 
 import org.camunda.bpm.application.InvocationContext;
 import org.camunda.bpm.application.ProcessApplicationReference;
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.OptimisticLockingException;
@@ -43,6 +44,7 @@ import org.camunda.bpm.engine.impl.cmmn.entity.runtime.CaseSentryPartManager;
 import org.camunda.bpm.engine.impl.cmmn.operation.CmmnAtomicOperation;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.context.ProcessApplicationContextUtil;
+import org.camunda.bpm.engine.impl.db.EnginePersistenceLogger;
 import org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager;
 import org.camunda.bpm.engine.impl.db.sql.DbSqlSession;
 import org.camunda.bpm.engine.impl.dmn.entity.repository.DecisionDefinitionManager;
@@ -195,6 +197,11 @@ public class CommandContext {
               transactionContext.commit();
             }
           } catch (Throwable exception) {
+            
+            if (DbSqlSession.isCrdbConcurrencyConflict(exception)) {
+              exception = ProcessEngineLogger.PERSISTENCE_LOGGER.crdbTransactionRetryExceptionOnCommit(exception);
+            }
+            
             commandInvocationContext.trySetThrowable(exception);
           }
 
@@ -234,7 +241,9 @@ public class CommandContext {
   }
 
   protected boolean shouldLogFine(Throwable exception) {
-    return exception instanceof OptimisticLockingException || exception instanceof BadUserRequestException;
+    return exception instanceof OptimisticLockingException ||
+        exception instanceof BadUserRequestException ||
+        exception instanceof AuthorizationException;
   }
 
   protected boolean shouldLogCmdException() {

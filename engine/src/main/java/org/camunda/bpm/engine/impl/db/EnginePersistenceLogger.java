@@ -16,17 +16,14 @@
  */
 package org.camunda.bpm.engine.impl.db;
 
-import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.ibatis.executor.BatchExecutorException;
-import org.apache.ibatis.executor.BatchResult;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.BadUserRequestException;
+import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.SuspendedEntityInteractionException;
@@ -117,18 +114,22 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
     ));
   }
 
-  public ProcessEngineException flushDbOperationException(List<DbOperation> operationsToFlush, DbOperation operation,
-      Throwable cause) {
+  public ProcessEngineException flushDbOperationException(List<DbOperation> operationsToFlush,
+                                                          DbOperation failedOperation,
+                                                          Throwable e) {
+
+    String message = ExceptionUtil.collectExceptionMessages(e);
 
     String exceptionMessage = exceptionMessage(
-      "004",
-      "Exception while executing Database Operation '{}' with message '{}'. Flush summary: \n {}",
-      operation.toString(),
-      cause.getMessage(),
-      buildStringFromList(operationsToFlush)
+        "004",
+        "Exception while executing Database Operation '{}' with message '{}'. Flush summary: \n {}",
+        failedOperation,
+        message,
+        buildStringFromList(operationsToFlush)
     );
 
-    return new ProcessEngineException(exceptionMessage, cause);
+    ProcessEngineException subException = new ProcessEngineException(exceptionMessage, e);
+    return ExceptionUtil.wrapPersistenceException(subException);
   }
 
   public OptimisticLockingException concurrentUpdateDbEntityException(DbOperation operation) {
@@ -441,8 +442,9 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
   }
 
   public ProcessEngineException retrieveMetadataException(Throwable cause) {
-    return new ProcessEngineException(
-      exceptionMessage("050", "Could not retrieve database metadata. Reason: '{}'", cause.getMessage()), cause);
+    String exceptionMessage = exceptionMessage("050", "Could not retrieve database metadata. Reason: '{}'", cause.getMessage());
+    ProcessEngineException exception = new ProcessEngineException(exceptionMessage, cause);
+    return ExceptionUtil.wrapPersistenceException(exception);
   }
 
   public ProcessEngineException invokeTaskListenerException(Throwable cause) {
@@ -652,45 +654,17 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         "081", "No startup lock property found in database");
   }
 
-  public void printBatchResults(List<BatchResult> results) {
-    if (results.size() > 0) {
-      StringBuilder sb = new StringBuilder();
-      sb.append("Batch summary:\n");
-      for (int i = 0; i < results.size(); i++) {
-        BatchResult result = results.get(i);
-        sb.append("Result ").append(i).append(":\t");
-        sb.append(result.getSql().replaceAll("\n", "").replaceAll("\\s+", " ")).append("\t");
-        sb.append("Update counts: ").append(Arrays.toString(result.getUpdateCounts())).append("\n");
-      }
-      logDebug("082", sb.toString());
-    }
-  }
-
-  public ProcessEngineException flushDbOperationsException(List<DbOperation> operationsToFlush,
-    Throwable cause) {
-    String message = cause.getMessage();
-
-    //collect real SQL exception messages in case of batch processing
-    Throwable exCause = cause;
-    do {
-      if (exCause instanceof BatchExecutorException) {
-        final List<SQLException> relatedSqlExceptions = ExceptionUtil.findRelatedSqlExceptions(exCause);
-        StringBuilder sb = new StringBuilder();
-        for (SQLException sqlException : relatedSqlExceptions) {
-          sb.append(sqlException).append("\n");
-        }
-        message = message + "\n" + sb.toString();
-      }
-      exCause = exCause.getCause();
-    } while (exCause != null);
-
+  public ProcessEngineException flushDbOperationUnexpectedException(List<DbOperation> operationsToFlush,
+                                                                    Throwable cause) {
     String exceptionMessage = exceptionMessage(
       "083",
-      "Unexpected exception while executing database operations with message '{}'. Flush summary: \n {}", message,
-      buildStringFromList(operationsToFlush)
+      "Unexpected exception while executing database operations with message '{}'. Flush summary: \n {}",
+        ExceptionUtil.collectExceptionMessages(cause),
+        buildStringFromList(operationsToFlush)
     );
 
-    return new ProcessEngineException(exceptionMessage, cause);
+    ProcessEngineException subException = new ProcessEngineException(exceptionMessage, cause);
+    return ExceptionUtil.wrapPersistenceException(subException);
   }
 
   public ProcessEngineException wrongBatchResultsSizeException(List<DbOperation> operationsToFlush) {
@@ -750,6 +724,124 @@ public class EnginePersistenceLogger extends ProcessEngineLogger {
         "Historic instance permissions are disabled, " +
             "please check your process engine configuration."
     ));
+  }
+
+  public void noTelemetryLockPropertyFound() {
+    logDebug(
+        "091", "No telemetry lock property found in the database");
+  }
+
+  public void noTelemetryPropertyFound() {
+    logDebug(
+        "092", "No telemetry property found in the database");
+  }
+
+  public void creatingTelemetryPropertyInDatabase(Boolean telemetryEnabled) {
+    logDebug(
+        "093",
+        "Creating the telemetry property in database with the value: {}", telemetryEnabled);
+  }
+
+  public void errorFetchingTelemetryPropertyInDatabase(Exception exception) {
+    logDebug(
+        "094",
+        "Error while fetching the telemetry property from the database: {}", exception.getMessage());
+  }
+
+  public void errorConfiguringTelemetryProperty(Exception exception) {
+    logDebug(
+        "095",
+        "Error while configurting the telemetry property: {}", exception.getMessage());
+  }
+
+  public void noInstallationIdPropertyFound() {
+    logDebug(
+        "096", "No installation id property found in database");
+  }
+
+  public void creatingInstallationPropertyInDatabase(String value) {
+    logDebug(
+        "097",
+        "Creating the installation id property in database with the value: {}", value);
+  }
+
+  public void couldNotSelectInstallationId(String message) {
+    logDebug(
+        "098",
+        "Could not select installation id property: {}", message);
+  }
+
+  public void noInstallationIdLockPropertyFound() {
+    logDebug(
+        "099", "No installation id lock property found in the database");
+  }
+
+  public void installationIdPropertyFound(String value) {
+    logDebug(
+        "100", "Installation id property found in the database: {}", value);
+  }
+
+  public void ignoreFailureDuePreconditionNotMet(DbOperation ignoredOperation, String preconditionMessage, DbOperation failedOperation) {
+    logDebug(
+        "101",
+        "Ignoring '{}' database operation failure due to an unmet precondition. {}: '{}'",
+        ignoredOperation.toString(),
+        preconditionMessage,
+        failedOperation.toString());
+  }
+
+  public void logTaskWithoutExecution(String taskId) {
+	  logDebug("091",
+			  "Execution of external task {} is null. This indicates that the task was concurrently completed or deleted. "
+			  + "It is not returned by the current fetch and lock command.",
+			  taskId);
+  }
+
+  public CrdbTransactionRetryException crdbTransactionRetryException(DbOperation operation) {
+    return new CrdbTransactionRetryException(exceptionMessage(
+        "102",
+        "Execution of '{}' failed. Entity was updated by another transaction concurrently, " +
+            "and the transaction needs to be retried",
+        operation),
+        operation.getFailure());
+  }
+
+  public CrdbTransactionRetryException crdbTransactionRetryExceptionOnSelect(Throwable cause) {
+    return new CrdbTransactionRetryException(exceptionMessage(
+      "103",
+      "Execution of SELECT statement failed. The transaction needs to be retried."),
+      cause
+    );
+  }
+
+  public CrdbTransactionRetryException crdbTransactionRetryExceptionOnCommit(Throwable cause) {
+    return new CrdbTransactionRetryException(exceptionMessage(
+        "104",
+        "Could not commit transaction. The transaction needs to be retried."),
+        cause
+    );
+  }
+
+  public void crdbFailureIgnored(DbOperation operation) {
+    logDebug(
+      "105",
+      "An OptimisticLockingListener attempted to ignore a failure of: {}. "
+      + "Since CockroachDB aborted the transaction, ignoring the failure "
+      + "is not possible and an exception is thrown instead.",
+      operation
+    );
+  }
+
+  public void debugDisabledPessimisticLocks() {
+    logDebug(
+      "106", "No exclusive lock is acquired on CockroachDB or H2, " +
+            "as pessimistic locks are disabled on these databases.");
+  }
+
+  public void errorFetchingTelemetryInitialMessagePropertyInDatabase(Exception exception) {
+    logDebug(
+        "107",
+        "Error while fetching the telemetry initial message status property from the database: {}", exception.getMessage());
   }
 
 }

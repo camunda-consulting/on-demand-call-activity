@@ -16,23 +16,25 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.ByteArrayOutputStream;
 import java.util.List;
 
+import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.impl.cmd.DeployCmd;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.repository.DeploymentBuilderImpl;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.test.util.DatabaseHelper;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.junit.After;
+import org.junit.Test;
 
 /**
  * <p>Tests the deployment from two threads simultaneously.</p>
@@ -42,6 +44,7 @@ import org.camunda.bpm.model.bpmn.BpmnModelInstance;
  *
  * @author Daniel Meyer
  */
+@RequiredDatabase(excludes = DbSqlSessionFactory.H2)
 public class ConcurrentDeploymentTest extends ConcurrencyTestCase {
 
   private static String processResource;
@@ -53,24 +56,13 @@ public class ConcurrentDeploymentTest extends ConcurrencyTestCase {
     processResource = new String(outputStream.toByteArray());
   }
 
-  /**
-   * hook into test method invocation - after the process engine is initialized
-   */
-  @Override
-  protected void runTest() throws Throwable {
-    String databaseType = DatabaseHelper.getDatabaseType(processEngineConfiguration);
-
-    if("h2".equals(databaseType)) {
-      // skip test method - if database is H2
-    } else {
-      // invoke the test method
-      super.runTest();
-    }
-  }
+  protected ThreadControl thread1;
+  protected ThreadControl thread2;
 
   /**
-   * @see https://app.camunda.com/jira/browse/CAM-2128
+   * @see <a href="https://app.camunda.com/jira/browse/CAM-2128">https://app.camunda.com/jira/browse/CAM-2128</a>
    */
+  @Test
   public void testDuplicateFiltering() throws InterruptedException {
 
     deployOnTwoConcurrentThreads(
@@ -78,10 +70,20 @@ public class ConcurrentDeploymentTest extends ConcurrencyTestCase {
         createDeploymentBuilder().enableDuplicateFiltering(false));
 
     // ensure that although both transactions were run concurrently, only one deployment was constructed.
+    assertThat(thread1.getException()).isNull();
     DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
-    assertThat(deploymentQuery.count(), is(1L));
+    assertThat(deploymentQuery.count()).isEqualTo(1L);
+
+    if (!testRule.isOptimisticLockingExceptionSuppressible()) {
+      // on CockroachDB, the deployment pessimistic lock is disabled
+      // and concurrent deployments rely on the CRDB optimistic locking mechanism.
+      // By default, the `commandRetries` property is set to 0, so retryable commands
+      // will still re-throw the `CrdbTransactionRetryException` to the caller and fail.
+      assertCockroachDBConcurrentFailure();
+    }
   }
 
+  @Test
   public void testVersioning() throws InterruptedException {
 
     deployOnTwoConcurrentThreads(
@@ -96,9 +98,20 @@ public class ConcurrentDeploymentTest extends ConcurrencyTestCase {
         .asc()
         .list();
 
-    assertThat(processDefinitions.size(), is(2));
-    assertThat(processDefinitions.get(0).getVersion(), is(1));
-    assertThat(processDefinitions.get(1).getVersion(), is(2));
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
+      assertThat(processDefinitions.size()).isEqualTo(2);
+      assertThat(processDefinitions.get(0).getVersion()).isEqualTo(1);
+      assertThat(processDefinitions.get(1).getVersion()).isEqualTo(2);
+    } else {
+      assertThat(thread1.getException()).isNull();
+      assertThat(processDefinitions.size()).isEqualTo(1);
+      assertThat(processDefinitions.get(0).getVersion()).isEqualTo(1);
+      // on CockroachDB, the deployment pessimistic lock is disabled
+      // and concurrent deployments rely on the CRDB optimistic locking mechanism.
+      // By default, the `commandRetries` property is set to 0, so retryable commands
+      // will still re-throw the `CrdbTransactionRetryException` to the caller and fail.
+      assertCockroachDBConcurrentFailure();
+    }
   }
 
   protected DeploymentBuilder createDeploymentBuilder() {
@@ -108,15 +121,19 @@ public class ConcurrentDeploymentTest extends ConcurrencyTestCase {
   }
 
   protected void deployOnTwoConcurrentThreads(DeploymentBuilder deploymentOne, DeploymentBuilder deploymentTwo) throws InterruptedException {
-    assertThat("you can not use the same deployment builder for both deployments", deploymentOne, is(not(deploymentTwo)));
+    assertThat(deploymentOne)
+        .as("you can not use the same deployment builder for both deployments")
+        .isNotEqualTo(deploymentTwo);
 
     // STEP 1: bring two threads to a point where they have
     // 1) started a new transaction
     // 2) are ready to deploy
-    ThreadControl thread1 = executeControllableCommand(new ControllableDeployCommand(deploymentOne));
+    thread1 = executeControllableCommand(new ControllableDeployCommand(deploymentOne));
+    thread1.reportInterrupts();
     thread1.waitForSync();
 
-    ThreadControl thread2 = executeControllableCommand(new ControllableDeployCommand(deploymentTwo));
+    thread2 = executeControllableCommand(new ControllableDeployCommand(deploymentTwo));
+    thread2.reportInterrupts();
     thread2.waitForSync();
 
     // STEP 2: make Thread 1 proceed and wait until it has deployed but not yet committed
@@ -140,12 +157,18 @@ public class ConcurrentDeploymentTest extends ConcurrencyTestCase {
     thread2.waitUntilDone();
   }
 
-  @Override
-  protected void tearDown() throws Exception {
+  protected void assertCockroachDBConcurrentFailure() {
+    assertThat(thread2.getException()).isInstanceOf(CrdbTransactionRetryException.class);
+  }
+
+  @After
+  public void tearDown() throws Exception {
 
     for(Deployment deployment : repositoryService.createDeploymentQuery().list()) {
       repositoryService.deleteDeployment(deployment.getId(), true);
     }
+
+    processEngineConfiguration.getDeploymentCache().purgeCache();
   }
 
   protected static class ControllableDeployCommand extends ControllableCommand<Void> {

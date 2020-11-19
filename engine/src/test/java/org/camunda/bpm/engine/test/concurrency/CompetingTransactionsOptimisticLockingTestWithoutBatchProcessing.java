@@ -16,31 +16,61 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
-import org.camunda.bpm.engine.OptimisticLockingException;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.ProcessEngineLogger;
-import org.camunda.bpm.engine.impl.cmd.CompleteTaskCmd;
-import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
-import org.camunda.bpm.engine.impl.test.ResourceProcessEngineTestCase;
-import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.engine.test.Deployment;
-import org.camunda.bpm.engine.test.util.DatabaseHelper;
-import org.slf4j.Logger;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.List;
+
+import org.camunda.bpm.engine.CrdbTransactionRetryException;
+import org.camunda.bpm.engine.OptimisticLockingException;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cmd.CompleteTaskCmd;
+import org.camunda.bpm.engine.impl.db.sql.DbSqlSessionFactory;
+import org.camunda.bpm.engine.impl.test.RequiredDatabase;
+import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
+import org.slf4j.Logger;
 
 /**
  * @author Nikola Koevski
  */
-public class CompetingTransactionsOptimisticLockingTestWithoutBatchProcessing extends ResourceProcessEngineTestCase {
+public class CompetingTransactionsOptimisticLockingTestWithoutBatchProcessing {
 
   private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
-  static ControllableThread activeThread;
+  protected static ControllableThread activeThread;
 
-  public CompetingTransactionsOptimisticLockingTestWithoutBatchProcessing() {
-    super("org/camunda/bpm/engine/test/concurrency/custombatchprocessing.camunda.cfg.xml");
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(
+      "org/camunda/bpm/engine/test/concurrency/custombatchprocessing.camunda.cfg.xml");
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+  protected RuntimeService runtimeService;
+  protected TaskService taskService;
+
+  @Before
+  public void setUp() {
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    runtimeService = engineRule.getRuntimeService();
+    taskService = engineRule.getTaskService();
   }
-
 
   public class TransactionThread extends ControllableThread {
     String taskId;
@@ -70,19 +100,9 @@ public class CompetingTransactionsOptimisticLockingTestWithoutBatchProcessing ex
     }
   }
 
-  @Override
-  protected void runTest() throws Throwable {
-    String databaseType = DatabaseHelper.getDatabaseType(processEngineConfiguration);
-
-    if (DbSqlSessionFactory.POSTGRES.equals(databaseType)) {
-      // skip test method - if database is PostgreSQL
-    } else {
-      // invoke the test method
-      super.runTest();
-    }
-  }
-
+  @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/concurrency/CompetingTransactionsOptimisticLockingTest.testCompetingTransactionsOptimisticLocking.bpmn20.xml")
+  @RequiredDatabase(excludes = DbSqlSessionFactory.POSTGRES)
   public void testCompetingTransactionsOptimisticLocking() throws Exception {
     // given
     runtimeService.startProcessInstanceByKey("competingTransactionsProcess");
@@ -103,6 +123,13 @@ public class CompetingTransactionsOptimisticLockingTestWithoutBatchProcessing ex
 
     thread1.proceedAndWaitTillDone();
     assertNotNull(thread1.exception);
-    assertEquals(OptimisticLockingException.class, thread1.exception.getClass());
+
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
+      assertEquals(OptimisticLockingException.class, thread1.exception.getClass());
+    } else {
+      // on CRDB, the transaction needs to be rolled back and retried,
+      // so a CrdbTransactionRetryException is thrown.
+      assertEquals(CrdbTransactionRetryException.class, thread1.exception.getClass());
+    }
   }
 }

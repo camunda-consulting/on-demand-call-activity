@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.calendar.DurationHelper;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.el.Expression;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.telemetry.dto.Jdk;
 
 public class ParseUtil {
 
@@ -102,4 +103,51 @@ public class ParseUtil {
       return null;
     }
   }
+
+  public static ProcessEngineDetails parseProcessEngineVersion(String packageImplementationVersion, boolean trimSuffixEE) {
+    String version = packageImplementationVersion;
+    String edition = ProcessEngineDetails.EDITION_COMMUNITY;
+
+    if (version != null && version.contains("-ee")) {
+      edition = ProcessEngineDetails.EDITION_ENTERPRISE;
+      if (trimSuffixEE) {
+        version = version.replace("-ee", ""); // trim `-ee` suffix
+      }
+    }
+
+    return new ProcessEngineDetails(version, edition);
+  }
+
+  public static String parseServerVendor(String applicationServerInfo) {
+    String serverVendor = "";
+
+    Pattern pattern = Pattern.compile("[\\sA-Za-z]+");
+    Matcher matcher = pattern.matcher(applicationServerInfo);
+    if (matcher.find()) {
+      try {
+        serverVendor = matcher.group();
+      } catch (IllegalStateException ignored) {
+      }
+
+      serverVendor = serverVendor.trim();
+
+      if (serverVendor.contains("WildFly")) {
+        return "WildFly";
+      }
+    }
+
+    return serverVendor;
+  }
+
+  public static Jdk parseJdkDetails() {
+    String jdkVendor = System.getProperty("java.vm.vendor");
+    if (jdkVendor != null && jdkVendor.contains("Oracle")
+        && System.getProperty("java.vm.name").contains("OpenJDK")) {
+      jdkVendor = "OpenJDK";
+    }
+    String jdkVersion = System.getProperty("java.version");
+    Jdk jdk = new Jdk(jdkVersion, jdkVendor);
+    return jdk;
+  }
+
 }

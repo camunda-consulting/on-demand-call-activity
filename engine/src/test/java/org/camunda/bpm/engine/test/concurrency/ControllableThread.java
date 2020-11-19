@@ -25,7 +25,7 @@ import org.slf4j.Logger;
  */
 public class ControllableThread extends Thread {
 
-private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
+  private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
 
   public ControllableThread() {
     super();
@@ -61,11 +61,6 @@ private static Logger LOG = ProcessEngineLogger.TEST_LOGGER.getLogger();
     } catch (InterruptedException e) {
       e.printStackTrace();
     }
-  }
-
-  public synchronized void returnControlToControllableThreadAndWait() {
-    // just for understanding the test case
-    returnControlToTestThreadAndWait();
   }
 
   public synchronized void proceedAndWaitTillDone() {

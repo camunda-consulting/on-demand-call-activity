@@ -16,24 +16,30 @@
  */
 package org.camunda.bpm.engine.test.bpmn.async;
 
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-import org.camunda.bpm.engine.runtime.ActivityInstance;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.engine.test.Deployment;
-import org.junit.Assert;
-import org.junit.Ignore;
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
+import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat;
-import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Assert;
+import org.junit.Ignore;
+import org.junit.Test;
 
-public class AsyncStartEventTest extends PluggableProcessEngineTestCase {
+public class AsyncStartEventTest extends PluggableProcessEngineTest {
 
   @Deployment
+  @Test
   public void testAsyncStartEvent() {
     runtimeService.startProcessInstanceByKey("asyncStartEvent");
 
@@ -42,7 +48,7 @@ public class AsyncStartEventTest extends PluggableProcessEngineTestCase {
 
     Assert.assertEquals(1, runtimeService.createExecutionQuery().activityId("startEvent").count());
 
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
     task = taskService.createTaskQuery().singleResult();
 
     Assert.assertEquals(0, runtimeService.createExecutionQuery().activityId("startEvent").count());
@@ -51,17 +57,19 @@ public class AsyncStartEventTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testAsyncStartEventListeners() {
     ProcessInstance instance = runtimeService.startProcessInstanceByKey("asyncStartEvent");
 
     Assert.assertNull(runtimeService.getVariable(instance.getId(), "listener"));
 
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
 
     Assert.assertNotNull(runtimeService.getVariable(instance.getId(), "listener"));
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/async/AsyncStartEventTest.testAsyncStartEvent.bpmn20.xml")
+  @Test
   public void testAsyncStartEventActivityInstance() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncStartEvent");
 
@@ -73,6 +81,7 @@ public class AsyncStartEventTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testMultipleAsyncStartEvents() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("foo", "bar");
@@ -80,7 +89,7 @@ public class AsyncStartEventTest extends PluggableProcessEngineTestCase {
 
     assertEquals(1, runtimeService.createProcessInstanceQuery().count());
 
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
 
     Task task = taskService.createTaskQuery().singleResult();
     assertNotNull(task);
@@ -98,7 +107,9 @@ public class AsyncStartEventTest extends PluggableProcessEngineTestCase {
       "org/camunda/bpm/engine/test/bpmn/async/AsyncStartEventTest.testCallActivity-sub.bpmn20.xml"
   })
   // Ignored because assertions demand a call activity
-  public void ignore_testCallActivity() {
+  @Ignore
+  @Test
+  public void testCallActivity() {
     runtimeService.startProcessInstanceByKey("super");
 
     ProcessInstance pi = runtimeService
@@ -113,6 +124,7 @@ public class AsyncStartEventTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment
+  @Test
   public void testAsyncSubProcessStartEvent() {
     runtimeService.startProcessInstanceByKey("process");
 
@@ -121,7 +133,7 @@ public class AsyncStartEventTest extends PluggableProcessEngineTestCase {
 
     assertEquals(1, runtimeService.createExecutionQuery().activityId("StartEvent_2").count());
 
-    executeAvailableJobs();
+    testRule.executeAvailableJobs();
     task = taskService.createTaskQuery().singleResult();
 
     assertEquals(0, runtimeService.createExecutionQuery().activityId("StartEvent_2").count());
@@ -129,6 +141,7 @@ public class AsyncStartEventTest extends PluggableProcessEngineTestCase {
   }
 
   @Deployment(resources = "org/camunda/bpm/engine/test/bpmn/async/AsyncStartEventTest.testAsyncSubProcessStartEvent.bpmn")
+  @Test
   public void testAsyncSubProcessStartEventActivityInstance() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("process");
 

@@ -16,22 +16,54 @@
  */
 package org.camunda.bpm.engine.test.concurrency;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.CrdbTransactionRetryException;
 import org.camunda.bpm.engine.OptimisticLockingException;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.externaltask.LockedExternalTask;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cmd.FetchExternalTasksCmd;
 import org.camunda.bpm.engine.impl.externaltask.TopicFetchInstruction;
-import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.util.ProcessEngineBootstrapRule;
+import org.camunda.bpm.engine.test.util.ProcessEngineTestRule;
+import org.camunda.bpm.engine.test.util.ProvidedProcessEngineRule;
+import org.junit.Before;
+import org.junit.ClassRule;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.RuleChain;
 
 /**
  * @author Thorben Lindhauer
  *
  */
-public class CompetingExternalTaskFetchingTest extends PluggableProcessEngineTestCase {
+public class CompetingExternalTaskFetchingTest {
+
+  @ClassRule
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule();
+  protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
+  public ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
+
+  @Rule
+  public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
+
+  protected ProcessEngineConfigurationImpl processEngineConfiguration;
+  protected RuntimeService runtimeService;
+
+  @Before
+  public void initializeServices() {
+    processEngineConfiguration = engineRule.getProcessEngineConfiguration();
+    runtimeService = engineRule.getRuntimeService();
+  }
 
   public class ExternalTaskFetcherThread extends ControllableThread {
 
@@ -39,7 +71,7 @@ public class CompetingExternalTaskFetchingTest extends PluggableProcessEngineTes
     protected int results;
     protected String topic;
 
-    protected List<LockedExternalTask> fetchedTasks;
+    protected List<LockedExternalTask> fetchedTasks = Collections.emptyList();
     protected OptimisticLockingException exception;
 
     public ExternalTaskFetcherThread(String workerId, int results, String topic) {
@@ -54,9 +86,12 @@ public class CompetingExternalTaskFetchingTest extends PluggableProcessEngineTes
       TopicFetchInstruction instruction = new TopicFetchInstruction(topic, 10000L);
       instructions.put(topic, instruction);
 
+      ControlledCommand<List<LockedExternalTask>> cmd = new ControlledCommand<>(
+          (ControllableThread) Thread.currentThread(), 
+          new FetchExternalTasksCmd(workerId, results, instructions));
+      
       try {
-        fetchedTasks = processEngineConfiguration.getCommandExecutorTxRequired().execute(
-            new FetchExternalTasksCmd(workerId, results, instructions));
+        fetchedTasks = processEngineConfiguration.getCommandExecutorTxRequired().execute(cmd);
       } catch (OptimisticLockingException e) {
         exception = e;
       }
@@ -64,6 +99,7 @@ public class CompetingExternalTaskFetchingTest extends PluggableProcessEngineTes
   }
 
   @Deployment
+  @Test
   public void testCompetingExternalTaskFetching() {
     runtimeService.startProcessInstanceByKey("oneExternalTaskProcess");
 
@@ -83,6 +119,13 @@ public class CompetingExternalTaskFetchingTest extends PluggableProcessEngineTes
     thread2.proceedAndWaitTillDone();
     assertEquals(0, thread2.fetchedTasks.size());
     // but does not fail with an OptimisticLockingException
-    assertNull(thread2.exception);
+    if (testRule.isOptimisticLockingExceptionSuppressible()) {
+      assertNull(thread2.exception);
+    } else {
+      // on CockroachDb, the `commandRetries` property is 0 by default. So any retryable commands,
+      // like the `FetchExternalTasksCmd` will not be retried, but report
+      // a `CrdbTransactionRetryException` to the caller.
+      assertTrue(thread2.exception instanceof CrdbTransactionRetryException);
+    }
   }
 }
