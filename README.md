@@ -17,8 +17,8 @@ There are several test branches using the Camunda engine test suite:
 - [engine-test-suite-without-child-processes](https://github.com/camunda-consulting/on-demand-call-activity/tree/engine-test-suite-without-child-processes)
 - [engine-test-suite-with-child-processes-7.13.0](https://github.com/camunda-consulting/on-demand-call-activity/tree/engine-test-suite-with-child-processes-7.13.0)
 - [engine-test-suite-without-child-processes-7.13.0](https://github.com/camunda-consulting/on-demand-call-activity/tree/engine-test-suite-without-child-processes-7.13.0)
-- [engine-test-suite-with-child-processes-7.14.0-SNAPSHOT](https://github.com/camunda-consulting/on-demand-call-activity/tree/engine-test-suite-with-child-processes-7.14.0-SNAPSHOT)
-- [engine-test-suite-without-child-processes-7.14.0-SNAPSHOT](https://github.com/camunda-consulting/on-demand-call-activity/tree/engine-test-suite-without-child-processes-7.14.0-SNAPSHOT)
+- [engine-test-suite-with-child-processes-7.14.0](https://github.com/camunda-consulting/on-demand-call-activity/tree/engine-test-suite-with-child-processes-7.14.0)
+- [engine-test-suite-without-child-processes-7.14.0](https://github.com/camunda-consulting/on-demand-call-activity/tree/engine-test-suite-without-child-processes-7.14.0)
 
 A GitHub action under [maven.yml](https://github.com/camunda-consulting/on-demand-call-activity/edit/master/.github/workflows/maven.yml) builds the plugin and runs all tests on GitHub after pushing any change.
 
