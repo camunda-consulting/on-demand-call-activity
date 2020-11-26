@@ -16,9 +16,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
-import static org.camunda.bpm.engine.test.assertions.bpmn.AbstractAssertions.processEngine;
 import static org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.TestUtil.cleanUpAndCreateEngine;
+import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
 import static org.junit.Assert.*;
 
 /**
@@ -52,7 +51,15 @@ public class OnDemandCallActivityProcessEnginePluginTest {
     public void testWithCallActivity() {
         ProcessInstance processInstance = processEngine().getRuntimeService()
                 .startProcessInstanceByKey(PROCESS_DEFINITION_KEY, withVariables("retProcess", true));
+        // FIXME test with 7.14.0-alpha1
 //        assertThat(processInstance).calledProcessInstance().hasPassed("CallLoggerTask").isEnded();
+        assertEquals(2, historyService().createHistoricProcessInstanceQuery().count());
+        assertEquals(2, historyService().createHistoricVariableInstanceQuery()
+            .variableName("retProcess")
+            .count());
+        assertEquals(1, historyService().createHistoricVariableInstanceQuery()
+            .variableName("variableSetByChildProcessProvider")
+            .count());
         assertThat(processInstance).isEnded();
     }
 
@@ -234,6 +241,18 @@ public class OnDemandCallActivityProcessEnginePluginTest {
         assertThat(processInstance).variables().containsEntry("outputVar", "someValue");
         assertThat(processInstance).variables().containsEntry("output", "someValue");
     }
+    
+	@Test
+	public void testOnDemandCallActivityWithParentVariableAccess() throws InterruptedException {
+		ProcessInstance processInstance = processEngine().getRuntimeService().startProcessInstanceByKey(
+				PROCESS_DEFINITION_KEY,
+				withVariables("retProcess", false, "doThrowException", false, "setParentVar", true));
+		assertThat(processInstance).calledProcessInstance("process-child").isNull();
+		Thread.sleep(sleepTime);
+		assertThat(processInstance).hasPassed("EndEvent_InParentProcess");
+		assertThat(processInstance).isEnded();
+		assertThat(processInstance).variables().containsEntry("parentVar", "aParentVar");
+	}
     
     // TODO: test all operations that should normally work with a call activity (see engine test suite)
 

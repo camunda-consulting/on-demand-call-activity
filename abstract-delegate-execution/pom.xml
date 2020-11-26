@@ -1,0 +1,132 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.camunda.bpm.extension.engine.delegate.abstract</groupId>
+  <artifactId>abstract-delegate-execution</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+
+  <name>Abstract Delegate Execution</name>
+  <description>An abstract base class for DelegateExecution implementations for execution a JavaDelegate.</description>
+
+  <!-- Camunda-maintained build settings, plugin versions and release profiles -->
+  <parent>
+    <groupId>org.camunda</groupId>
+    <artifactId>camunda-release-parent</artifactId>
+    <version>3.7</version>
+    <relativePath />
+  </parent>
+
+  <properties>
+    <camunda.version>7.7.0</camunda.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine</artifactId>
+      <version>${camunda.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+    	<groupId>junit</groupId>
+    	<artifactId>junit</artifactId>
+    	<version>4.13.1</version>
+    	<scope>test</scope>
+    </dependency>
+  </dependencies>
+
+    <profiles>
+        <!-- Profiles just here to ease testing in IDEs (Ctrl+Alt+P in Eclipse)-->
+        <profile>
+            <id>camunda-LATEST</id>
+            <properties>
+                <camunda.version>LATEST</camunda.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>camunda-7.13.0</id>
+            <properties>
+                <camunda.version>7.13.0</camunda.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>camunda-7.12.0</id>
+            <properties>
+                <camunda.version>7.12.0</camunda.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>camunda-7.11.0</id>
+            <properties>
+                <camunda.version>7.11.0</camunda.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>camunda-7.10.0</id>
+            <properties>
+                <camunda.version>7.10.0</camunda.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>camunda-7.9.0</id>
+            <properties>
+                <camunda.version>7.9.0</camunda.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>camunda-7.8.0</id>
+            <properties>
+                <camunda.version>7.8.0</camunda.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>camunda-7.7.0</id>
+            <properties>
+                <camunda.version>7.7.0</camunda.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>camunda-7.6.0</id>
+            <properties>
+                <camunda.version>7.6.0</camunda.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>camunda-7.5.0</id>
+            <properties>
+                <camunda.version>7.5.0</camunda.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>camunda-7.4.0</id>
+            <properties>
+                <camunda.version>7.4.0</camunda.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>camunda-7.3.0</id>
+            <properties>
+                <camunda.version>7.3.0</camunda.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>camunda-7.2.0</id>
+            <properties>
+                <camunda.version>7.2.0</camunda.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>camunda-7.1.0</id>
+            <properties>
+                <camunda.version>7.1.0-Final</camunda.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>camunda-7.0.0</id>
+            <properties>
+                <camunda.version>7.0.0-Final</camunda.version>
+            </properties>
+        </profile>
+    </profiles>
+
+</project>

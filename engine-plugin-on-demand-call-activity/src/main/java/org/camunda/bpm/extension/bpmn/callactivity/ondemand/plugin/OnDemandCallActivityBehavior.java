@@ -1,33 +1,35 @@
 package org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin;
 
+import static org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.util.OnDemandCallActivityUtil.getAsyncServiceCallVarName;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Date;
-import java.util.List;
+import java.util.Map;
 
-import org.camunda.bpm.engine.delegate.BpmnError;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CallActivityBehavior;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
-import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
-import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
-import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.JobUtil;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.util.OnDemandCallActivityUtil.getAsyncServiceCallVarName;
-import static org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.util.OnDemandCallActivityUtil.getRetriesVarName;
-
+/**
+ * <p>A BPMN Call Activity that allows to skip the invocation of a sub-process
+ * and behaves like a wait state instead, which can be resolved by invoking
+ * {@link RuntimeService#signal(String, Map)}.</p>
+ *
+ * <p>Must be used with an implementation of {@link AbstractChildProcessProvider}
+ * as calledElement in BPMN, e.g.,
+ * <code>${childProcessProvider.getChildProcessDefinitionKey(execution)}</code>.
+ * </p>
+ *
+ * @author Falko Menge (Camunda)
+ */
 public class OnDemandCallActivityBehavior extends CallActivityBehavior {
 
     private Logger logger = LoggerFactory.getLogger(getClass());
@@ -45,34 +47,10 @@ public class OnDemandCallActivityBehavior extends CallActivityBehavior {
     }
 
     @Override
-    public void execute(ActivityExecution execution) throws Exception {
-        List<JobEntity> jobs = Context.getCommandContext().getJobManager().findJobsByExecutionId(execution.getId());
-        if (jobs.size() > 0) {
-            execution.setVariable(getRetriesVarName(execution), jobs.get(0).getRetries());
-        }
-        super.execute(execution);
-
-        /*ExecutionEntity subProcessInstance = ((ExecutionEntity) execution).getSubProcessInstance();
-        logger.info("Method execute subprocess instance: {}", subProcessInstance);
-
-        final HistoryEventHandler historyEventHandler = Context.getProcessEngineConfiguration()
-                .getHistoryEventHandler();
-        final HistoryEventProducer historyEventProducer = Context.getProcessEngineConfiguration()
-                .getHistoryEventProducer();
-        HistoryEvent activityInstanceUpdateEvt = historyEventProducer.createActivityInstanceUpdateEvt(execution);
-        historyEventHandler.handleEvent(activityInstanceUpdateEvt);*/
-    }
-
-    @Override
     protected void startInstance(ActivityExecution execution, VariableMap variables, String businessKey) {
         // try to start process with the provided process definition key
         try {
             super.startInstance(execution, variables, businessKey);
-            ExecutionEntity subProcessInstance = ((ExecutionEntity) execution).getSubProcessInstance();
-            logger.info("Method start instance subprocess instance: {}", subProcessInstance);
-
-            // UPDATE THE HISTORY RECORD WITH THE PROCESS ID...
-            // SQL CALL
         }
         // process definition key is null => no child process needed
         catch (NullValueException e) {
@@ -89,24 +67,15 @@ public class OnDemandCallActivityBehavior extends CallActivityBehavior {
     public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
         if (signalData instanceof Exception) {
 
-            Integer currentRetries = (Integer) execution.getVariable(getRetriesVarName(execution));
-
-            if (currentRetries == null) {
-                currentRetries = 3; // TODO: read this from ProcessEngineConfiguration
-            }
-
             Exception exception = (Exception) signalData;
-            currentRetries--;
-            execution.setVariable(getRetriesVarName(execution), currentRetries);
-            createAsynchronousContinuationJob(execution, currentRetries, exception);
+            createAsynchronousContinuationJob(execution, exception);
         } else {
-            execution.setVariableLocal(getRetriesVarName(execution), null);
             execution.setVariableLocal(getAsyncServiceCallVarName(execution), null);
             leave(execution);
         }
     }
 
-    public static void createAsynchronousContinuationJob(DelegateExecution execution, Integer retries, Exception exception/*, Date duedate*/) {
+    public static void createAsynchronousContinuationJob(DelegateExecution execution, Exception exception) {
         MessageEntity message = new MessageEntity();
         message.setProcessInstanceId(execution.getProcessInstanceId());
         message.setProcessDefinitionId(execution.getProcessDefinitionId());
@@ -116,14 +85,7 @@ public class OnDemandCallActivityBehavior extends CallActivityBehavior {
         // FIXME: eigenen Job-Handler bauen, der PvmAtomicOperation.ACTIVITY_EXECUTE anstößt. Dann steigst du wieder am richtigen Punkt in die Ausführung ein.
         message.setExceptionMessage(exception.getMessage());
         message.setExceptionStacktrace(getExceptionStacktrace(exception));
-        message.setRetries(retries);
-        //message.setDuedate(duedate);
-        // TODO add retryTimeCycle
         Context.getCommandContext().getJobManager().send(message);
-
-        if (retries == 0)
-            JobUtil.createIncident(message);
-
     }
 
     public static String getExceptionStacktrace(Exception exception) {

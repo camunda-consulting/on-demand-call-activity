@@ -1,13 +1,13 @@
 # This workflow will build and test the Java project with Maven
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
 
-name: History Test
+name: Java CI with Maven
 
 on:
   push:
-    branches: [ call-activity-history-test ]
+    branches: [ master ]
   pull_request:
-    branches: [ call-activity-history-test ]
+    branches: [ master ]
 
 jobs:
   build:
@@ -28,3 +28,66 @@ jobs:
           ${{ runner.os }}-maven-
     - name: Build with Maven
       run: mvn -B package --file pom.xml
+    - run: mkdir staging && cp engine-plugin-on-demand-call-activity/target/*.jar staging/engine-plugin-on-demand-call-activity.jar
+    - run: cp asynchronous-service-task/target/*.jar staging/asynchronous-service-task.jar
+    - run: cp abstract-delegate-execution/target/*.jar staging/abstract-delegate-execution.jar
+    - uses: actions/upload-artifact@v2.2.1
+      with:
+        name: Package
+        path: staging
+
+
+
+  test:
+    needs: build
+    strategy:
+      matrix:
+        branch:
+        - engine-test-suite-with-child-processes
+        - engine-test-suite-without-child-processes
+        - engine-test-suite-with-child-processes-7.13.0
+        - engine-test-suite-without-child-processes-7.13.0
+        - engine-test-suite-with-child-processes-7.14.0
+        - engine-test-suite-without-child-processes-7.14.0
+      fail-fast: false
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Setup timezone
+      uses: zcong1993/setup-timezone@v1.1.1
+      with:
+        timezone: Europe/Berlin
+    - uses: actions/checkout@v2
+      with:
+        ref: ${{ matrix.branch }}
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+    - name: Enable snapshots in Maven settings
+      if: endsWith(matrix.branch, 'SNAPSHOT')
+      uses: whelk-io/maven-settings-xml-action@v14
+      with:
+        repositories: '[{ "id": "camunda-bpm-nexus", "name": "camunda-bpm-nexus", "url": "https://app.camunda.com/nexus/content/groups/public", "releases": { "enabled": "true" }, "snapshots": { "enabled": "true" } }]'
+    - uses: actions/cache@v2
+      with:
+        path: ~/.m2/repository
+        key: ${{ runner.os }}-engine-maven-${{ hashFiles('**/pom.xml') }}
+        restore-keys: |
+          ${{ runner.os }}-engine-maven-
+    - name: Download Build Artifacts
+      uses: actions/download-artifact@v2
+      with:
+        # Artifact name
+        name: Package
+        # Destination path
+        path: staging
+    - name: Install abstract-delegate-execution
+      run: mvn --batch-mode org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file -Dfile=staging/abstract-delegate-execution.jar
+    - name: Install asynchronous-service-task
+      run: mvn --batch-mode org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file -Dfile=staging/asynchronous-service-task.jar
+    - name: Install On-demand Call Activity Plugin
+      run: mvn --batch-mode org.apache.maven.plugins:maven-install-plugin:3.0.0-M1:install-file -Dfile=staging/engine-plugin-on-demand-call-activity.jar
+    - name: Test with Maven
+      run: mvn --projects engine --batch-mode test --file pom.xml

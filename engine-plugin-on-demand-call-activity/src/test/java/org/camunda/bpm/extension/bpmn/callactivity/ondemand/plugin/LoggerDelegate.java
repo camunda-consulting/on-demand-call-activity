@@ -19,7 +19,14 @@ public class LoggerDelegate implements JavaDelegate {
         RepositoryService repositoryService = Context.getProcessEngineConfiguration().getProcessEngine().getRepositoryService();
 
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
-
         logger.info("Running logger delegate for definition {} and instance id {}...", processDefinition.getKey(), execution.getProcessInstanceId());
+        
+        DelegateExecution superExecution = execution.getSuperExecution();
+        if (superExecution != null) {
+          logger.info("variableSetByChildProcessProvider from parent: "
+              + superExecution.getVariable("variableSetByChildProcessProvider"));
+        }
+        logger.info("variableSetByChildProcessProvider from child: "
+            + execution.getVariable("variableSetByChildProcessProvider"));
     }
 }

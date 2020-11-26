@@ -7,12 +7,17 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.BehaviorUtil;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CallActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.AbstractBpmnParseListener;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.util.xml.Element;
 
+/**
+ * A {@link BpmnParseListener} that replaces the {@link ActivityBehavior} of
+ * BPMN Call Activities with {@link OnDemandCallActivityBehavior}.
+ *
+ * @author Falko Menge (Camunda)
+ */
 public class OnDemandCallActivityParseListener extends AbstractBpmnParseListener implements BpmnParseListener {
 
     private final Logger LOGGER = Logger.getLogger(OnDemandCallActivityParseListener.class.getName());

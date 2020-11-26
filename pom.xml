@@ -10,6 +10,7 @@
   <modules>
     <module>asynchronous-service-task</module>
     <module>engine-plugin-on-demand-call-activity/</module>
+    <module>abstract-delegate-execution</module>
   </modules>
 
 </project>

@@ -16,23 +16,14 @@
  */
 package org.camunda.bpm.extension.bpmn.servicetask.asynchronous;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-
-import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
-import org.camunda.bpm.engine.variable.VariableMap;
-
-import static org.camunda.bpm.extension.bpmn.servicetask.asynchronous.CompletableFutureJava8Compatibility.delayedExecutor;
 
 /**
  * <p>This is a simple implementation of the {@link SignallableActivityBehavior}
  * interface.</p> 
- * 
+ *
  * <p>The {@link SignallableActivityBehavior} provides two methods:
  * <ul>
  * 
@@ -46,7 +37,7 @@ import static org.camunda.bpm.extension.bpmn.servicetask.asynchronous.Completabl
  *   responsible for leaving the service task activity.</li>
  * </ul>
  * </p>
- *    
+ *
  * <p>The asynchronous nature of the invocation decouples the process engine from
  * the service implementation. The process engine does not propagate any thread context
  * to the service implementation. Most prominently, the service implementation is not 
@@ -55,45 +46,36 @@ import static org.camunda.bpm.extension.bpmn.servicetask.asynchronous.Completabl
  * wait state: after the execute()-Method returns, the process engine will stop execution,
  * flush out the sate of the execution to the database and wait for the callback to 
  * occur.</p>
- * 
+ *
  * <p>If a failure occurs in the service implementation, the failure will not cause the 
  * process engine to roll back. The reason is that the service implementation is not 
  * directly invoked by the process engine and does not participate in the process 
  * engine transaction.</p>
- *  
+ *
+ * @author Falko Menge (Camunda)
  */
-public class AsynchronousServiceTask extends AbstractBpmnActivityBehavior {
+public abstract class AbstractAsynchronousServiceTask extends AbstractBpmnActivityBehavior {
 
-  public static final String EXECUTION_ID = "executionId";
-
-	public void execute(final ActivityExecution execution) throws Exception {
-	  
-      // get variables
-      VariableMap inputVariables = execution.getVariablesTyped();
-      VariableMap inputVariablesLocal = execution.getVariablesLocalTyped();
-
-	  String executionId = execution.getId();
-	  
-	  // Publish a task to a scheduled executor. This method returns after the task has 
-	  // been put into the executor. The actual service implementation (lambda) will not yet 
-	  // be invoked:
-	  RuntimeService runtimeService = execution.getProcessEngineServices().getRuntimeService();
-	  // TODO prepare REST request using input variables
-      CompletableFuture.runAsync(() -> { // simulates the sending of a non-blocking REST request
-        // the code inside this lambda runs in a separate thread outside the TX
-        // this will not work: execution.setVariable("foo", "bar");
-        System.out.println("Hello");
-        Map<String, Object> newVariables = new HashMap<>();
-        newVariables.put("foo", "bar");
-        runtimeService.signal(executionId, newVariables);
-      }, delayedExecutor(250L, TimeUnit.MILLISECONDS));
-	  
+  
+    @Override
+	final public void execute(final ActivityExecution execution) throws Exception {
+	  execute(new ThreadSaveExecution(execution));
 	}
-			
-	public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
+
+    @Override   
+	final public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
 	  
 	  // leave the service task activity:
 	  leave(execution);
 	}
 
+
+  /**
+   * <p>This method's implementation must call {@link ThreadSaveExecution#complete()}
+   * in a separate thread and with enough delay to let the engine commit the TX.
+   *
+   * <p>Exceptions must be caught by the implementation and reported back to the
+   * BPMN process using process variables that, e.g., a Gateway can react to.
+   */
+  abstract public void execute(ThreadSaveExecution execution);
 }
