@@ -36,6 +36,7 @@ import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.bpmn.subprocess.util.GetActInstanceDelegate;
 import org.camunda.bpm.engine.test.util.ActivityInstanceAssert;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -128,7 +129,9 @@ public class SubProcessTest extends PluggableProcessEngineTest {
    * where 2 concurrent paths are defined when the timer fires.
    */
   @Deployment
-  public void IGNORE_testSimpleSubProcessWithConcurrentTimer() {
+  @Ignore
+  @Test
+  public void testSimpleSubProcessWithConcurrentTimer() {
 
     // After staring the process, the task in the subprocess should be active
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcessWithConcurrentTimer");

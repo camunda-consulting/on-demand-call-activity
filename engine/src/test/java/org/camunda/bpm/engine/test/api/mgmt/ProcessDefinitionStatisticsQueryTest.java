@@ -254,8 +254,8 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testCallActivityWithIncidentsWithoutFailedJobs.bpmn20.xml")
-  // Ignored. The incident that is tested is generated inside the call activity.
-  public void ignore_testCallActivityProcessDefinitionStatisticsQuery() {
+  @Ignore // The incident that is tested is generated inside the call activity.
+  public void testCallActivityProcessDefinitionStatisticsQuery() {
     runtimeService.startProcessInstanceByKey("callExampleSubProcess");
 
     testRule.executeAvailableJobs();
@@ -458,8 +458,8 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testCallActivityWithIncidentsWithoutFailedJobs.bpmn20.xml")
-  // Ignored. The incident that is tested is generated inside the call activity.
-  public void ignore_testProcessDefinitionStatisticsQueryWithIncidentsWithoutFailedJobs() {
+  @Ignore // The incident that is tested is generated inside the call activity.
+  public void testProcessDefinitionStatisticsQueryWithIncidentsWithoutFailedJobs() {
     runtimeService.startProcessInstanceByKey("callExampleSubProcess");
 
     testRule.executeAvailableJobs();
@@ -626,8 +626,8 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testCallActivityWithIncidentsWithoutFailedJobs.bpmn20.xml")
-  // Ignored. The incident that is tested is generated inside the call activity.
-  public void ignore_testIncludeRootIncidentsOnly() {
+  @Ignore // The incident that is tested is generated inside the call activity.
+  public void testIncludeRootIncidentsOnly() {
     runtimeService.startProcessInstanceByKey("callExampleSubProcess");
 
     testRule.executeAvailableJobs();

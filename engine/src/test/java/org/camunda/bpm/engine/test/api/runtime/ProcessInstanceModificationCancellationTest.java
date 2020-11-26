@@ -1643,7 +1643,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
   })
   @Ignore
   @Test
-  public void ignore_testCancellationAndRestartInCallActivitySubProcess() {
+  public void testCancellationAndRestartInCallActivitySubProcess() {
     // given
     runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
 

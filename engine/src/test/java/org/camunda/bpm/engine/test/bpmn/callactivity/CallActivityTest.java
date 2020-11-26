@@ -807,8 +807,9 @@ public class CallActivityTest extends PluggableProcessEngineTest {
   @Deployment(resources = {
     "org/camunda/bpm/engine/test/bpmn/callactivity/CallActivity.testSubProcessAllDataInputOutput.bpmn20.xml",
     "org/camunda/bpm/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml"})
+  @Ignore
   @Test
-  public void ignore_testSubProcessAllDataInputOutput() {
+  public void testSubProcessAllDataInputOutput() {
     Map<String, Object> vars = new HashMap<String, Object>();
     vars.put("superVariable", "Hello from the super process.");
     vars.put("testVariable", "Only a test.");
@@ -1631,8 +1632,9 @@ public class CallActivityTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithVersionTag.bpmn20.xml" })
+  @Ignore
   @Test
-  public void ignore_testCallProcessByVersionTagAsDelegateExpression() {
+  public void testCallProcessByVersionTagAsDelegateExpression() {
     // given
     processEngineConfiguration.getBeans().put("myDelegate", new MyVersionDelegate());
     BpmnModelInstance modelInstance = getModelWithCallActivityVersionTagBinding("${myDelegate.getVersionTag()}");
@@ -1692,8 +1694,9 @@ public class CallActivityTest extends PluggableProcessEngineTest {
   }
 
   @Deployment(resources = { "org/camunda/bpm/engine/test/bpmn/callactivity/subProcessWithVersionTag.bpmn20.xml" })
+  @Ignore
   @Test
-  public void ignore_testCallProcessByVersionTagTwoSubprocesses() {
+  public void testCallProcessByVersionTagTwoSubprocesses() {
     // given
     BpmnModelInstance modelInstance = getModelWithCallActivityVersionTagBinding("ver_tag_1");
 

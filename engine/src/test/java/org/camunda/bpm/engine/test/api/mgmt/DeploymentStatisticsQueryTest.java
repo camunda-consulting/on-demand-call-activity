@@ -250,10 +250,11 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTest {
     assertEquals(1, incident.getIncidentCount());
   }
 
+  @Ignore
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testCallActivityWithIncidentsWithoutFailedJobs.bpmn20.xml")
   // Ignored. The incident that is tested is generated inside the call activity.
-  public void ignore_testDeploymentStatisticsQueryWithTwoIncidentsAndOneFailedJobs() {
+  public void testDeploymentStatisticsQueryWithTwoIncidentsAndOneFailedJobs() {
     runtimeService.startProcessInstanceByKey("callExampleSubProcess");
 
     testRule.executeAvailableJobs();
