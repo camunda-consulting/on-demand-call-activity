@@ -1602,6 +1602,7 @@ public class ProcessInstanceModificationCancellationTest extends PluggableProces
   })
   @Ignore
   @Test
+  public void testCancellationInCallActivitySubProcess() {
     // given
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
     String processInstanceId = processInstance.getId();

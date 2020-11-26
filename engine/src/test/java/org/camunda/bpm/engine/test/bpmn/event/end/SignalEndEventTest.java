@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.util.PluggableProcessEngineTest;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**

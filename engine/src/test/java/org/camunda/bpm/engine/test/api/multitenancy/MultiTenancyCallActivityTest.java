@@ -91,7 +91,7 @@ public class MultiTenancyCallActivityTest extends PluggableProcessEngineTest {
     assertThat(query.tenantIdIn(TENANT_TWO).count(), is(1L));
   }
 
-  Ignore
+  @Ignore
   @Test
   public void testStartProcessInstanceWithLatestBindingDifferentVersion() {
 
