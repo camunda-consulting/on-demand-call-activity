@@ -1,14 +1,9 @@
 package org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin;
 
 import org.apache.ibatis.logging.LogFactory;
-import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.ProcessEngines;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.mock.Mocks;
 import org.camunda.bpm.model.bpmn.Bpmn;
@@ -21,13 +16,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static org.camunda.bpm.engine.impl.test.TestHelper.createSchema;
-import static org.camunda.bpm.engine.impl.test.TestHelper.dropSchema;
 import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
 import static org.camunda.bpm.engine.test.assertions.bpmn.AbstractAssertions.processEngine;
 import static org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.TestUtil.cleanUpAndCreateEngine;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 /**
  * Test case starting an in-memory database-backed Process Engine.
