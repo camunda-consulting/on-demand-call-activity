@@ -1,5 +1,11 @@
 # Abstract Delegate Execution
 
+## Unsupported Community Extension
+
+This is a [community extension](https://docs.camunda.org/manual/latest/introduction/extensions/)
+and therefore not supported by Camunda as part of its commercial services
+to enterprise subscription customers.
+
 ## How does it work?
 
 [AbstractDelegateExecution](src/main/java/org/camunda/bpm/extension/engine/delegate/AbstractDelegateExecution.java)

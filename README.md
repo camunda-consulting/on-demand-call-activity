@@ -5,6 +5,12 @@ A Camunda BPM plugin that allows a BPMN Call Activity to dynamically call a chil
 
 You can find the plugin code on the master branch.
 
+## Unsupported Community Extension
+
+This is a [community extension](https://docs.camunda.org/manual/latest/introduction/extensions/)
+and therefore not supported by Camunda as part of its commercial services
+to enterprise subscription customers.
+
 ## How to test an engine plugin against the process engine test suite
 To check if the plugin has some unexpected side effects to the process engine, you can run the complete engine test suite against a process engine that contains your plugin.
 
