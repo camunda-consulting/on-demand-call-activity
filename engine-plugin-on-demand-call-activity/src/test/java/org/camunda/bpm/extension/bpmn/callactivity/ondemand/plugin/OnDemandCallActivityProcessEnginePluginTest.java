@@ -308,6 +308,6 @@ public class OnDemandCallActivityProcessEnginePluginTest {
         Thread.sleep(15000L);
         //assertThat(processInstance).isEnded();
         //assertThat(processInstance).job().isNull();
-        assertEquals(1, ChildProcessProvider.invocationCount);
+        assertEquals(2, ChildProcessProvider.invocationCount);
     }
 }
