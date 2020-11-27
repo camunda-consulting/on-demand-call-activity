@@ -17,11 +17,14 @@ import org.slf4j.LoggerFactory;
  */
 public class ChildProcessProvider extends AbstractChildProcessProvider {
 
+    public static int invocationCount = 0;
+
     /**
      * If this method returns null execute will be invoked
      */
     @Override
     public String decideOnChildProcess(DelegateExecution execution) {
+      invocationCount++;
       Boolean retProcess = (Boolean) execution.getVariable("retProcess");
       // hand over to child process for error handling
       if (execution.hasVariable("firstTryHasFailed")) {
