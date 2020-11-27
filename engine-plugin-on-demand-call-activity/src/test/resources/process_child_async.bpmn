@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_1mv1q6l" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.3">
-  <bpmn:process id="process-child" name="Process Child" isExecutable="true">
+  <bpmn:process id="process-child-async" name="Process Child" isExecutable="true">
     <bpmn:extensionElements>
       <camunda:executionListener class="org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.UpdateHistoryExecutionListener" event="start" />
     </bpmn:extensionElements>
-    <bpmn:startEvent id="StartEvent_InChildProcess" name="Process Started">
+    <bpmn:startEvent id="StartEvent_InChildProcess" name="Process Started" camunda:asyncBefore="true">
       <bpmn:outgoing>SequenceFlow_0l1u1nm</bpmn:outgoing>
     </bpmn:startEvent>
     <bpmn:endEvent id="EndEvent_InChildProcess" name="Process Ended">
@@ -18,7 +18,7 @@
     <bpmn:sequenceFlow id="SequenceFlow_0l1u1nm" sourceRef="StartEvent_InChildProcess" targetRef="ServiceTask_InChildProcess" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="process-child">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="process-child-async">
       <bpmndi:BPMNEdge id="SequenceFlow_0l1u1nm_di" bpmnElement="SequenceFlow_0l1u1nm">
         <di:waypoint x="215" y="117" />
         <di:waypoint x="270" y="117" />

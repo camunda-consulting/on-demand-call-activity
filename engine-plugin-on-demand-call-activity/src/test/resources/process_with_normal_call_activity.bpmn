@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" id="Definitions_1" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.7.3">
-  <bpmn:process id="engine-plugin-on-demand-call-activity" name="engine-plugin-on-demand-call-activity" isExecutable="true">
+  <bpmn:process id="engine-plugin-on-demand-call-activity_with_normal_call_activity" name="engine-plugin-on-demand-call-activity_with_normal_call_activity" isExecutable="true">
     <bpmn:startEvent id="StartEvent_InParentProcess" name="Process&#10;started">
       <bpmn:outgoing>SequenceFlow1</bpmn:outgoing>
     </bpmn:startEvent>
     <bpmn:endEvent id="EndEvent_InParentProcess" name="Process&#10;ended">
-      <bpmn:incoming>SequenceFlow_14t5oxg</bpmn:incoming>
+      <bpmn:incoming>Flow_0myvbtk</bpmn:incoming>
     </bpmn:endEvent>
     <bpmn:sequenceFlow id="SequenceFlow1" sourceRef="StartEvent_InParentProcess" targetRef="On-demand_Call_Activity" />
-    <bpmn:sequenceFlow id="SequenceFlow_14t5oxg" sourceRef="On-demand_Call_Activity" targetRef="EndEvent_InParentProcess" />
+    <bpmn:sequenceFlow id="SequenceFlow_14t5oxg" sourceRef="On-demand_Call_Activity" targetRef="ServiceTask_InParentProcess" />
     <bpmn:callActivity id="On-demand_Call_Activity" name="On-demand&#10;Call Activity" calledElement="${childProcessProvider.getChildProcessDefinitionKey(execution)}">
       <bpmn:extensionElements>
         <camunda:in variables="all" />
@@ -17,12 +17,30 @@
       <bpmn:incoming>SequenceFlow1</bpmn:incoming>
       <bpmn:outgoing>SequenceFlow_14t5oxg</bpmn:outgoing>
     </bpmn:callActivity>
+    <bpmn:sequenceFlow id="Flow_0myvbtk" sourceRef="NormalCallActivity" targetRef="EndEvent_InParentProcess" />
+    <bpmn:callActivity id="NormalCallActivity" name="On-demand&#10;Call Activity" calledElement="process-child">
+      <bpmn:incoming>Flow_1suhfdr</bpmn:incoming>
+      <bpmn:outgoing>Flow_0myvbtk</bpmn:outgoing>
+    </bpmn:callActivity>
+    <bpmn:sequenceFlow id="Flow_1suhfdr" sourceRef="ServiceTask_InParentProcess" targetRef="NormalCallActivity" />
+    <bpmn:serviceTask id="ServiceTask_InParentProcess" name="Call Logger" camunda:class="org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.LoggerDelegate">
+      <bpmn:incoming>SequenceFlow_14t5oxg</bpmn:incoming>
+      <bpmn:outgoing>Flow_1suhfdr</bpmn:outgoing>
+    </bpmn:serviceTask>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
-    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="engine-plugin-on-demand-call-activity">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="engine-plugin-on-demand-call-activity_with_normal_call_activity">
+      <bpmndi:BPMNEdge id="Flow_1suhfdr_di" bpmnElement="Flow_1suhfdr">
+        <di:waypoint x="540" y="120" />
+        <di:waypoint x="620" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0myvbtk_di" bpmnElement="Flow_0myvbtk">
+        <di:waypoint x="720" y="120" />
+        <di:waypoint x="782" y="120" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="SequenceFlow_14t5oxg_di" bpmnElement="SequenceFlow_14t5oxg">
         <di:waypoint x="380" y="120" />
-        <di:waypoint x="462" y="120" />
+        <di:waypoint x="440" y="120" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="399" y="105" width="0" height="0" />
         </bpmndi:BPMNLabel>
@@ -40,14 +58,20 @@
           <dc:Bounds x="171" y="138" width="41" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0fkea3f_di" bpmnElement="EndEvent_InParentProcess">
+        <dc:Bounds x="782" y="102" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="780" y="138" width="41" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="CallActivity_1f50qwc_di" bpmnElement="On-demand_Call_Activity">
         <dc:Bounds x="280" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="EndEvent_0fkea3f_di" bpmnElement="EndEvent_InParentProcess">
-        <dc:Bounds x="462" y="102" width="36" height="36" />
-        <bpmndi:BPMNLabel>
-          <dc:Bounds x="460" y="138" width="41" height="27" />
-        </bpmndi:BPMNLabel>
+      <bpmndi:BPMNShape id="Activity_0wxhziv_di" bpmnElement="NormalCallActivity">
+        <dc:Bounds x="620" y="80" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0wki7tb_di" bpmnElement="ServiceTask_InParentProcess">
+        <dc:Bounds x="440" y="80" width="100" height="80" />
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

@@ -25,6 +25,9 @@ public class ChildProcessProvider extends AbstractChildProcessProvider {
       Boolean retProcess = (Boolean) execution.getVariable("retProcess");
       // hand over to child process for error handling
       if (execution.hasVariable("firstTryHasFailed")) {
+          if (execution.hasVariable("Async")) {
+            return "process-child-async"; // child process with asyncBefore=true on start event
+          }
         return "process-child"; // process definition key
         // maybe also another process for repair or self-healing
       }

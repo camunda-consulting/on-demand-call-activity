@@ -31,9 +31,9 @@ jobs:
     - run: mkdir staging && cp engine-plugin-on-demand-call-activity/target/*.jar staging/engine-plugin-on-demand-call-activity.jar
     - run: cp asynchronous-service-task/target/*.jar staging/asynchronous-service-task.jar
     - run: cp abstract-delegate-execution/target/*.jar staging/abstract-delegate-execution.jar
-    - uses: actions/upload-artifact@v2.1.4
+    - uses: actions/upload-artifact@v2.2.1
       with:
-        name: Package
+        name: library-jar-files.zip
         path: staging
 
 
@@ -55,7 +55,7 @@ jobs:
 
     steps:
     - name: Setup timezone
-      uses: zcong1993/setup-timezone@v1.0
+      uses: zcong1993/setup-timezone@v1.1.1
       with:
         timezone: Europe/Berlin
     - uses: actions/checkout@v2
@@ -67,7 +67,7 @@ jobs:
         java-version: 1.8
     - name: Enable snapshots in Maven settings
       if: endsWith(matrix.branch, 'SNAPSHOT')
-      uses: whelk-io/maven-settings-xml-action@v12
+      uses: whelk-io/maven-settings-xml-action@v14
       with:
         repositories: '[{ "id": "camunda-bpm-nexus", "name": "camunda-bpm-nexus", "url": "https://app.camunda.com/nexus/content/groups/public", "releases": { "enabled": "true" }, "snapshots": { "enabled": "true" } }]'
     - uses: actions/cache@v2
@@ -80,7 +80,7 @@ jobs:
       uses: actions/download-artifact@v2
       with:
         # Artifact name
-        name: Package
+        name: library-jar-files.zip
         # Destination path
         path: staging
     - name: Install abstract-delegate-execution
