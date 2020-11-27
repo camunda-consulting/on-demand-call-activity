@@ -5,6 +5,12 @@ A Camunda BPM plugin that allows a BPMN Call Activity to dynamically call a chil
 
 You can find the plugin code on the master branch.
 
+## Unsupported Community Extension
+
+This is a [community extension](https://docs.camunda.org/manual/latest/introduction/extensions/)
+and therefore not supported by Camunda as part of its commercial services
+to enterprise subscription customers.
+
 ## How to test an engine plugin against the process engine test suite
 To check if the plugin has some unexpected side effects to the process engine, you can run the complete engine test suite against a process engine that contains your plugin.
 
@@ -17,8 +23,8 @@ There are several test branches using the Camunda engine test suite:
 - [engine-test-suite-without-child-processes](https://github.com/camunda-consulting/on-demand-call-activity/tree/engine-test-suite-without-child-processes)
 - [engine-test-suite-with-child-processes-7.13.0](https://github.com/camunda-consulting/on-demand-call-activity/tree/engine-test-suite-with-child-processes-7.13.0)
 - [engine-test-suite-without-child-processes-7.13.0](https://github.com/camunda-consulting/on-demand-call-activity/tree/engine-test-suite-without-child-processes-7.13.0)
-- [engine-test-suite-with-child-processes-7.14.0-SNAPSHOT](https://github.com/camunda-consulting/on-demand-call-activity/tree/engine-test-suite-with-child-processes-7.14.0-SNAPSHOT)
-- [engine-test-suite-without-child-processes-7.14.0-SNAPSHOT](https://github.com/camunda-consulting/on-demand-call-activity/tree/engine-test-suite-without-child-processes-7.14.0-SNAPSHOT)
+- [engine-test-suite-with-child-processes-7.14.0](https://github.com/camunda-consulting/on-demand-call-activity/tree/engine-test-suite-with-child-processes-7.14.0)
+- [engine-test-suite-without-child-processes-7.14.0](https://github.com/camunda-consulting/on-demand-call-activity/tree/engine-test-suite-without-child-processes-7.14.0)
 
 A GitHub action under [maven.yml](https://github.com/camunda-consulting/on-demand-call-activity/edit/master/.github/workflows/maven.yml) builds the plugin and runs all tests on GitHub after pushing any change.
 

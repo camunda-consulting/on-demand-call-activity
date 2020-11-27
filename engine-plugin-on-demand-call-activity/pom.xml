@@ -60,14 +60,14 @@
     <dependency>
       <groupId>org.camunda.bpm.assert</groupId>
       <artifactId>camunda-bpm-assert</artifactId>
-      <version>5.0.0</version>
+      <version>8.0.0</version>
       <scope>test</scope>
     </dependency>
     <!-- AssertJ Testing Library -->
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <version>3.16.1</version>
+      <version>3.18.1</version>
       <scope>test</scope>
     </dependency>
 
@@ -90,7 +90,7 @@
       <!-- Used to generate test coverage reports, see https://github.com/camunda/camunda-consulting/tree/master/snippets/camunda-bpm-process-test-coverage -->
       <groupId>org.camunda.bpm.extension</groupId>
       <artifactId>camunda-bpm-process-test-coverage</artifactId>
-      <version>0.3.2</version>
+      <version>0.4.0</version>
       <scope>test</scope>
     </dependency>
 
