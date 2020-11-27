@@ -40,7 +40,8 @@ public class OnDemandCallActivityParseListener extends AbstractBpmnParseListener
             } else {
                 onDemandCallActivityBehavior = new OnDemandCallActivityBehavior(expression);
             }
-            onDemandCallActivityBehavior.setCallableElement(currentCallActivityBehavior.getCallableElement());
+            onDemandCallActivityBehavior.setCallableElement(
+                new OnDemandCallableElement(currentCallActivityBehavior.getCallableElement()));
             activity.setActivityBehavior(onDemandCallActivityBehavior);
 
         }
