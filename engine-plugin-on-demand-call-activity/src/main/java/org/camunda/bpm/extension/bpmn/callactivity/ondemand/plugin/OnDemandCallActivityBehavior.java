@@ -9,7 +9,6 @@ import java.util.Map;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.Expression;
-import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.impl.bpmn.behavior.CallActivityBehavior;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
@@ -51,14 +50,14 @@ public class OnDemandCallActivityBehavior extends CallActivityBehavior {
         // try to start process with the provided process definition key
         try {
             super.startInstance(execution, variables, businessKey);
-        }
-        // process definition key is null => no child process needed
-        catch (NullValueException e) {
-            if(!execution.hasVariableLocal(getAsyncServiceCallVarName(execution))){
+        } catch (DefinitionKeyNullValueException e) {
+            // process definition key is null
+            if (execution.hasVariableLocal(getAsyncServiceCallVarName(execution))) {
+                // => no child process needed
+                logger.debug("Ignoring processDefinitionKey=null. There is no demand for creating a child process.");
+            } else {
+                // unexpected null value that does not come from a child process provider 
                 throw e;
-            }
-            else {
-                logger.info("Ignoring process without existing key...");
             }
         }
     }
@@ -66,7 +65,6 @@ public class OnDemandCallActivityBehavior extends CallActivityBehavior {
     @Override
     public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
         if (signalData instanceof Exception) {
-
             Exception exception = (Exception) signalData;
             createAsynchronousContinuationJob(execution, exception);
         } else {
