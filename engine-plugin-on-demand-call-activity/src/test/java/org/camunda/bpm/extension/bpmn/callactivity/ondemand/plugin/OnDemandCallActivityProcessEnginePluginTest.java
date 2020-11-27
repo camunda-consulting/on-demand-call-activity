@@ -46,6 +46,7 @@ public class OnDemandCallActivityProcessEnginePluginTest {
         Mocks.register("childProcessProvider", new ChildProcessProvider());
         Mocks.register("loggerDelegate", new LoggerDelegate());
         init(rule.getProcessEngine());
+        ChildProcessProvider.invocationCount = 0;
     }
 
     @Test
@@ -62,6 +63,7 @@ public class OnDemandCallActivityProcessEnginePluginTest {
             .variableName("variableSetByChildProcessProvider")
             .count());
         assertThat(processInstance).isEnded();
+        assertEquals(1, ChildProcessProvider.invocationCount);
     }
 
     @Test
@@ -73,6 +75,7 @@ public class OnDemandCallActivityProcessEnginePluginTest {
         Thread.sleep(sleepTime);
         assertThat(processInstance).isEnded();
         assertThat(processInstance).job().isNull();
+        assertEquals(1, ChildProcessProvider.invocationCount);
     }
 
     @Test
@@ -84,6 +87,7 @@ public class OnDemandCallActivityProcessEnginePluginTest {
         Thread.sleep(sleepTime);
         assertThat(processInstance).isNotEnded();
         logger.info(job().toString());
+        assertEquals(1, ChildProcessProvider.invocationCount);
     }
 
     @Test
@@ -91,6 +95,7 @@ public class OnDemandCallActivityProcessEnginePluginTest {
         ProcessInstance processInstance = processEngine().getRuntimeService()
                 .startProcessInstanceByKey(PROCESS_DEFINITION_KEY,
                         withVariables("retProcess", false, "doThrowException", true));
+        assertEquals(1, ChildProcessProvider.invocationCount);
         assertThat(processInstance).calledProcessInstance("process-child").isNull();
         //CHECK IF THE FIRST RETRY JOB WAS CREATED AND THEN EXECUTED
         Thread.sleep(sleepTime);
@@ -104,6 +109,7 @@ public class OnDemandCallActivityProcessEnginePluginTest {
         assertThat(processInstance).isEnded();
         // this can not work because queries runtime:
         // assertThat(processInstance).calledProcessInstance("process-child").isEnded();
+        assertEquals(2, ChildProcessProvider.invocationCount);
     }
 
     @Test
@@ -111,6 +117,7 @@ public class OnDemandCallActivityProcessEnginePluginTest {
         ProcessInstance processInstance = processEngine().getRuntimeService()
                 .startProcessInstanceByKey("engine-plugin-on-demand-call-activity_with_normal_call_activity",
                         withVariables("retProcess", false, "doThrowException", true));
+        assertEquals(1, ChildProcessProvider.invocationCount);
         assertThat(processInstance).calledProcessInstance("process-child").isNull();
         //CHECK IF THE FIRST RETRY JOB WAS CREATED AND THEN EXECUTED
         Thread.sleep(sleepTime);
@@ -123,6 +130,7 @@ public class OnDemandCallActivityProcessEnginePluginTest {
         assertThat(processInstance).isEnded();
         // this can not work because queries runtime:
         // assertThat(processInstance).calledProcessInstance("process-child").isEnded();
+        assertEquals(2, ChildProcessProvider.invocationCount);
     }
 
     @Test
@@ -132,6 +140,7 @@ public class OnDemandCallActivityProcessEnginePluginTest {
                 .startProcessInstanceByKey(PROCESS_DEFINITION_KEY,
                         withVariables("retProcess", false, "doThrowException", true, "Async", true));
         assertThat(processInstance).calledProcessInstance("process-child").isNull();
+        assertEquals(1, ChildProcessProvider.invocationCount);
         //CHECK IF THE FIRST RETRY JOB WAS CREATED AND THEN EXECUTED
         Thread.sleep(sleepTime);
         assertThat(processInstance).isNotEnded();
@@ -148,6 +157,7 @@ public class OnDemandCallActivityProcessEnginePluginTest {
         assertThat(processInstance).isEnded();
         // this can not work because queries runtime:
         // assertThat(processInstance).calledProcessInstance("process-child").isEnded();
+        assertEquals(2, ChildProcessProvider.invocationCount);
     }
 
     @Test
@@ -156,6 +166,7 @@ public class OnDemandCallActivityProcessEnginePluginTest {
         ProcessInstance processInstance = processEngine().getRuntimeService()
                 .startProcessInstanceByKey("engine-plugin-on-demand-call-activity_with_normal_call_activity",
                         withVariables("retProcess", false, "doThrowException", true, "Async", true));
+        assertEquals(1, ChildProcessProvider.invocationCount);
         assertThat(processInstance).calledProcessInstance("process-child").isNull();
         //CHECK IF THE FIRST RETRY JOB WAS CREATED AND THEN EXECUTED
         Thread.sleep(sleepTime);
@@ -168,12 +179,14 @@ public class OnDemandCallActivityProcessEnginePluginTest {
         assertThatChildProcessIsInHistory(processInstance, 1);
 
         execute(jobQuery().singleResult());
+        assertEquals(2, ChildProcessProvider.invocationCount);
 
         assertThatChildProcessIsInHistory(processInstance, 2);
 
         assertThat(processInstance).isEnded();
         // this can not work because queries runtime:
         // assertThat(processInstance).calledProcessInstance("process-child").isEnded();
+        assertEquals(2, ChildProcessProvider.invocationCount);
     }
 
     private void assertThatChildProcessIsInHistory(ProcessInstance processInstance, int numberOfChildren) {
@@ -241,7 +254,8 @@ public class OnDemandCallActivityProcessEnginePluginTest {
         assertThat(processInstance).variables().containsEntry("input", "anInputVariable");
         assertThat(processInstance).variables().containsEntry("outputVar", "someValue");
         assertThat(processInstance).variables().containsEntry("output", "someValue");
-    }
+        assertEquals(1, ChildProcessProvider.invocationCount);
+   }
     
 	@Test
 	public void testOnDemandCallActivityWithParentVariableAccess() throws InterruptedException {
@@ -253,6 +267,7 @@ public class OnDemandCallActivityProcessEnginePluginTest {
 		assertThat(processInstance).hasPassed("EndEvent_InParentProcess");
 		assertThat(processInstance).isEnded();
 		assertThat(processInstance).variables().containsEntry("parentVar", "aParentVar");
+        assertEquals(1, ChildProcessProvider.invocationCount);
 	}
     
     // TODO: test all operations that should normally work with a call activity (see engine test suite)
@@ -265,6 +280,7 @@ public class OnDemandCallActivityProcessEnginePluginTest {
         Thread.sleep(6000L);
         assertThat(processInstance).isEnded();
         assertThat(processInstance).job().isNull();
+        assertEquals(1, ChildProcessProvider.invocationCount);
     }
     
     @Test
@@ -280,6 +296,7 @@ public class OnDemandCallActivityProcessEnginePluginTest {
       ProcessInstance processInstance = runtimeService().startProcessInstanceByKey("user-task-process");
       assertThat(processInstance).isActive();
       claim(task(), "falko");
+      assertEquals(0, ChildProcessProvider.invocationCount);
     }
     
     @Test
@@ -291,5 +308,6 @@ public class OnDemandCallActivityProcessEnginePluginTest {
         Thread.sleep(15000L);
         //assertThat(processInstance).isEnded();
         //assertThat(processInstance).job().isNull();
+        assertEquals(1, ChildProcessProvider.invocationCount);
     }
 }
