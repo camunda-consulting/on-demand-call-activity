@@ -1,10 +1,17 @@
 package org.camunda.bpm.extension.bpmn.servicetask.asynchronous;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.AuthorizationException;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.impl.pvm.PvmException;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.extension.engine.delegate.DelegateExecutionDTO;
 
 /**
@@ -51,7 +58,82 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
    */
   public void complete() {
     // TODO catch and retry on exceptions indicating that the transaction was not yet committed 
-    runtimeService.signal(getId(), getVariables());
+    try {
+      runtimeService.signal(getId(), getVariables());
+    } catch (PvmException e) {
+      if (e.getMessage().equals("cannot signal execution " + getId() + ": it has no current activity")) {
+        Execution execution = runtimeService.createExecutionQuery()
+          .activityId(getCurrentActivityId())
+          .singleResult();
+        runtimeService.signal(execution.getId(), getVariables());
+      } else {
+        throw e;
+      }
+    }
+  }
+
+  /**
+   * Triggers a BPMN Signal by invoking {@link RuntimeService#signalEventReceived(String)}.
+   *
+   * Notifies the process engine that a signal event of name 'signalName' has
+   * been received. Delivers the signal to all executions waiting on
+   * the signal and to all process definitions that can started by this signal. <p/>
+   *
+   * <strong>NOTE:</strong> Notification and instantiation happen synchronously.
+   *
+   * @param signalName
+   *          the name of the signal event
+   *
+   * @throws AuthorizationException
+   *          <li>if notify an execution and the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.</li>
+   *          <li>if start a new process instance and the user has no {@link Permissions#CREATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.</li>
+   */
+  public void signalEventReceived(String signalName) {
+    runtimeService.signalEventReceived(signalName);
+  }
+  
+  /**
+   * Obtain the value of a variable in a given process instance or execution
+   * using {@link RuntimeService#getVariable(String, String)}.
+   *
+   * Searching for the variable is done in all scopes that are visible to the given execution (including parent scopes).
+   * Returns null when no variable value is found with the given name or when the value is set to null.
+   *
+   * @param executionId id of process instance or execution, cannot be null.
+   * @param variableName name of variable, cannot be null.
+   *
+   * @return the variable value or null if the variable is undefined or the value of the variable is null.
+   *
+   * @throws ProcessEngineException
+   *          when no execution is found for the given executionId.
+   * @throws AuthorizationException
+   *          when permission are missing. See {@link RuntimeService#getVariable(String, String)}.
+   */
+  public Object getVariableFromExecution(final String executionId, final String variableName) {
+    // TODO write test case for this
+    return runtimeService.getVariable(executionId, variableName);
+  }
+
+  /**
+   * Update or create a variable for a given process instance or execution.  If the variable does not already exist
+   * somewhere in the execution hierarchy (i.e. the specified execution or any ancestor),
+   * it will be created in the process instance (which is the root execution).
+   *
+   * @param executionId id of process instance or execution to set variable in, cannot be null.
+   * @param variableName name of variable to set, cannot be null.
+   * @param value value to set. When null is passed, the variable is not removed,
+   * only it's value will be set to null.
+   *
+   * @throws ProcessEngineException
+   *          when no execution is found for the given executionId.
+   * @throws AuthorizationException
+   *          when permission are missing. See {@link RuntimeService#setVariable(String, String, Object)}.
+   */
+  public void setVariableInExecution(final String executionId, final String variableName, Object value) {
+    // TODO write test case for this
+    runtimeService.setVariable(executionId, variableName, value);
   }
 
   /**

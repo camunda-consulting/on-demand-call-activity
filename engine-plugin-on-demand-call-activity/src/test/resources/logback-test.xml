@@ -24,6 +24,10 @@
   <logger name="org.camunda.bpm.engine.test" level="debug" />
   <logger name="org.camunda.bpm.engine.persistence" level="debug" />
   <logger name="org.camunda.bpm.engine.impl.persistence.entity" level="debug" />
+  <logger name="org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceEntity" level="debug"/>
+  <logger name="org.camunda.bpm.engine.impl.db.entitymanager.DbEntityManager" level="debug"/>
+  <logger name="org.camunda.bpm.engine.impl.history.event" level="debug" />
+  <logger name="org.camunda.bpm.engine.history" level="debug" />
 
 <!--
   <logger name="org.camunda.bpm.engine.bpmn.parser" level="debug" />
