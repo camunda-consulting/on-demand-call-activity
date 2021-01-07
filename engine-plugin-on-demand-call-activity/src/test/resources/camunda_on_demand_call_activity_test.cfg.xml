@@ -6,9 +6,9 @@
 
   <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
     
-    <!-- <property name="databaseSchemaUpdate" value="false" />
+    <!-- <property name="databaseSchemaUpdate" value="true" />
 	<property name="jdbcDriver" value="org.postgresql.Driver"/>
-	<property name="jdbcUrl" value="jdbc:postgresql://10.76.129.140:32768/cc_postgres?reWriteBatchedInserts=true"/>
+	<property name="jdbcUrl" value="jdbc:postgresql://localhost:5432/cc_postgres?reWriteBatchedInserts=true&amp;loggerLevel=TRACE"/>
 	<property name="jdbcUsername" value="postgres"/>
 	<property name="jdbcPassword" value="abcde"/> -->
     

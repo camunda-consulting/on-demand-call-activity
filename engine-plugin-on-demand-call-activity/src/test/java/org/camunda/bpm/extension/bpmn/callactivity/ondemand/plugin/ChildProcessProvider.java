@@ -53,16 +53,11 @@ public class ChildProcessProvider extends AbstractChildProcessProvider {
     public void execute(OnDemandCallActivityExecution execution) {
 
       long delay = 250L;
-      Boolean optimisticLockingException = execution.hasVariable("optimisticLockingException") && (Boolean) execution.getVariable("optimisticLockingException");
-      if(optimisticLockingException) {
-    	  delay = Long.valueOf(execution.getVariable("delay").toString());
-    	  logger.info("ChildProcessProvider delay : {}", delay);
-      }
     	
       // When connected to postgres db, send signal fails with exception as it takes time to commit the execution. works fine with delay of 5000L  
       Boolean badUserRequestException = execution.hasVariable("badUserRequestException") && (Boolean) execution.getVariable("badUserRequestException");
       if(badUserRequestException) {
-    	  delay = 250L; //1500L
+    	  delay = 50L;
       }
     	
       // TODO handle exceptions during request creation? Only needed during reactive REST calls
