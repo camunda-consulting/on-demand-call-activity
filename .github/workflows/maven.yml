@@ -36,9 +36,7 @@ jobs:
         name: library-jar-files.zip
         path: staging
     name: Publish package to the Maven Central Repository and GitHub Packages
-    on:
-      release:
-        types: [created]
+
   publish:
     runs-on: ubuntu-latest
     steps:
