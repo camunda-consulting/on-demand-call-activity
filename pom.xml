@@ -13,4 +13,12 @@
     <module>abstract-delegate-execution</module>
   </modules>
 
+  <distributionManagement>
+    <repository>
+      <id>github</id>
+      <name>github</name>
+      <url>https://repo.maven.apache.org/maven2</url>
+    </repository>
+  </distributionManagement>
+
 </project>
