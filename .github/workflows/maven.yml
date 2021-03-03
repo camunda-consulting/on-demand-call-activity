@@ -53,7 +53,7 @@ jobs:
       - name: Publish to GitHub Packages
         run: mvn --batch-mode deploy
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
 
   test:
     needs: build
