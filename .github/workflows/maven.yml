@@ -45,7 +45,7 @@ jobs:
       - name: Publish package
         run: mvn --batch-mode deploy
         env:
-          GITHUB_TOKEN: da53558d5cdd42bb6b120a946d97bddd27a24f25
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
   test:
