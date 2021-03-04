@@ -120,32 +120,6 @@
 
   </dependencies>
 
-  <repositories>
-    <repository>
-      <id>camunda-bpm-nexus</id>
-      <name>Camunda Maven Repository</name>
-      <url>https://app.camunda.com/nexus/content/groups/public</url>
-    </repository>
-    <!-- enable this for EE dependencies (requires credentials in ~/.m2/settings.xml)
-    <repository>
-      <id>camunda-bpm-nexus-ee</id>
-      <name>Camunda Enterprise Maven Repository</name>
-      <url>https://app.camunda.com/nexus/content/repositories/camunda-bpm-ee</url>
-    </repository>
-    -->
-  </repositories>
 
-  <distributionManagement>
-    <snapshotRepository>
-      <id>github</id>
-      <name>GitHub Packages</name>
-      <url>https://maven.pkg.github.com/OHUser/camunda-consulting/on-demand-call-activity</url>
-    </snapshotRepository>
-    <repository>
-      <id>github</id>
-      <name>GitHub Packages</name>
-      <url>https://maven.pkg.github.com/OHUser/camunda-consulting/on-demand-call-activity</url>
-    </repository>
-  </distributionManagement>
   
 </project>
