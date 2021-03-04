@@ -13,16 +13,4 @@
     <module>abstract-delegate-execution</module>
   </modules>
 
-  <distributionManagement>
-    <snapshotRepository>
-      <id>github</id>
-      <name>GitHub Packages</name>
-      <url>https://maven.pkg.github.com/OHUser/camunda-consulting/on-demand-call-activity</url>
-    </snapshotRepository>
-    <repository>
-      <id>github</id>
-      <name>GitHub Packages</name>
-      <url>https://maven.pkg.github.com/OHUser/camunda-consulting/on-demand-call-activity</url>
-    </repository>
-  </distributionManagement>
 </project>
