@@ -35,24 +35,7 @@ jobs:
       with:
         name: library-jar-files.zip
         path: staging
-  publish:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Set up Maven Central Repository
-        uses: actions/setup-java@v1
-        with:
-          java-version: 1.8
-          server-id: ossrh
-          server-username: MAVEN_USERNAME
-          server-password: MAVEN_PASSWORD
-      - name: Publish package
-        run: mvn --batch-mode deploy
-        with:
-          repositories: '[{ "id": "org", "name": "org", "url": "http://indlin3991.corp.amdocs.com:28080/repository/maven-snapshots", "releases": { "enabled": "true" }, "snapshots": { "enabled": "true" } }]'
-        env:
-          MAVEN_USERNAME: psmdocker
-          MAVEN_PASSWORD: unix11
+
 
   test:
     needs: build
