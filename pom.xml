@@ -12,4 +12,12 @@
     <module>engine-plugin-on-demand-call-activity/</module>
     <module>abstract-delegate-execution</module>
   </modules>
+
+  <distributionManagement>
+    <repository>
+      <id>github</id>
+      <name>GitHub Packages</name>
+      <url>https://github.com/camunda-consulting/on-demand-call-activity</url>
+    </repository>
+  </distributionManagement>
 </project>
