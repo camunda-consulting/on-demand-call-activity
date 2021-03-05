@@ -136,6 +136,11 @@
   </repositories>
 
   <distributionManagement>
+    <snapshotRepository>
+      <id>github</id>
+      <name>GitHub Packages</name>
+      <url>https://maven.pkg.github.com/camunda-consulting/on-demand-call-activity</url>
+    </snapshotRepository>
     <repository>
       <id>github</id>
       <name>GitHub Packages</name>
