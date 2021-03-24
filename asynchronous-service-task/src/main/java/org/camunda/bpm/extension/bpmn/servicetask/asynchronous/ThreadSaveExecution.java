@@ -40,7 +40,7 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
 
   private static final long serialVersionUID = 1L;
 
-  protected final RuntimeService runtimeService;
+  private final RuntimeService runtimeService;
   
   public ThreadSaveExecution(final DelegateExecution execution) {
     super(execution);
@@ -59,13 +59,13 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
   public void complete() {
     // TODO catch and retry on exceptions indicating that the transaction was not yet committed 
     try {
-      runtimeService.signal(getId(), getVariables());
+      getRuntimeService().signal(getId(), getVariables());
     } catch (PvmException e) {
       if (e.getMessage().equals("cannot signal execution " + getId() + ": it has no current activity")) {
-        Execution execution = runtimeService.createExecutionQuery()
+        Execution execution = getRuntimeService().createExecutionQuery()
           .activityId(getCurrentActivityId())
           .singleResult();
-        runtimeService.signal(execution.getId(), getVariables());
+        getRuntimeService().signal(execution.getId(), getVariables());
       } else {
         throw e;
       }
@@ -91,7 +91,7 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
    *          and no {@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.</li>
    */
   public void signalEventReceived(String signalName) {
-    runtimeService.signalEventReceived(signalName);
+    getRuntimeService().signalEventReceived(signalName);
   }
   
   /**
@@ -113,7 +113,7 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
    */
   public Object getVariableFromExecution(final String executionId, final String variableName) {
     // TODO write test case for this
-    return runtimeService.getVariable(executionId, variableName);
+    return getRuntimeService().getVariable(executionId, variableName);
   }
 
   /**
@@ -133,7 +133,7 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
    */
   public void setVariableInExecution(final String executionId, final String variableName, Object value) {
     // TODO write test case for this
-    runtimeService.setVariable(executionId, variableName, value);
+    getRuntimeService().setVariable(executionId, variableName, value);
   }
 
   /**
@@ -230,6 +230,10 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
   @Override
   public void removeVariablesLocal(Collection<String> variableNames) {
     throw new UnsupportedOperationException();
+  }
+
+  protected RuntimeService getRuntimeService() {
+    return runtimeService;
   }
   
 }

@@ -4,6 +4,9 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.impl.cfg.TransactionState;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.extension.bpmn.servicetask.asynchronous.ThreadSaveExecution;
 
 /**
@@ -20,11 +23,17 @@ public class OnDemandCallActivityExecution extends ThreadSaveExecution implement
 
   private static final long serialVersionUID = 1L;
 
+  private boolean transactionCommitted = false;
+
   /**
    * @param execution
    */
   public OnDemandCallActivityExecution(final DelegateExecution execution) {
     super(execution);
+    CommandContext commandContext = Context.getCommandContext();
+    commandContext.getTransactionContext().addTransactionListener(TransactionState.COMMITTED, c -> {
+      this.setTransactionCommitted(true);
+    });
   }
 
   /**
@@ -38,7 +47,29 @@ public class OnDemandCallActivityExecution extends ThreadSaveExecution implement
    * @param exception the {@link Exception} that was caught by the thread.
    */
   public void handleFailure(final Exception exception) {
-    runtimeService.signal(getId(), null, exception, getVariables());
+    getRuntimeService().signal(getId(), null, exception, getVariables());
   }
 
+  public boolean isTransactionCommitted() {
+    return transactionCommitted;
+  }
+
+  public void setTransactionCommitted(boolean transactionCommitted) {
+    this.transactionCommitted = transactionCommitted;
+  }
+
+  @Override
+  public RuntimeService getRuntimeService() {
+    while (!isTransactionCommitted()) {
+      // TODO handle TX rollback
+      try {
+        Thread.sleep(100); // TODO don't block the thread
+      } catch (InterruptedException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+    }
+    return super.getRuntimeService();
+  }
+  
 }
