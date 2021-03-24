@@ -31,12 +31,10 @@ jobs:
     - run: mkdir staging && cp engine-plugin-on-demand-call-activity/target/*.jar staging/engine-plugin-on-demand-call-activity.jar
     - run: cp asynchronous-service-task/target/*.jar staging/asynchronous-service-task.jar
     - run: cp abstract-delegate-execution/target/*.jar staging/abstract-delegate-execution.jar
-    - uses: actions/upload-artifact@v2.2.1
+    - uses: actions/upload-artifact@v2.2.2
       with:
         name: library-jar-files.zip
         path: staging
-
-
 
   test:
     needs: build
