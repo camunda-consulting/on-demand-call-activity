@@ -83,6 +83,7 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.Ignore;
 import org.junit.rules.RuleChain;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
@@ -94,6 +95,7 @@ import com.google.gson.Gson;
 /**
  * Uses Wiremock so should be run as part of {@link TelemetrySuiteTest}.
  */
+@Ignore
 public class TelemetryReporterTest {
 
   protected static final String TELEMETRY_ENDPOINT = "http://localhost:8084/pings";
