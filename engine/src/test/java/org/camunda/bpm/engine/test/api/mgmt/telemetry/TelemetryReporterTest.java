@@ -83,6 +83,7 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.Ignore;
 import org.junit.rules.RuleChain;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
