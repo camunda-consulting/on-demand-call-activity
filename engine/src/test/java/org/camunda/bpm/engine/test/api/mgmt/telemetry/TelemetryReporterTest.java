@@ -94,6 +94,7 @@ import com.google.gson.Gson;
 /**
  * Uses Wiremock so should be run as part of {@link TelemetrySuiteTest}.
  */
+@Ignore
 public class TelemetryReporterTest {
 
   protected static final String TELEMETRY_ENDPOINT = "http://localhost:8084/pings";
