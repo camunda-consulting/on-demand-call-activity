@@ -22,12 +22,12 @@ to enterprise subscription customers.
 
 ## How does it work?
 
-[AsynchronousServiceTask](src/main/java/org/camunda/bpm/extension/bpmn/servicetask/asynchronous/AsynchronousJavaDelegate.java)
+[MultiThreadedJavaDelegate](src/test/java/org/camunda/bpm/extension/bpmn/servicetask/asynchronous/MultiThreadedJavaDelegate.java)
 
 ## How to use it?
 
 ### Unit Test
-You can run the JUnit test [InMemoryH2Test](src/test/java/com/camunda/bpm/consulting/snippet/asynchronous_service_task/InMemoryH2Test.java) in your IDE or using:
+You can run the JUnit test [InMemoryH2Test](src/test/java/org/camunda/bpm/extension/bpmn/servicetask/asynchronous/InMemoryH2Test.java) in your IDE or using:
 
 ```bash
 mvn clean test
