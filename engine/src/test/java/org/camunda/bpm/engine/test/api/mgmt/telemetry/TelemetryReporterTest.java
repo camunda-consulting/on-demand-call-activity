@@ -96,16 +96,13 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.http.Fault;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import com.google.gson.Gson;
+import ch.qos.logback.classic.spi.ILoggingEvent;
 
-<<<<<<< HEAD
+
 /**
  * Uses Wiremock so should be run as part of {@link TelemetrySuiteTest}.
  */
 @Ignore
-=======
-import ch.qos.logback.classic.spi.ILoggingEvent;
-
->>>>>>> f69ef4479829b71d1e333868695b7d0dd14fb3aa
 public class TelemetryReporterTest {
 
   protected static final String TELEMETRY_ENDPOINT = "http://localhost:8084/pings";
