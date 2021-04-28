@@ -5,15 +5,19 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
     <relativePath>../database</relativePath>
-    <version>7.14.0</version>
+    <version>7.15.0</version>
   </parent>
 
   <groupId>org.camunda.bpm.springboot.project</groupId>
   <artifactId>camunda-bpm-spring-boot-starter-root</artifactId>
-  <name>camunda BPM - Spring Boot Starter - Root Pom</name>
+  <name>Camunda Platform - Spring Boot Starter - Root Pom</name>
   <inceptionYear>2015</inceptionYear>
 
   <packaging>pom</packaging>
+
+  <properties>
+    <version.powermock>2.0.9</version.powermock>
+  </properties>
 
   <dependencyManagement>
     <dependencies>
@@ -24,6 +28,18 @@
         <version>${version.spring-boot}</version>
         <scope>import</scope>
         <type>pom</type>
+      </dependency>
+      <dependency>
+        <groupId>org.powermock</groupId>
+        <artifactId>powermock-module-junit4</artifactId>
+        <version>${version.powermock}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.powermock</groupId>
+        <artifactId>powermock-api-mockito2</artifactId>
+        <version>${version.powermock}</version>
+        <scope>test</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -38,6 +54,8 @@
         <module>starter</module>
         <module>starter-rest</module>
         <module>starter-test</module>
+        <module>starter-client/spring</module>
+        <module>starter-client/spring-boot</module>
         <module>starter-qa</module>
       </modules>
     </profile>
@@ -55,7 +73,7 @@
     <profile>
       <id>distro-starter</id>
       <!-- This profile is run in the release CI for building the enterprise artifacts
-          It can be removed if the webapp repo is merged to the platform and
+          It can be removed if the distro job is merged with the assembly and
           distro-ce is not used for building the spring boot starter -->
       <modules>
         <module>starter-webapp-core</module>
@@ -71,6 +89,7 @@
         <module>starter-qa</module>
         <module>starter</module>
         <module>starter-rest</module>
+        <module>starter-client/spring-boot</module>
         <module>starter-webapp-core</module>
       </modules>
       <build>

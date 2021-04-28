@@ -16,7 +16,8 @@
  */
 package org.camunda.bpm.engine.test.standalone.history;
 
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -30,17 +31,10 @@ import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration
 import org.camunda.bpm.engine.impl.cmd.DetermineHistoryLevelCmd;
 import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventType;
-import org.camunda.bpm.engine.impl.test.TestHelper;
-import org.hamcrest.CoreMatchers;
 import org.junit.After;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class DetermineHistoryLevelCmdTest {
-
-  @Rule
-  public final ExpectedException thrown = ExpectedException.none();
 
   private ProcessEngineImpl processEngineImpl;
 
@@ -70,7 +64,7 @@ public class DetermineHistoryLevelCmdTest {
 
     HistoryLevel historyLevel = config.getCommandExecutorSchemaOperations().execute(new DetermineHistoryLevelCmd(config.getHistoryLevels()));
 
-    assertThat(historyLevel, CoreMatchers.equalTo(HistoryLevel.HISTORY_LEVEL_FULL));
+    assertThat(historyLevel).isEqualTo(HistoryLevel.HISTORY_LEVEL_FULL);
   }
 
 
@@ -81,12 +75,12 @@ public class DetermineHistoryLevelCmdTest {
     // init the db with level=auto -> audit
     processEngineImpl = (ProcessEngineImpl) config.buildProcessEngine();
     // the history Level has been overwritten with audit
-    assertThat(config.getHistoryLevel(), CoreMatchers.equalTo(HistoryLevel.HISTORY_LEVEL_AUDIT));
+    assertThat(config.getHistoryLevel()).isEqualTo(HistoryLevel.HISTORY_LEVEL_AUDIT);
 
     // and this is written to the database
     HistoryLevel databaseLevel =
         config.getCommandExecutorSchemaOperations().execute(new DetermineHistoryLevelCmd(config.getHistoryLevels()));
-    assertThat(databaseLevel, CoreMatchers.equalTo(HistoryLevel.HISTORY_LEVEL_AUDIT));
+    assertThat(databaseLevel).isEqualTo(HistoryLevel.HISTORY_LEVEL_AUDIT);
   }
 
   @Test
@@ -112,11 +106,11 @@ public class DetermineHistoryLevelCmdTest {
     config.setCustomHistoryLevels(Arrays.asList(customLevel));
     processEngineImpl = (ProcessEngineImpl) config.buildProcessEngine();
 
-    thrown.expect(ProcessEngineException.class);
-    thrown.expectMessage("The configured history level with id='99' is not registered in this config.");
-
-    config.getCommandExecutorSchemaOperations().execute(
-        new DetermineHistoryLevelCmd(Collections.<HistoryLevel>emptyList()));
+    // when/then
+    assertThatThrownBy(() -> config.getCommandExecutorSchemaOperations().execute(
+        new DetermineHistoryLevelCmd(Collections.<HistoryLevel>emptyList())))
+      .isInstanceOf(ProcessEngineException.class)
+      .hasMessageContaining("The configured history level with id='99' is not registered in this config.");
   }
 
   @After

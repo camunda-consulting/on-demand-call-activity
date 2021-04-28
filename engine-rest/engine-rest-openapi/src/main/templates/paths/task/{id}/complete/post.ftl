@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "complete"
       tag = "Task"
+      summary = "Complete"
       desc = "Completes a task and updates process variables." />
 
   "parameters" : [
@@ -68,16 +69,14 @@
                        "summary": "POST `/task/anId/complete`",
                        "description": "Response Body",
                        "value": {
-                         "variables": {
-                           "aVariable": {
-                             "value": "aStringValue"
-                           },
-                           "anotherVariable": {
-                             "value": 42
-                           },
-                           "aThirdVariable": {
-                             "value": true
-                           }
+                         "aVariable": {
+                           "value": "aStringValue"
+                         },
+                         "anotherVariable": {
+                           "value": 42
+                         },
+                         "aThirdVariable": {
+                           "value": true
                          }
                        }
                      }'

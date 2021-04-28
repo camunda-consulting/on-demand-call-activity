@@ -69,7 +69,7 @@ create table ACT_GE_SCHEMA_LOG (
 );
 
 insert into ACT_GE_SCHEMA_LOG
-values ('0', CURRENT_TIMESTAMP, '7.14.0');
+values ('0', CURRENT_TIMESTAMP, '7.15.0');
 
 create table ACT_RE_DEPLOYMENT (
     ID_ nvarchar(64),
@@ -259,6 +259,7 @@ create table ACT_RU_INCIDENT (
   CONFIGURATION_ nvarchar(255),
   TENANT_ID_ nvarchar(64),
   JOB_DEF_ID_ nvarchar(64),
+  ANNOTATION_ nvarchar(4000),
   primary key (ID_)
 );
 
@@ -294,6 +295,13 @@ create table ACT_RU_METER_LOG (
   VALUE_ numeric(19,0),
   TIMESTAMP_ datetime2,
   MILLISECONDS_ numeric(19,0) DEFAULT 0,
+  primary key (ID_)
+);
+
+create table ACT_RU_TASK_METER_LOG (
+  ID_ nvarchar(64) not null,
+  ASSIGNEE_HASH_ numeric(19,0),
+  TIMESTAMP_ datetime2,
   primary key (ID_)
 );
 
@@ -372,6 +380,9 @@ CREATE INDEX ACT_IDX_METER_LOG_REPORT ON ACT_RU_METER_LOG(NAME_, REPORTER_, MILL
 -- old metric timestamp column
 CREATE INDEX ACT_IDX_METER_LOG_TIME ON ACT_RU_METER_LOG(TIMESTAMP_);
 CREATE INDEX ACT_IDX_METER_LOG ON ACT_RU_METER_LOG(NAME_, TIMESTAMP_);
+
+-- task metric timestamp column
+CREATE INDEX ACT_IDX_TASK_METER_LOG_TIME ON ACT_RU_TASK_METER_LOG(TIMESTAMP_);
 
 create index ACT_IDX_EXT_TASK_TOPIC on ACT_RU_EXT_TASK(TOPIC_NAME_);
 create index ACT_IDX_EXT_TASK_TENANT_ID on ACT_RU_EXT_TASK(TENANT_ID_);

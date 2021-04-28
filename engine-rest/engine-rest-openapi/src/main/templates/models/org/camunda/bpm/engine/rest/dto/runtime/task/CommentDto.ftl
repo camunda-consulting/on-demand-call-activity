@@ -20,7 +20,6 @@
         name = "time"
         type = "string"
         format = "date-time"
-        nullable = false
         desc = "The time when the comment was created.
                 [Default format]($(docsUrl)/reference/rest/overview/date-format/)
                 `yyyy-MM-dd'T'HH:mm:ss.SSSZ`." />

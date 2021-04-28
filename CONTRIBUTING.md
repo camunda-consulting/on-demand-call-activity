@@ -71,7 +71,7 @@ In order to build our codebase from source, add the following to your Maven `set
 </activeProfiles>
 ```
 
-An entire repository can then be built by running `mvn clean install` in the root directory. This will build all sub modules and execute unit tests. Furthermore, you can restrict the build to just the module you are changing by running the same command in the corresponding directory. Check the repository's or module's README for additional module-specific instructions. 
+An entire repository can then be built by running `mvn clean install` in the root directory. This will build all sub modules and execute unit tests. Furthermore, you can restrict the build to just the module you are changing by running the same command in the corresponding directory. Check the repository's or module's README for additional module-specific instructions. The `webapps` module requires NodeJS. You can exclude building the Webapps by running `mvn clean install -pl '!webapps'`.
 
 Integration tests (e.g. tests that run in an actual application server) are usually not part of the default Maven profiles. If you think they are relevant to your contribution, please ask us in the ticket, on the forum or in your pull request for how to run them. Smaller contributions usually do not need this.
 
@@ -90,11 +90,11 @@ A pull request can be submitted as follows:
 Before submitting your pull request for code review, please go through the following checklist:
 
 1. Is your code formatted according to our code style guidelines?
-    * Java: Please check our [Java Code Style Guidelines](https://github.com/camunda/camunda-bpm-dev-docs/blob/master/development/Coding-Style-Java.md). You can also import [our template and settings files](https://github.com/camunda/camunda-bpm-platform/tree/master/settings) into your IDE before you start coding.
+    * Java: Please check our [Java Code Style Guidelines](https://github.com/camunda/camunda-bpm-platform/wiki/Coding-Style-Java). You can also import [our template and settings files](https://github.com/camunda/camunda-bpm-platform/tree/master/settings) into your IDE before you start coding.
     * Javascript: Your code is automatically formatted whenever you commit.
 1. Is your code covered by unit tests?
     * Ask us if you are not sure where to write the tests or what kind of tests you should write.
-    * Java: Please follow our [testing best practices](https://github.com/camunda/camunda-bpm-dev-docs/blob/master/development/Testing-Best-Practices-Java.md).
+    * Java: Please follow our [testing best practices](https://github.com/camunda/camunda-bpm-platform/wiki/Testing-Best-Practices-Java).
     * Have a look at other tests in the same module for how it works.
     * In rare cases, it is not feasible to write an automated test. Please ask us if you think that is the case for your contribution.
 1. Do your commits follow our [commit message conventions](#commit-message-conventions)?

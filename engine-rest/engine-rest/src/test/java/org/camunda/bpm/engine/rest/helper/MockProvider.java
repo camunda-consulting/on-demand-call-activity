@@ -975,7 +975,7 @@ public abstract class MockProvider {
   }
 
   public static List<Task> createMockTasks() {
-    List<Task> mocks = new ArrayList<Task>();
+    List<Task> mocks = new ArrayList<>();
     mocks.add(createMockTask());
     return mocks;
   }
@@ -997,7 +997,7 @@ public abstract class MockProvider {
     when(mockFormData.getFormKey()).thenReturn(EXAMPLE_FORM_KEY);
     when(mockFormData.getDeploymentId()).thenReturn(EXAMPLE_DEPLOYMENT_ID);
 
-    List<FormProperty> mockFormProperties = new ArrayList<FormProperty>();
+    List<FormProperty> mockFormProperties = new ArrayList<>();
     mockFormProperties.add(mockFormProperty);
     when(mockFormData.getFormProperties()).thenReturn(mockFormProperties);
     return mockFormData;
@@ -1016,7 +1016,7 @@ public abstract class MockProvider {
     TaskFormData mockFormData = mock(TaskFormData.class);
     when(mockFormData.getDeploymentId()).thenReturn(EXAMPLE_DEPLOYMENT_ID);
 
-    List<FormField> mockFormFields = new ArrayList<FormField>();
+    List<FormField> mockFormFields = new ArrayList<>();
     mockFormFields.add(mockFormField);
     when(mockFormData.getFormFields()).thenReturn(mockFormFields);
     return mockFormData;
@@ -1036,7 +1036,7 @@ public abstract class MockProvider {
   }
 
   public static List<Comment> createMockTaskComments() {
-    List<Comment> mocks = new ArrayList<Comment>();
+    List<Comment> mocks = new ArrayList<>();
     mocks.add(createMockTaskComment());
     return mocks;
   }
@@ -1059,7 +1059,7 @@ public abstract class MockProvider {
   }
 
   public static List<Attachment> createMockTaskAttachments() {
-    List<Attachment> mocks = new ArrayList<Attachment>();
+    List<Attachment> mocks = new ArrayList<>();
     mocks.add(createMockTaskAttachment());
     return mocks;
   }
@@ -1069,7 +1069,7 @@ public abstract class MockProvider {
     when(mock.getGroupName()).thenReturn(EXAMPLE_GROUP_ID);
     when(mock.getTaskCount()).thenReturn(EXAMPLE_TASK_COUNT_BY_CANDIDATE_GROUP);
 
-    List<TaskCountByCandidateGroupResult> mockList = new ArrayList<TaskCountByCandidateGroupResult>();
+    List<TaskCountByCandidateGroupResult> mockList = new ArrayList<>();
     mockList.add(mock);
     return mockList;
   }
@@ -1106,7 +1106,7 @@ public abstract class MockProvider {
     when(mock.getPeriod()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_DURATION_REPORT_PERIOD);
     when(mock.getPeriodUnit()).thenReturn(periodUnit);
 
-    List<DurationReportResult> mockList = new ArrayList<DurationReportResult>();
+    List<DurationReportResult> mockList = new ArrayList<>();
     mockList.add(mock);
     return mockList;
   }
@@ -1131,7 +1131,7 @@ public abstract class MockProvider {
     when(mockFormData.getDeploymentId()).thenReturn(EXAMPLE_DEPLOYMENT_ID);
     when(mockFormData.getProcessDefinition()).thenReturn(definition);
 
-    List<FormProperty> mockFormProperties = new ArrayList<FormProperty>();
+    List<FormProperty> mockFormProperties = new ArrayList<>();
     mockFormProperties.add(mockFormProperty);
     when(mockFormData.getFormProperties()).thenReturn(mockFormProperties);
     return mockFormData;
@@ -1151,7 +1151,7 @@ public abstract class MockProvider {
     when(mockFormData.getDeploymentId()).thenReturn(EXAMPLE_DEPLOYMENT_ID);
     when(mockFormData.getProcessDefinition()).thenReturn(definition);
 
-    List<FormField> mockFormFields = new ArrayList<FormField>();
+    List<FormField> mockFormFields = new ArrayList<>();
     mockFormFields.add(mockFormField);
     when(mockFormData.getFormFields()).thenReturn(mockFormFields);
 
@@ -1291,7 +1291,7 @@ public abstract class MockProvider {
     when(incidentStaticits.getIncidentType()).thenReturn(EXAMPLE_INCIDENT_TYPE);
     when(incidentStaticits.getIncidentCount()).thenReturn(EXAMPLE_INCIDENT_COUNT);
 
-    List<IncidentStatistics> exampleIncidentList = new ArrayList<IncidentStatistics>();
+    List<IncidentStatistics> exampleIncidentList = new ArrayList<>();
     exampleIncidentList.add(incidentStaticits);
     when(statistics.getIncidentStatistics()).thenReturn(exampleIncidentList);
 
@@ -1308,11 +1308,11 @@ public abstract class MockProvider {
     when(anotherIncidentStaticits.getIncidentType()).thenReturn(ANOTHER_EXAMPLE_INCIDENT_TYPE);
     when(anotherIncidentStaticits.getIncidentCount()).thenReturn(ANOTHER_EXAMPLE_INCIDENT_COUNT);
 
-    List<IncidentStatistics> anotherExampleIncidentList = new ArrayList<IncidentStatistics>();
+    List<IncidentStatistics> anotherExampleIncidentList = new ArrayList<>();
     anotherExampleIncidentList.add(anotherIncidentStaticits);
     when(anotherStatistics.getIncidentStatistics()).thenReturn(anotherExampleIncidentList);
 
-    List<ProcessDefinitionStatistics> processDefinitionResults = new ArrayList<ProcessDefinitionStatistics>();
+    List<ProcessDefinitionStatistics> processDefinitionResults = new ArrayList<>();
     processDefinitionResults.add(statistics);
     processDefinitionResults.add(anotherStatistics);
 
@@ -1329,7 +1329,7 @@ public abstract class MockProvider {
     when(incidentStaticits.getIncidentType()).thenReturn(EXAMPLE_INCIDENT_TYPE);
     when(incidentStaticits.getIncidentCount()).thenReturn(EXAMPLE_INCIDENT_COUNT);
 
-    List<IncidentStatistics> exampleIncidentList = new ArrayList<IncidentStatistics>();
+    List<IncidentStatistics> exampleIncidentList = new ArrayList<>();
     exampleIncidentList.add(incidentStaticits);
     when(statistics.getIncidentStatistics()).thenReturn(exampleIncidentList);
 
@@ -1342,11 +1342,11 @@ public abstract class MockProvider {
     when(anotherIncidentStaticits.getIncidentType()).thenReturn(ANOTHER_EXAMPLE_INCIDENT_TYPE);
     when(anotherIncidentStaticits.getIncidentCount()).thenReturn(ANOTHER_EXAMPLE_INCIDENT_COUNT);
 
-    List<IncidentStatistics> anotherExampleIncidentList = new ArrayList<IncidentStatistics>();
+    List<IncidentStatistics> anotherExampleIncidentList = new ArrayList<>();
     anotherExampleIncidentList.add(anotherIncidentStaticits);
     when(anotherStatistics.getIncidentStatistics()).thenReturn(anotherExampleIncidentList);
 
-    List<ActivityStatistics> activityResults = new ArrayList<ActivityStatistics>();
+    List<ActivityStatistics> activityResults = new ArrayList<>();
     activityResults.add(statistics);
     activityResults.add(anotherStatistics);
 
@@ -1355,13 +1355,13 @@ public abstract class MockProvider {
 
   // process definition
   public static List<ProcessDefinition> createMockDefinitions() {
-    List<ProcessDefinition> mocks = new ArrayList<ProcessDefinition>();
+    List<ProcessDefinition> mocks = new ArrayList<>();
     mocks.add(createMockDefinition());
     return mocks;
   }
 
   public static List<ProcessDefinition> createMockTwoDefinitions() {
-    List<ProcessDefinition> mocks = new ArrayList<ProcessDefinition>();
+    List<ProcessDefinition> mocks = new ArrayList<>();
     mocks.add(createMockDefinition());
     mocks.add(createMockAnotherDefinition());
     return mocks;
@@ -1384,7 +1384,7 @@ public abstract class MockProvider {
 
   // deployments
   public static List<Deployment> createMockDeployments() {
-    List<Deployment> mocks = new ArrayList<Deployment>();
+    List<Deployment> mocks = new ArrayList<>();
     mocks.add(createMockDeployment());
     return mocks;
   }
@@ -1441,7 +1441,7 @@ public abstract class MockProvider {
 
   // deployment resources
   public static List<Resource> createMockDeploymentResources() {
-    List<Resource> mocks = new ArrayList<Resource>();
+    List<Resource> mocks = new ArrayList<>();
     mocks.add(createMockDeploymentResource());
     return mocks;
   }
@@ -1685,7 +1685,7 @@ public abstract class MockProvider {
   }
 
   public static List<Group> createMockGroups() {
-    List<Group> mockGroups = new ArrayList<Group>();
+    List<Group> mockGroups = new ArrayList<>();
     mockGroups.add(createMockGroup());
     return mockGroups;
   }
@@ -1741,13 +1741,13 @@ public abstract class MockProvider {
   }
 
   public static List<Job> createMockJobs() {
-    List<Job> mockList = new ArrayList<Job>();
+    List<Job> mockList = new ArrayList<>();
     mockList.add(createMockJob());
     return mockList;
   }
 
   public static List<Job> createMockEmptyJobList() {
-    return new ArrayList<Job>();
+    return new ArrayList<>();
   }
 
   public static User createMockUserUpdate() {
@@ -1761,7 +1761,7 @@ public abstract class MockProvider {
   }
 
   public static List<User> createMockUsers() {
-    ArrayList<User> list = new ArrayList<User>();
+    ArrayList<User> list = new ArrayList<>();
     list.add(createMockUser());
     return list;
   }
@@ -1836,7 +1836,7 @@ public abstract class MockProvider {
 
   public static ProcessApplicationInfo createMockProcessApplicationInfo() {
     ProcessApplicationInfo appInfo = mock(ProcessApplicationInfo.class);
-    Map<String, String> mockAppProperties = new HashMap<String, String>();
+    Map<String, String> mockAppProperties = new HashMap<>();
     String mockServletContextPath = MockProvider.EXAMPLE_PROCESS_APPLICATION_CONTEXT_PATH;
     mockAppProperties.put(ProcessApplicationInfo.PROP_SERVLET_CONTEXT_PATH, mockServletContextPath);
     when(appInfo.getProperties()).thenReturn(mockAppProperties);
@@ -1845,7 +1845,7 @@ public abstract class MockProvider {
 
   // History
   public static List<HistoricActivityInstance> createMockHistoricActivityInstances() {
-    List<HistoricActivityInstance> mockList = new ArrayList<HistoricActivityInstance>();
+    List<HistoricActivityInstance> mockList = new ArrayList<>();
     mockList.add(createMockHistoricActivityInstance());
     return mockList;
   }
@@ -1883,7 +1883,7 @@ public abstract class MockProvider {
   }
 
   public static List<HistoricActivityInstance> createMockRunningHistoricActivityInstances() {
-    List<HistoricActivityInstance> mockList = new ArrayList<HistoricActivityInstance>();
+    List<HistoricActivityInstance> mockList = new ArrayList<>();
     mockList.add(createMockRunningHistoricActivityInstance());
     return mockList;
   }
@@ -1911,7 +1911,7 @@ public abstract class MockProvider {
   }
 
   public static List<HistoricCaseActivityInstance> createMockHistoricCaseActivityInstances() {
-    ArrayList<HistoricCaseActivityInstance> mockList = new ArrayList<HistoricCaseActivityInstance>();
+    ArrayList<HistoricCaseActivityInstance> mockList = new ArrayList<>();
     mockList.add(createMockHistoricCaseActivityInstance());
     return mockList;
   }
@@ -1950,7 +1950,7 @@ public abstract class MockProvider {
   }
 
   public static List<HistoricCaseActivityInstance> createMockRunningHistoricCaseActivityInstances() {
-    List<HistoricCaseActivityInstance> mockList = new ArrayList<HistoricCaseActivityInstance>();
+    List<HistoricCaseActivityInstance> mockList = new ArrayList<>();
     mockList.add(createMockRunningHistoricCaseActivityInstance());
     return mockList;
   }
@@ -1993,7 +1993,7 @@ public abstract class MockProvider {
     when(anotherStatistics.getResolvedIncidents()).thenReturn(ANOTHER_EXAMPLE_RESOLVED_INCIDENTS_LONG);
     when(anotherStatistics.getDeletedIncidents()).thenReturn(ANOTHER_EXAMPLE_DELETED_INCIDENTS_LONG);
 
-    List<HistoricActivityStatistics> activityResults = new ArrayList<HistoricActivityStatistics>();
+    List<HistoricActivityStatistics> activityResults = new ArrayList<>();
     activityResults.add(statistics);
     activityResults.add(anotherStatistics);
 
@@ -2021,7 +2021,7 @@ public abstract class MockProvider {
     when(anotherStatistics.getEnabled()).thenReturn(ANOTHER_EXAMPLE_ENABLED_LONG);
     when(anotherStatistics.getTerminated()).thenReturn(ANOTHER_EXAMPLE_TERMINATED_LONG);
 
-    List<HistoricCaseActivityStatistics> activityResults = new ArrayList<HistoricCaseActivityStatistics>();
+    List<HistoricCaseActivityStatistics> activityResults = new ArrayList<>();
     activityResults.add(statistics);
     activityResults.add(anotherStatistics);
 
@@ -2029,7 +2029,7 @@ public abstract class MockProvider {
   }
 
   public static List<HistoricProcessInstance> createMockHistoricProcessInstances() {
-    List<HistoricProcessInstance> mockList = new ArrayList<HistoricProcessInstance>();
+    List<HistoricProcessInstance> mockList = new ArrayList<>();
     mockList.add(createMockHistoricProcessInstance());
     return mockList;
   }
@@ -2065,7 +2065,7 @@ public abstract class MockProvider {
   }
 
   public static List<HistoricProcessInstance> createMockRunningHistoricProcessInstances() {
-    List<HistoricProcessInstance> mockList = new ArrayList<HistoricProcessInstance>();
+    List<HistoricProcessInstance> mockList = new ArrayList<>();
     mockList.add(createMockHistoricProcessInstanceUnfinished());
     return mockList;
   }
@@ -2090,7 +2090,7 @@ public abstract class MockProvider {
     when(mock.getPeriod()).thenReturn(EXAMPLE_HISTORIC_PROC_INST_DURATION_REPORT_PERIOD);
     when(mock.getPeriodUnit()).thenReturn(PeriodUnit.MONTH);
 
-    List<DurationReportResult> mockList = new ArrayList<DurationReportResult>();
+    List<DurationReportResult> mockList = new ArrayList<>();
     mockList.add(mock);
     return mockList;
   }
@@ -2103,13 +2103,13 @@ public abstract class MockProvider {
     when(mock.getPeriod()).thenReturn(EXAMPLE_HISTORIC_PROC_INST_DURATION_REPORT_PERIOD);
     when(mock.getPeriodUnit()).thenReturn(PeriodUnit.QUARTER);
 
-    List<DurationReportResult> mockList = new ArrayList<DurationReportResult>();
+    List<DurationReportResult> mockList = new ArrayList<>();
     mockList.add(mock);
     return mockList;
   }
 
   public static List<HistoricCaseInstance> createMockHistoricCaseInstances() {
-    List<HistoricCaseInstance> mockList = new ArrayList<HistoricCaseInstance>();
+    List<HistoricCaseInstance> mockList = new ArrayList<>();
     mockList.add(createMockHistoricCaseInstance());
     return mockList;
   }
@@ -2142,7 +2142,7 @@ public abstract class MockProvider {
   }
 
   public static List<HistoricCaseInstance> createMockRunningHistoricCaseInstances() {
-    List<HistoricCaseInstance> mockList = new ArrayList<HistoricCaseInstance>();
+    List<HistoricCaseInstance> mockList = new ArrayList<>();
     mockList.add(createMockHistoricCaseInstanceNotClosed());
     return mockList;
   }
@@ -2191,7 +2191,7 @@ public abstract class MockProvider {
   }
 
   public static List<ProcessInstance> createAnotherMockProcessInstanceList() {
-    List<ProcessInstance> mockProcessInstanceList = new ArrayList<ProcessInstance>();
+    List<ProcessInstance> mockProcessInstanceList = new ArrayList<>();
     mockProcessInstanceList.add(createMockInstance());
     mockProcessInstanceList.add(createAnotherMockInstance());
     return mockProcessInstanceList;
@@ -2211,7 +2211,7 @@ public abstract class MockProvider {
   }
 
   public static Set<String> createMockSetFromList(String list){
-    return new HashSet<String>(Arrays.asList(list.split(",")));
+    return new HashSet<>(Arrays.asList(list.split(",")));
   }
 
   public static IdentityLink createMockUserAssigneeIdentityLink() {
@@ -2276,14 +2276,14 @@ public abstract class MockProvider {
   }
 
   public static List<HistoricIdentityLinkLog> createMockHistoricIdentityLinks() {
-    List<HistoricIdentityLinkLog> entries = new ArrayList<HistoricIdentityLinkLog>();
+    List<HistoricIdentityLinkLog> entries = new ArrayList<>();
     entries.add(createMockHistoricIdentityLink());
     return entries;
   }
 
   // job definition
   public static List<JobDefinition> createMockJobDefinitions() {
-    List<JobDefinition> mocks = new ArrayList<JobDefinition>();
+    List<JobDefinition> mocks = new ArrayList<>();
     mocks.add(createMockJobDefinition());
     return mocks;
   }
@@ -2306,7 +2306,7 @@ public abstract class MockProvider {
   }
 
   public static List<UserOperationLogEntry> createUserOperationLogEntries() {
-    List<UserOperationLogEntry> entries = new ArrayList<UserOperationLogEntry>();
+    List<UserOperationLogEntry> entries = new ArrayList<>();
     entries.add(createUserOperationLogEntry());
     return entries;
   }
@@ -2400,7 +2400,7 @@ public abstract class MockProvider {
   }
 
   public static List<HistoricFormField> createMockHistoricFormFields() {
-    List<HistoricFormField> entries = new ArrayList<HistoricFormField>();
+    List<HistoricFormField> entries = new ArrayList<>();
     entries.add(createMockHistoricFormField());
     return entries;
   }
@@ -2410,7 +2410,7 @@ public abstract class MockProvider {
   }
 
   public static List<HistoricDetail> createMockHistoricDetails(String tenantId) {
-    List<HistoricDetail> entries = new ArrayList<HistoricDetail>();
+    List<HistoricDetail> entries = new ArrayList<>();
     entries.add(mockHistoricVariableUpdate(tenantId).build());
     entries.add(createMockHistoricFormField(tenantId));
     return entries;
@@ -2421,6 +2421,10 @@ public abstract class MockProvider {
   }
 
   public static HistoricTaskInstance createMockHistoricTaskInstance(String tenantId) {
+    return createMockHistoricTaskInstance(tenantId, EXAMPLE_HISTORIC_TASK_INST_DUE_DATE);
+  }
+
+  public static HistoricTaskInstance createMockHistoricTaskInstance(String tenantId, String dueDateString) {
     HistoricTaskInstance taskInstance = mock(HistoricTaskInstance.class);
 
     when(taskInstance.getId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_ID);
@@ -2439,7 +2443,7 @@ public abstract class MockProvider {
     when(taskInstance.getDurationInMillis()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_DURATION);
     when(taskInstance.getTaskDefinitionKey()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_DEF_KEY);
     when(taskInstance.getPriority()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_PRIORITY);
-    when(taskInstance.getDueDate()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_TASK_INST_DUE_DATE));
+    when(taskInstance.getDueDate()).thenReturn(dueDateString == null ? null : DateTimeUtil.parseDate(dueDateString));
     when(taskInstance.getFollowUpDate()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HISTORIC_TASK_INST_FOLLOW_UP_DATE));
     when(taskInstance.getParentTaskId()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_PARENT_TASK_ID);
     when(taskInstance.getCaseDefinitionKey()).thenReturn(EXAMPLE_HISTORIC_TASK_INST_CASE_DEF_KEY);
@@ -2454,7 +2458,7 @@ public abstract class MockProvider {
   }
 
   public static List<HistoricTaskInstance> createMockHistoricTaskInstances() {
-    List<HistoricTaskInstance> entries = new ArrayList<HistoricTaskInstance>();
+    List<HistoricTaskInstance> entries = new ArrayList<>();
     entries.add(createMockHistoricTaskInstance());
     return entries;
   }
@@ -2482,12 +2486,13 @@ public abstract class MockProvider {
     when(incident.getIncidentMessage()).thenReturn(EXAMPLE_INCIDENT_MESSAGE);
     when(incident.getTenantId()).thenReturn(tenantId);
     when(incident.getJobDefinitionId()).thenReturn(EXAMPLE_JOB_DEFINITION_ID);
+    when(incident.getAnnotation()).thenReturn(EXAMPLE_USER_OPERATION_ANNOTATION);
 
     return incident;
   }
 
   public static List<Incident> createMockIncidents() {
-    List<Incident> entries = new ArrayList<Incident>();
+    List<Incident> entries = new ArrayList<>();
     entries.add(createMockIncident());
     return entries;
   }
@@ -2521,25 +2526,26 @@ public abstract class MockProvider {
     when(incident.getJobDefinitionId()).thenReturn(EXAMPLE_JOB_DEFINITION_ID);
     when(incident.getRemovalTime()).thenReturn(DateTimeUtil.parseDate(EXAMPLE_HIST_INCIDENT_REMOVAL_TIME));
     when(incident.getRootProcessInstanceId()).thenReturn(EXAMPLE_HIST_INCIDENT_ROOT_PROC_INST_ID);
+    when(incident.getAnnotation()).thenReturn(EXAMPLE_USER_OPERATION_ANNOTATION);
 
     return incident;
   }
 
   public static List<HistoricIncident> createMockHistoricIncidents() {
-    List<HistoricIncident> entries = new ArrayList<HistoricIncident>();
+    List<HistoricIncident> entries = new ArrayList<>();
     entries.add(createMockHistoricIncident());
     return entries;
   }
 
   // case definition
   public static List<CaseDefinition> createMockCaseDefinitions() {
-    List<CaseDefinition> mocks = new ArrayList<CaseDefinition>();
+    List<CaseDefinition> mocks = new ArrayList<>();
     mocks.add(createMockCaseDefinition());
     return mocks;
   }
 
   public static List<CaseDefinition> createMockTwoCaseDefinitions() {
-    List<CaseDefinition> mocks = new ArrayList<CaseDefinition>();
+    List<CaseDefinition> mocks = new ArrayList<>();
     mocks.add(createMockCaseDefinition());
     mocks.add(createAnotherMockCaseDefinition());
     return mocks;
@@ -2570,7 +2576,7 @@ public abstract class MockProvider {
 
   // case instance
   public static List<CaseInstance> createMockCaseInstances() {
-    List<CaseInstance> mocks = new ArrayList<CaseInstance>();
+    List<CaseInstance> mocks = new ArrayList<>();
     mocks.add(createMockCaseInstance());
     return mocks;
   }
@@ -2595,7 +2601,7 @@ public abstract class MockProvider {
 
   // case execution
   public static List<CaseExecution> createMockCaseExecutions() {
-    List<CaseExecution> mocks = new ArrayList<CaseExecution>();
+    List<CaseExecution> mocks = new ArrayList<>();
     mocks.add(createMockCaseExecution());
     return mocks;
   }
@@ -2631,7 +2637,7 @@ public abstract class MockProvider {
   }
 
   public static List<Filter> createMockFilters() {
-    List<Filter> mocks = new ArrayList<Filter>();
+    List<Filter> mocks = new ArrayList<>();
     mocks.add(createMockFilter(EXAMPLE_FILTER_ID));
     mocks.add(createMockFilter(ANOTHER_EXAMPLE_FILTER_ID));
     return mocks;
@@ -2709,7 +2715,7 @@ public abstract class MockProvider {
   }
 
   public static List<MetricIntervalValue> createMockMetricIntervalResult() {
-    List<MetricIntervalValue> metrics = new ArrayList<MetricIntervalValue>();
+    List<MetricIntervalValue> metrics = new ArrayList<>();
 
     MetricIntervalEntity entity1 = new MetricIntervalEntity(new Date(15 * 60 * 1000 * 1), EXAMPLE_METRICS_NAME, EXAMPLE_METRICS_REPORTER);
     entity1.setValue(21);
@@ -2729,13 +2735,13 @@ public abstract class MockProvider {
 
   // decision definition
   public static List<DecisionDefinition> createMockDecisionDefinitions() {
-    List<DecisionDefinition> mocks = new ArrayList<DecisionDefinition>();
+    List<DecisionDefinition> mocks = new ArrayList<>();
     mocks.add(createMockDecisionDefinition());
     return mocks;
   }
 
   public static List<DecisionDefinition> createMockTwoDecisionDefinitions() {
-    List<DecisionDefinition> mocks = new ArrayList<DecisionDefinition>();
+    List<DecisionDefinition> mocks = new ArrayList<>();
     mocks.add(createMockDecisionDefinition());
     mocks.add(createAnotherMockDecisionDefinition());
     return mocks;
@@ -2795,13 +2801,13 @@ public abstract class MockProvider {
   }
 
   public static List<DecisionRequirementsDefinition> createMockDecisionRequirementsDefinitions() {
-    List<DecisionRequirementsDefinition> mocks = new ArrayList<DecisionRequirementsDefinition>();
+    List<DecisionRequirementsDefinition> mocks = new ArrayList<>();
     mocks.add(createMockDecisionRequirementsDefinition());
     return mocks;
   }
 
   public static List<DecisionRequirementsDefinition> createMockTwoDecisionRequirementsDefinitions() {
-    List<DecisionRequirementsDefinition> mocks = new ArrayList<DecisionRequirementsDefinition>();
+    List<DecisionRequirementsDefinition> mocks = new ArrayList<>();
     mocks.add(createMockDecisionRequirementsDefinition());
     mocks.add(createAnotherMockDecisionRequirementsDefinition());
     return mocks;
@@ -2810,7 +2816,7 @@ public abstract class MockProvider {
   // Historic job log
 
   public static List<HistoricJobLog> createMockHistoricJobLogs() {
-    List<HistoricJobLog> mocks = new ArrayList<HistoricJobLog>();
+    List<HistoricJobLog> mocks = new ArrayList<>();
     mocks.add(createMockHistoricJobLog());
     return mocks;
   }
@@ -2858,7 +2864,7 @@ public abstract class MockProvider {
   // Historic decision instance
 
   public static List<HistoricDecisionInstance> createMockHistoricDecisionInstances() {
-    List<HistoricDecisionInstance> mockList = new ArrayList<HistoricDecisionInstance>();
+    List<HistoricDecisionInstance> mockList = new ArrayList<>();
     mockList.add(createMockHistoricDecisionInstance());
     return mockList;
   }
@@ -2931,7 +2937,7 @@ public abstract class MockProvider {
   }
 
   public static List<HistoricDecisionInputInstance> createMockHistoricDecisionInputInstances() {
-    List<HistoricDecisionInputInstance> mockInputs = new ArrayList<HistoricDecisionInputInstance>();
+    List<HistoricDecisionInputInstance> mockInputs = new ArrayList<>();
     mockInputs.add(createMockHistoricDecisionInput(EXAMPLE_HISTORIC_DECISION_STRING_VALUE));
     mockInputs.add(createMockHistoricDecisionInput(EXAMPLE_HISTORIC_DECISION_BYTE_ARRAY_VALUE));
     mockInputs.add(createMockHistoricDecisionInput(EXAMPLE_HISTORIC_DECISION_SERIALIZED_VALUE));
@@ -2954,7 +2960,7 @@ public abstract class MockProvider {
   }
 
   public static List<HistoricDecisionOutputInstance> createMockHistoricDecisionOutputInstances() {
-    List<HistoricDecisionOutputInstance> mockOutputs = new ArrayList<HistoricDecisionOutputInstance>();
+    List<HistoricDecisionOutputInstance> mockOutputs = new ArrayList<>();
     mockOutputs.add(createMockHistoricDecisionOutput(EXAMPLE_HISTORIC_DECISION_STRING_VALUE));
     mockOutputs.add(createMockHistoricDecisionOutput(EXAMPLE_HISTORIC_DECISION_BYTE_ARRAY_VALUE));
     mockOutputs.add(createMockHistoricDecisionOutput(EXAMPLE_HISTORIC_DECISION_SERIALIZED_VALUE));
@@ -3013,7 +3019,7 @@ public abstract class MockProvider {
   }
 
   public static List<ExternalTask> createMockExternalTasks() {
-    List<ExternalTask> mocks = new ArrayList<ExternalTask>();
+    List<ExternalTask> mocks = new ArrayList<>();
     mocks.add(createMockExternalTask());
     return mocks;
   }
@@ -3050,7 +3056,7 @@ public abstract class MockProvider {
   }
 
   public static List<Batch> createMockBatches() {
-    List<Batch> mockList = new ArrayList<Batch>();
+    List<Batch> mockList = new ArrayList<>();
     mockList.add(createMockBatch());
     return mockList;
   }
@@ -3077,7 +3083,7 @@ public abstract class MockProvider {
   }
 
   public static List<HistoricBatch> createMockHistoricBatches() {
-    List<HistoricBatch> mockList = new ArrayList<HistoricBatch>();
+    List<HistoricBatch> mockList = new ArrayList<>();
     mockList.add(createMockHistoricBatch());
     return mockList;
   }
@@ -3106,7 +3112,7 @@ public abstract class MockProvider {
   }
 
   public static List<BatchStatistics> createMockBatchStatisticsList() {
-    ArrayList<BatchStatistics> mockList = new ArrayList<BatchStatistics>();
+    ArrayList<BatchStatistics> mockList = new ArrayList<>();
     mockList.add(createMockBatchStatistics());
     return mockList;
   }
@@ -3140,7 +3146,7 @@ public abstract class MockProvider {
   }
 
   public static List<MessageCorrelationResult> createMessageCorrelationResultList(MessageCorrelationResultType type) {
-    List<MessageCorrelationResult> list = new ArrayList<MessageCorrelationResult>();
+    List<MessageCorrelationResult> list = new ArrayList<>();
     list.add(createMessageCorrelationResult(type));
     list.add(createMessageCorrelationResult(type));
     return list;
@@ -3158,7 +3164,7 @@ public abstract class MockProvider {
     when(anotherStatistics.getDecisionDefinitionKey()).thenReturn(ANOTHER_DECISION_DEFINITION_KEY);
     when(anotherStatistics.getEvaluations()).thenReturn(2);
 
-    List<HistoricDecisionInstanceStatistics> decisionResults = new ArrayList<HistoricDecisionInstanceStatistics>();
+    List<HistoricDecisionInstanceStatistics> decisionResults = new ArrayList<>();
     decisionResults.add(statistics);
     decisionResults.add(anotherStatistics);
 
@@ -3167,7 +3173,7 @@ public abstract class MockProvider {
 
   // historic external task log
   public static List<HistoricExternalTaskLog> createMockHistoricExternalTaskLogs() {
-    List<HistoricExternalTaskLog> mocks = new ArrayList<HistoricExternalTaskLog>();
+    List<HistoricExternalTaskLog> mocks = new ArrayList<>();
     mocks.add(createMockHistoricExternalTaskLog());
     return mocks;
   }

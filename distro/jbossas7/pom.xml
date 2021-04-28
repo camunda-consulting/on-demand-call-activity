@@ -5,14 +5,14 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
     <relativePath>../../database</relativePath>
-    <version>7.14.0</version>
+    <version>7.15.0</version>
   </parent>
   
   <groupId>org.camunda.bpm.jboss</groupId>
   <artifactId>camunda-jboss</artifactId>
   <packaging>pom</packaging>
 
-  <name>camunda BPM - jBoss7</name>
+  <name>Camunda Platform - jBoss7</name>
 
   <dependencyManagement>
     <dependencies>

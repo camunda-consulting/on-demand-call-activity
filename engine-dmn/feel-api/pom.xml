@@ -5,12 +5,14 @@
   <parent>
     <groupId>org.camunda.bpm.dmn</groupId>
     <artifactId>camunda-engine-dmn-root</artifactId>
-    <version>7.14.0</version>
+    <version>7.15.0</version>
   </parent>
 
   <artifactId>camunda-engine-feel-api</artifactId>
   <name>camunda DMN - engine FEEL - API</name>
-
+  <properties>
+    <camunda.artifact>org.camunda.bpm.dmn.feel.impl</camunda.artifact>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.camunda.commons</groupId>

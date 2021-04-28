@@ -5,14 +5,14 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
     <relativePath>../../database</relativePath>
-    <version>7.14.0</version>
+    <version>7.15.0</version>
   </parent>
 
   <groupId>org.camunda.bpm.distro</groupId>
   <artifactId>camunda-sql-scripts</artifactId>
   <packaging>jar</packaging>
 
-  <name>camunda BPM - SQL scripts</name>
+  <name>Camunda Platform - SQL scripts</name>
 
   <dependencyManagement>
     <dependencies>

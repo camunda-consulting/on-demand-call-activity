@@ -4,8 +4,8 @@
 {
   "openapi": "3.0.2",
   "info": {
-    "title": "Camunda BPM REST API",
-    "description": "OpenApi Spec for Camunda BPM REST API.",
+    "title": "Camunda Platform REST API",
+    "description": "OpenApi Spec for Camunda Platform REST API.",
     "version": "${cambpmVersion}",
     "license": {
       "name": "Apache License 2.0",
@@ -26,19 +26,30 @@
   <@lib.server
       url = "http://{host}:{port}/{contextPath}/engine/{engineName}"
       variables = {"host": "localhost", "port": "8080", "contextPath": "engine-rest", "engineName": "default"}
-      desc = "The API server for a named process engine"
+      desc = "The API server for a named process engine"/>
+
+  <@lib.server
+      url = "{url}"
+      variables = {"url": ""}
+      desc = "The API server with a custom url"
       last = true />
 
   ],
   "tags": [
+    {"name": "Batch"},
     {"name": "Condition"},
+    {"name": "Decision Definition"},
     {"name": "Deployment"},
     {"name": "Engine"},
     {"name": "Event Subscription"},
+    {"name": "Execution"},
     {"name": "External Task"},
+    {"name": "Group"},
     {"name": "Historic Activity Instance"},
     {"name": "Historic Process Instance"},
+    {"name": "Identity"},
     {"name": "Incident"},
+    {"name": "Job"},
     {"name": "Message"},
     {"name": "Metrics"},
     {"name": "Process Definition"},
@@ -52,7 +63,9 @@
     {"name": "Task Local Variable"},
     {"name": "Task Variable"},
     {"name": "Telemetry"},
+    {"name": "Tenant"},
     {"name": "User"},
+    {"name": "Variable Instance"},
     {"name": "Version"}
   ],
   "paths": {

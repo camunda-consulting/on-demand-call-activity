@@ -2,14 +2,14 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <name>camunda BPM - engine</name>
+  <name>Camunda Platform - engine</name>
   <artifactId>camunda-engine</artifactId>
 
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
     <relativePath>../database</relativePath>
-    <version>7.14.0</version>
+    <version>7.15.0</version>
   </parent>
 
   <dependencyManagement>
@@ -67,12 +67,16 @@
         <!-- these exclusions are needed when building with Maven >= 3.3
           see CAM-11822 for details -->
         <exclusion>
-          <groupId>org.camunda.feel</groupId>
-          <artifactId>feel-engine</artifactId>
+          <groupId>com.lihaoyi</groupId>
+          <artifactId>fastparse_2.13</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.scala-lang.modules</groupId>
-          <artifactId>scala-parser-combinators_2.13</artifactId>
+          <groupId>com.lihaoyi</groupId>
+          <artifactId>sourcecode_2.13</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.lihaoyi</groupId>
+          <artifactId>geny_2.13</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.scala-lang</groupId>
@@ -323,11 +327,8 @@
       ${camunda.artifact}.container.*;${camunda.osgi.version};-noimport:=true,
       ${camunda.artifact}.engine.*;${camunda.osgi.version};-noimport:=true
     </camunda.osgi.export.pkg>
-    <camunda.osgi.import.defaults>
-      org.camunda.bpm.engine.variable.*;${camunda.osgi.import.camunda.commons.version},
-      org.camunda.commons.*;${camunda.osgi.import.camunda.commons.version},
-    </camunda.osgi.import.defaults>
     <camunda.osgi.import.additional>
+      !com.google.gson.*,
       junit*;resolution:=optional,
       org.junit*;resolution:=optional,
       com.sun*;resolution:=optional,
@@ -349,6 +350,18 @@
 
   <build>
     <!-- filter test configurations to inject properties -->
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>org/camunda/bpm/engine/product-info.properties</include>
+        </includes>
+      </resource>
+    </resources>
     <testResources>
       <testResource>
         <directory>src/test/resources</directory>
@@ -425,6 +438,7 @@
               <exclude>org.camunda.bpm.dmn:*</exclude>
               <exclude>org.camunda.commons:*</exclude>
               <exclude>org.camunda.connect:*</exclude>
+              <exclude>org.camunda.feel:*</exclude>
 
               <exclude>org.springframework:*</exclude>
               <exclude>org.slf4j:*</exclude>

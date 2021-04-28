@@ -60,6 +60,8 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventProcessor;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
+import org.camunda.bpm.engine.impl.incident.IncidentContext;
+import org.camunda.bpm.engine.impl.incident.IncidentHandling;
 import org.camunda.bpm.engine.impl.interceptor.AtomicOperationInvocation;
 import org.camunda.bpm.engine.impl.jobexecutor.MessageJobDeclaration;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
@@ -454,23 +456,27 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
     }
 
     // determine tenant Id if null
-    provideTenantId(variables);
+    provideTenantId(variables, formProperties);
     super.start(variables, formProperties);
   }
 
   @Override
   public void startWithoutExecuting(Map<String, Object> variables) {
     setRootProcessInstanceId(getProcessInstanceId());
-    provideTenantId(variables);
+    provideTenantId(variables, null);
     super.startWithoutExecuting(variables);
   }
 
-  protected void provideTenantId(Map<String, Object> variables) {
+  protected void provideTenantId(Map<String, Object> variables, VariableMap properties) {
     if (tenantId == null) {
       TenantIdProvider tenantIdProvider = Context.getProcessEngineConfiguration().getTenantIdProvider();
 
       if (tenantIdProvider != null) {
         VariableMap variableMap = Variables.fromMap(variables);
+        if(properties != null && !properties.isEmpty()) {
+          variableMap.putAll(properties);
+        }
+
         ProcessDefinition processDefinition = getProcessDefinition();
 
         TenantIdProviderProcessInstanceContext ctx;
@@ -1082,8 +1088,15 @@ public class ExecutionEntity extends PvmExecutionImpl implements Execution, Proc
       if (isReplacedByParent()) {
         incident.setExecution(getReplacedBy());
       } else {
-        incident.delete();
+        IncidentContext incidentContext = createIncidentContext(incident.getConfiguration());
+        IncidentHandling.removeIncidents(incident.getIncidentType(), incidentContext, false);
       }
+    }
+
+    for (IncidentEntity incident : getIncidents()) {
+      // if the handler doesn't take care of it,
+      // make sure the incident is deleted nevertheless
+      incident.delete();
     }
   }
 

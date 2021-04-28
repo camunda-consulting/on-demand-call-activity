@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.exception.NotValidException;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -98,7 +99,13 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?,?>, U> extends
     addVariable(name, value, QueryOperator.LIKE, true);
     return (T)this;
   }
-  
+
+  @SuppressWarnings("unchecked")
+  public T variableValueNotLike(String name, String value) {
+    addVariable(name, value, QueryOperator.NOT_LIKE, true);
+    return (T)this;
+  }
+
   @SuppressWarnings("unchecked")
   public T matchVariableNamesIgnoreCase() {
     this.variableNamesIgnoreCase = true;
@@ -122,16 +129,20 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?,?>, U> extends
     if(value == null || isBoolean(value)) {
       // Null-values and booleans can only be used in EQUALS and NOT_EQUALS
       switch(operator) {
-      case GREATER_THAN:
-        throw new NotValidException("Booleans and null cannot be used in 'greater than' condition");
-      case LESS_THAN:
-        throw new NotValidException("Booleans and null cannot be used in 'less than' condition");
-      case GREATER_THAN_OR_EQUAL:
-        throw new NotValidException("Booleans and null cannot be used in 'greater than or equal' condition");
-      case LESS_THAN_OR_EQUAL:
-        throw new NotValidException("Booleans and null cannot be used in 'less than or equal' condition");
-      case LIKE:
-        throw new NotValidException("Booleans and null cannot be used in 'like' condition");
+        case GREATER_THAN:
+          throw new NotValidException("Booleans and null cannot be used in 'greater than' condition");
+        case LESS_THAN:
+          throw new NotValidException("Booleans and null cannot be used in 'less than' condition");
+        case GREATER_THAN_OR_EQUAL:
+          throw new NotValidException("Booleans and null cannot be used in 'greater than or equal' condition");
+        case LESS_THAN_OR_EQUAL:
+          throw new NotValidException("Booleans and null cannot be used in 'less than or equal' condition");
+        case LIKE:
+          throw new NotValidException("Booleans and null cannot be used in 'like' condition");
+        case NOT_LIKE:
+          throw new NotValidException("Booleans and null cannot be used in 'not like' condition");
+        default:
+          break;
       }
     }
 
@@ -149,11 +160,11 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?,?>, U> extends
 
   protected void ensureVariablesInitialized() {
     if (!queryVariableValues.isEmpty()) {
-      VariableSerializers variableSerializers = Context
-              .getProcessEngineConfiguration()
-              .getVariableSerializers();
+      ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+      VariableSerializers variableSerializers = processEngineConfiguration.getVariableSerializers();
+      String dbType = processEngineConfiguration.getDatabaseType();
       for(QueryVariableValue queryVariableValue : queryVariableValues) {
-        queryVariableValue.initialize(variableSerializers);
+        queryVariableValue.initialize(variableSerializers, dbType);
       }
     }
   }

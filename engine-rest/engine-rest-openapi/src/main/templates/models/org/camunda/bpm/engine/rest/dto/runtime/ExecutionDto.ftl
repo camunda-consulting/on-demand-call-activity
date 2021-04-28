@@ -13,7 +13,6 @@
     <@lib.property
         name = "ended"
         type = "boolean"
-        nullable = false
         desc = "Indicates if the execution is ended."/>
 
     <@lib.property

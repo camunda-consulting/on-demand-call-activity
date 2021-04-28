@@ -11,29 +11,29 @@
 
   <groupId>org.camunda.bpm</groupId>
   <artifactId>camunda-root</artifactId>
-  <version>7.14.0</version>
+  <version>7.15.0</version>
   <packaging>pom</packaging>
-  <name>camunda BPM - Root Pom</name>
+  <name>Camunda Platform - Root Pom</name>
   <inceptionYear>2013</inceptionYear>
 
   <description>
     This pom defines the modules that make up the build.
-    The parent pom for all camunda BPM projects can be found in the parent directory relative to this file.
+    The parent pom for all Camunda Platform projects can be found in the parent directory relative to this file.
   </description>
 
   <properties>
     <license.includeTransitiveDependencies>false</license.includeTransitiveDependencies>
 
     <!-- These properties are used in both the BOM as well as camunda-parent and subprojects -->
-    <version.mybatis>3.5.3</version.mybatis>
+    <version.mybatis>3.5.6</version.mybatis>
     <version.joda-time>2.1</version.joda-time>
     <version.uuid-generator>3.2.0</version.uuid-generator>
-    <version.camunda.commons>1.9.0</version.camunda.commons>
-    <version.camunda.connect>1.5.0</version.camunda.connect>
-    <version.camunda.spin>1.10.0</version.camunda.spin>
+    <version.camunda.commons>1.10.0</version.camunda.commons>
+    <version.camunda.connect>1.5.2</version.camunda.connect>
+    <version.camunda.spin>1.10.1</version.camunda.spin>
     <version.camunda.template-engines>2.0.0</version.camunda.template-engines>
     <version.camunda.ee.xslt-plugin>1.1.0</version.camunda.ee.xslt-plugin>
-    <version.feel-scala>1.12.2</version.feel-scala>
+    <version.feel-scala>1.13.1</version.feel-scala>
   </properties>
 
   <build>
@@ -66,7 +66,7 @@
 
         <module>qa</module>
 
-        <module>webapps/h2-webapp</module>
+        <module>distro/h2-webapp</module>
 
         <module>javaee/ejb-service</module>
         <module>javaee/ejb-client</module>
@@ -82,6 +82,8 @@
         <module>engine-spring</module>
         <module>engine-rest</module>
 
+        <module>webapps</module>
+
         <module>examples/invoice</module>
 
         <module>engine-plugins</module>
@@ -91,6 +93,8 @@
         <module>distro/tomcat</module>
         <module>distro/sql-script</module>
         <module>distro/run</module>
+
+        <module>clients/java</module>
 
         <module>internal-dependencies</module>
         <module>database</module>
@@ -105,7 +109,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
-        <!-- This profile is run in the CI after the webapps were built (platform-DISTRO);
+        <!-- This profile is run in the CI after the webapps were built (platform-ASSEMBLY);
           It should activate any module that has a dependency to the webapps -->
         <module>spring-boot-starter</module>
 
@@ -121,12 +125,14 @@
       <modules>
         <module>qa</module>
 
-        <module>webapps/h2-webapp</module>
+        <module>distro/h2-webapp</module>
 
         <module>engine</module>
         <module>engine-cdi</module>
         <module>engine-spring</module>
         <module>engine-rest</module>
+
+        <module>webapps</module>
 
         <module>examples/invoice</module>
 
@@ -199,7 +205,7 @@
     <profile>
       <id>distro-starter</id>
       <!-- This profile is run in the release CI for building the enterprise artifacts
-          It can be removed if the webapp repo is merged to the platform and
+          It can be removed if the distro job is merged with the assembly job and
           distro-ce is not used for building the spring boot starter -->
       <modules>
         <module>spring-boot-starter</module>
@@ -248,9 +254,13 @@
 
         <module>javaee/ejb-client</module>
 
+        <module>webapps</module>
+
         <module>engine-plugins</module>
 
         <module>distro/webjar</module>
+
+        <module>clients/java</module>
 
         <module>internal-dependencies</module>
         <module>database</module>
@@ -290,7 +300,7 @@
   <developers>
     <developer>
       <id>camunda.org</id>
-      <name>camunda BPM Community</name>
+      <name>Camunda Platform Community</name>
       <organization>camunda.org</organization>
       <organizationUrl>http://camunda.org</organizationUrl>
     </developer>
@@ -300,7 +310,7 @@
     <url>https://github.com/camunda/camunda-bpm-platform</url>
     <connection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</connection>
     <developerConnection>scm:git:git@github.com:camunda/camunda-bpm-platform.git</developerConnection>
-    <tag>7.14.0</tag>
+    <tag>7.15.0</tag>
   </scm>
 
   <issueManagement>

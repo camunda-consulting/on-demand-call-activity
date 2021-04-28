@@ -41,7 +41,7 @@ each server runtime we support. These projects are responsible for taking a runt
 distribution (ie. Apache Tomcat, WildFly AS ...) and configuring it for integration testing. The 
 actual integration tests are located in the `qa/integration-tests-engine` and `qa/integration-tests-webapps` modules.
  * *integration-tests-engine*: This module contains an extensive testsuite that test the integration of the process engine within a particular runtime container. For example, such tests will ensure that if you use the Job Executor Service inside a Java EE Container, you get a proper CDI request context spanning multiple EJB invocations or that EE resource injection works as expected. These integration tests are executed in-container, using [JBoss Arquillian](http://arquillian.org/).
- * *integration-tests-webapps*: This module tests the camunda BPM webapplications inside the runtime containers. These integration tests run inside a client / server setting: the webapplication is deployed to the runtime container, the runtime container is started and the tests running inside a client VM perform requests against the deployed applications.
+ * *integration-tests-webapps*: This module tests the Camunda Platform webapplications inside the runtime containers. These integration tests run inside a client / server setting: the webapplication is deployed to the runtime container, the runtime container is started and the tests running inside a client VM perform requests against the deployed applications.
 
 In order to run the integration tests, first perform a full install build. Then navigate to the `qa` folder.
 
@@ -72,6 +72,24 @@ mvn clean install -Pengine-integration,webapps-integration,tomcat,postgresql
 There is a special profile for the WildFly Application Servers:
 
 * WildFly Domain mode: `mvn clean install -Pengine-integration,h2,wildfly-domain`
+
+# Testing a Given Database
+
+Camunda supports all database technologies listed on [Supported Database Products](https://docs.camunda.org/manual/latest/introduction/supported-environments/#supported-database-products), and in all environments, they are operating in as specified. Support means we guarantee the Camunda Platform integrates well with the database technology’s JDBC behavior (there are some [documented](https://docs.camunda.org/manual/latest/user-guide/process-engine/database/) limitations, e.g., isolation level `READ_COMMITTED` is required for all databases except CockroachDB, which in turns requires `SERIALIZABLE`). We test a database technology with a specific database, i.e., we test it in one environment, not all possible environments that you can imagine (e.g., we test Postgres on local Docker containers, but not as hosted databases on AWS or Azure).
+
+## What about database technology X in environment Y?
+
+To make a statement regarding Camunda Platform support, we need to understand if technology X is one of the technologies we already support or different technology. Several databases may share the same or a similar name, but they can still be different technologies: For example, IBM DB2 z/OS behaves quite differently from IBM DB2 on Linux, Unix, Windows. Amazon Aurora Postgres is different from a standard Postgres.
+
+If you want to make sure that a given database works well with the Camunda Platform, you can run the test suite against this database.
+
+In the `pom.xml` file located in the `./database` folder, several database profiles are defined with a matching database driver.
+
+To run the test suite against a given database, select the `database` profile and your desired database profile and provide the connection parameters:
+
+```
+mvn test -Pdatabase,postgresql -Ddatabase.url=jdbc:postgresql:pgdb -Ddatabase.username=pguser -Ddatabase.password=pgpassword
+```
 
 # Limiting the Number of Engine Unit Tests
 

@@ -17,22 +17,26 @@
 package org.camunda.bpm.engine.impl.telemetry;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.impl.telemetry.dto.ApplicationServer;
 import org.camunda.bpm.engine.impl.telemetry.dto.LicenseKeyData;
 
 public class TelemetryRegistry {
 
-  public static final String UNIQUE_TASK_WORKERS = "unique-task-workers";
-
   protected Map<String, CommandCounter> commands = new HashMap<>();
   protected ApplicationServer applicationServer;
   protected LicenseKeyData licenseKey;
   protected String camundaIntegration;
+  protected Set<String> webapps = new HashSet<>();
   protected boolean isCollectingTelemetryDataEnabled = false;
 
   public synchronized ApplicationServer getApplicationServer() {
+    if (applicationServer == null) {
+      applicationServer = PlatformTelemetryRegistry.getApplicationServer();
+    }
     return applicationServer;
   }
 
@@ -64,6 +68,14 @@ public class TelemetryRegistry {
     this.licenseKey = licenseKey;
   }
 
+  public synchronized Set<String> getWebapps() {
+    return webapps;
+  }
+
+  public synchronized void setWebapps(Set<String> webapps) {
+    this.webapps = webapps;
+  }
+
   public boolean isCollectingTelemetryDataEnabled() {
     return isCollectingTelemetryDataEnabled;
   }
@@ -90,10 +102,17 @@ public class TelemetryRegistry {
     counter.mark(times);
   }
 
+  public synchronized void addWebapp(String webapp) {
+    if (!webapps.contains(webapp)) {
+      webapps.add(webapp);
+    }
+  }
+
   public void clear() {
     commands.clear();
     licenseKey = null;
     applicationServer = null;
+    webapps.clear();
   }
 
 }

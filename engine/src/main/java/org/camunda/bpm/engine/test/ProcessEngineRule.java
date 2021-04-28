@@ -37,6 +37,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.telemetry.PlatformTelemetryRegistry;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.junit.Assume;
@@ -75,7 +76,10 @@ import org.junit.runners.model.Statement;
  * You can declare a deployment with the {@link Deployment} annotation. This
  * base class will make sure that this deployment gets deployed before the setUp
  * and {@link RepositoryService#deleteDeployment(String, boolean) cascade
- * deleted} after the tearDown.
+ * deleted} after the tearDown. If you add a deployment programmatically in your
+ * test, you have to make it known to the processEngineRule by calling 
+ * {@link ProcessEngineRule#manageDeployment(Deployment)} to have it cleaned up
+ * automatically.
  * </p>
  * <p>
  * The processEngineRule also lets you
@@ -237,6 +241,8 @@ public class ProcessEngineRule extends TestWatcher implements ProcessEngineServi
 
 
     clearServiceReferences();
+
+    PlatformTelemetryRegistry.clear();
   }
 
   public void setCurrentTime(Date currentTime) {

@@ -21,18 +21,10 @@ import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.assertThat
 import static org.camunda.bpm.engine.test.util.ActivityInstanceAssert.describeActivityInstanceTree;
 import static org.camunda.bpm.engine.variable.Variables.createVariables;
 import static org.camunda.bpm.engine.variable.Variables.objectValue;
-import static org.hamcrest.CoreMatchers.anyOf;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -62,6 +54,7 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.exception.NotFoundException;
 import org.camunda.bpm.engine.exception.NullValueException;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricDetail;
@@ -106,7 +99,6 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -119,16 +111,13 @@ public class RuntimeServiceTest {
   public static final String A_STREAM = "aStream";
 
   @ClassRule
-  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration -> 
+  public static ProcessEngineBootstrapRule bootstrapRule = new ProcessEngineBootstrapRule(configuration ->
       configuration.setJavaSerializationFormatEnabled(true));
   protected ProvidedProcessEngineRule engineRule = new ProvidedProcessEngineRule(bootstrapRule);
   protected ProcessEngineTestRule testRule = new ProcessEngineTestRule(engineRule);
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   private RuntimeService runtimeService;
   private TaskService taskService;
@@ -258,7 +247,7 @@ public class RuntimeServiceTest {
     // if we skip the custom listeners,
     runtimeService.deleteProcessInstances(Arrays.asList(processInstance.getId(),processInstance2.getId()), null, false, false);
 
-    assertThat(runtimeService.createProcessInstanceQuery().count(),is(0l));
+    assertThat(runtimeService.createProcessInstanceQuery().count()).isEqualTo(0l);
   }
 
   @Deployment
@@ -286,21 +275,21 @@ public class RuntimeServiceTest {
       }
     }
 
-    assertThat(startEvents, hasSize(5));
-    assertThat(endEvents, hasSize(5));
+    assertThat(startEvents).hasSize(5);
+    assertThat(endEvents).hasSize(5);
     for (RecordedEvent startEvent : startEvents) {
-      assertThat(startEvent.getActivityId(), is(anyOf(equalTo("innerTask1"),
-          equalTo("innerTask2"), equalTo("outerTask"), equalTo("subProcess"), equalTo("theStart"))));
+      assertThat(startEvent.getActivityId()).isIn("innerTask1",
+          "innerTask2", "outerTask", "subProcess", "theStart");
       for (RecordedEvent endEvent : endEvents) {
         if(startEvent.getActivityId().equals(endEvent.getActivityId())){
-          assertThat(startEvent.getActivityInstanceId(), is(endEvent.getActivityInstanceId()));
-          assertThat(startEvent.getExecutionId(), is(endEvent.getExecutionId()));
+          assertThat(startEvent.getActivityInstanceId()).isEqualTo(endEvent.getActivityInstanceId());
+          assertThat(startEvent.getExecutionId()).isEqualTo(endEvent.getExecutionId());
         }
       }
     }
     for (RecordedEvent recordedEvent : endEvents) {
-      assertThat(recordedEvent.getActivityId(), is(anyOf(equalTo("innerTask1"),
-          equalTo("innerTask2"), equalTo("outerTask"), equalTo("subProcess"), nullValue())));
+      assertThat(recordedEvent.getActivityId()).isIn("innerTask1",
+          "innerTask2", "outerTask", "subProcess", null);
     }
   }
 
@@ -522,9 +511,9 @@ public class RuntimeServiceTest {
     try {
       runtimeService.deleteProcessInstance("aFake", null);
       fail("ProcessEngineException expected");
-    } catch (ProcessEngineException ae) {
-      testRule.assertTextPresent("No process instance found for id", ae.getMessage());
-      assertTrue(ae instanceof BadUserRequestException);
+    } catch (ProcessEngineException e) {
+      testRule.assertTextPresent("No process instance found for id", e.getMessage());
+      assertTrue(e instanceof NotFoundException);
     }
   }
 
@@ -545,6 +534,7 @@ public class RuntimeServiceTest {
     }catch (ProcessEngineException e) {
       //expected
       assertEquals(1, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
+      assertTrue(e instanceof NotFoundException);
     }
   }
 
@@ -2304,8 +2294,8 @@ public class RuntimeServiceTest {
 
 	  ProcessInstance processInstance = runtimeService.startProcessInstanceByMessageAndProcessDefinitionId("startMessage", processDefinition.getId());
 
-	  assertThat(processInstance, is(notNullValue()));
-	  assertThat(processInstance.getProcessDefinitionId(), is(processDefinition.getId()));
+	  assertThat(processInstance).isNotNull();
+	  assertThat(processInstance.getProcessDefinitionId()).isEqualTo(processDefinition.getId());
 
 	  // clean up
 	  repositoryService.deleteDeployment(deploymentId, true);
@@ -2319,8 +2309,8 @@ public class RuntimeServiceTest {
 
 	  ProcessInstance processInstance = runtimeService.startProcessInstanceByMessageAndProcessDefinitionId("newStartMessage", processDefinition.getId());
 
-	  assertThat(processInstance, is(notNullValue()));
-	  assertThat(processInstance.getProcessDefinitionId(), is(processDefinition.getId()));
+	  assertThat(processInstance).isNotNull();
+	  assertThat(processInstance.getProcessDefinitionId()).isEqualTo(processDefinition.getId());
 
 	  // clean up
 	  repositoryService.deleteDeployment(deploymentId, true);
@@ -2338,7 +2328,7 @@ public class RuntimeServiceTest {
 
 		 fail("exeception expected");
 	 } catch(ProcessEngineException e) {
-		 assertThat(e.getMessage(), containsString("Cannot correlate message 'newStartMessage'"));
+		 assertThat(e.getMessage()).contains("Cannot correlate message 'newStartMessage'");
 	 }
 	 finally {
 		 // clean up

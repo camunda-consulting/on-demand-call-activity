@@ -32,6 +32,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +44,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.AbstractPersistenceSession;
 import org.camunda.bpm.engine.impl.db.DbEntity;
@@ -71,6 +73,8 @@ import org.camunda.bpm.engine.impl.util.ReflectUtil;
 public abstract class DbSqlSession extends AbstractPersistenceSession {
 
   protected static final EnginePersistenceLogger LOG = ProcessEngineLogger.PERSISTENCE_LOGGER;
+  public static final String[] JDBC_METADATA_TABLE_TYPES = { "TABLE" };
+  public static final String[] PG_JDBC_METADATA_TABLE_TYPES = { "TABLE", "PARTITIONED TABLE" };
 
   protected SqlSession sqlSession;
   protected DbSqlSessionFactory dbSqlSessionFactory;
@@ -302,7 +306,36 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     return false;
   }
 
+  /**
+   * In cases where CockroachDB is used, and a failed operation is detected,
+   * the method checks if the exception was caused by a CockroachDB
+   * <code>TransactionRetryException</code>. This method may be used when a
+   * CRDB Error occurs on commit, and a Command Context is not available, as
+   * it has already been closed. This is the case with Spring/JTA transaction
+   * interceptors.
+   *
+   * @param cause for which an operation failed
+   * @param configuration of the Process Engine
+   * @return true if the failure was due to a CRDB <code>TransactionRetryException</code>.
+   *          Otherwise, it's false.
+   */
+  public static boolean isCrdbConcurrencyConflictOnCommit(Throwable cause, ProcessEngineConfigurationImpl configuration) {
+    // only check when CRDB is used
+    if (DatabaseUtil.checkDatabaseType(configuration, DbSqlSessionFactory.CRDB)) {
+      // with Java EE (JTA) transactions, the real cause is suppressed,
+      // and replaced with a RollbackException. We need to look into the
+      // suppressed exceptions to find the CRDB TransactionRetryError.
+      List<Throwable> causes = new ArrayList<>(Arrays.asList(cause.getSuppressed()));
+      causes.add(cause);
+      for (Throwable throwable : causes) {
+        if (ExceptionUtil.checkCrdbTransactionRetryException(throwable)) {
+          return true;
+        }
+      }
+    }
 
+    return false;
+  }
 
   // insert //////////////////////////////////////////
 
@@ -562,8 +595,6 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
     executeSchemaResource(operation, component, getResourceForDbOperation(operation, operation, component), false);
   }
 
-  public static String[] JDBC_METADATA_TABLE_TYPES = {"TABLE"};
-
   @Override
   public boolean isEngineTablePresent(){
     return isTablePresent("ACT_RU_EXECUTION");
@@ -615,7 +646,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
       }
 
       try {
-        tables = databaseMetaData.getTables(this.connectionMetadataDefaultCatalog, schema, tableName, JDBC_METADATA_TABLE_TYPES);
+        tables = databaseMetaData.getTables(this.connectionMetadataDefaultCatalog, schema, tableName, getTableTypes());
         return tables.next();
       } finally {
         if (tables != null) {
@@ -652,7 +683,7 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
           }
 
           DatabaseMetaData databaseMetaData = connection.getMetaData();
-          tablesRs = databaseMetaData.getTables(null, schema, tableNameFilter, DbSqlSession.JDBC_METADATA_TABLE_TYPES);
+          tablesRs = databaseMetaData.getTables(null, schema, tableNameFilter, getTableTypes());
           while (tablesRs.next()) {
             String tableName = tablesRs.getString("TABLE_NAME");
             if (!databaseTablePrefix.isEmpty()) {
@@ -859,6 +890,16 @@ public abstract class DbSqlSession extends AbstractPersistenceSession {
       }
     }
     return false;
+  }
+
+  protected String[] getTableTypes() {
+    // the PostgreSQL JDBC API changed in 42.2.11 and partitioned tables
+    // are not detected unless the corresponding table type flag is added.
+    if (DatabaseUtil.checkDatabaseType(DbSqlSessionFactory.POSTGRES)) {
+      return PG_JDBC_METADATA_TABLE_TYPES;
+    }
+
+    return JDBC_METADATA_TABLE_TYPES;
   }
 
   // getters and setters //////////////////////////////////////////////////////

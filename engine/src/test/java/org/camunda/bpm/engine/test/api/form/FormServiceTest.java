@@ -91,7 +91,6 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.rules.RuleChain;
 
 /**
@@ -110,9 +109,6 @@ public class FormServiceTest {
 
   @Rule
   public RuleChain ruleChain = RuleChain.outerRule(engineRule).around(testRule);
-
-  @Rule
-  public ExpectedException thrown = ExpectedException.none();
 
   private RuntimeService runtimeService;
   private TaskService taskService;
@@ -1457,6 +1453,24 @@ public class FormServiceTest {
     assertEquals(deployedStartFormAsString, fileAsString);
   }
 
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/form/DeployedCamundaFormsProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/form/start.form",
+      "org/camunda/bpm/engine/test/api/form/task.form" })
+  @Test
+  public void testGetDeployedCamundaStartForm() {
+    // given
+    String procDefId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
+
+    // when
+    InputStream deployedStartForm = formService.getDeployedStartForm(procDefId);
+
+    // then
+    assertNotNull(deployedStartForm);
+    String fileAsString = IoUtil.fileAsString("org/camunda/bpm/engine/test/api/form/start.form");
+    String deployedStartFormAsString = IoUtil.inputStreamAsString(deployedStartForm);
+    assertEquals(deployedStartFormAsString, fileAsString);
+  }
+
   @Test
   public void testGetDeployedStartFormWithNullProcDefId() {
     try {
@@ -1509,6 +1523,25 @@ public class FormServiceTest {
       "org/camunda/bpm/engine/test/api/form/task.form" })
   @Test
   public void testGetEmbeddedDeployedTaskForm() {
+    // given
+    runtimeService.startProcessInstanceByKey("FormsProcess");
+    String taskId = taskService.createTaskQuery().singleResult().getId();
+
+    // when
+    InputStream deployedTaskForm = formService.getDeployedTaskForm(taskId);
+
+    // then
+    assertNotNull(deployedTaskForm);
+    String fileAsString = IoUtil.fileAsString("org/camunda/bpm/engine/test/api/form/task.form");
+    String deployedStartFormAsString = IoUtil.inputStreamAsString(deployedTaskForm);
+    assertEquals(deployedStartFormAsString, fileAsString);
+  }
+
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/form/DeployedCamundaFormsProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/form/start.form",
+      "org/camunda/bpm/engine/test/api/form/task.form" })
+  @Test
+  public void testGetDeployedCamundaTaskForm() {
     // given
     runtimeService.startProcessInstanceByKey("FormsProcess");
     String taskId = taskService.createTaskQuery().singleResult().getId();

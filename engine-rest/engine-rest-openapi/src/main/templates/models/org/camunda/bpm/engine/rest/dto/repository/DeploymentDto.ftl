@@ -15,7 +15,6 @@
         name = "deploymentTime"
         type = "string"
         format = "date-time"
-        nullable = false
         desc = "The time when the deployment was created." />
 
     <@lib.property

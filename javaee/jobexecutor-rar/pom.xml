@@ -3,13 +3,13 @@
   <groupId>org.camunda.bpm.javaee</groupId>
   <artifactId>camunda-jobexecutor-rar</artifactId>
   <packaging>rar</packaging>
-  <name>camunda BPM - Job Executor RAR</name>
+  <name>Camunda Platform - Job Executor RAR</name>
 
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-parent</artifactId>
     <relativePath>../../parent</relativePath>
-    <version>7.14.0</version>
+    <version>7.15.0</version>
   </parent>
 
   <dependencyManagement>

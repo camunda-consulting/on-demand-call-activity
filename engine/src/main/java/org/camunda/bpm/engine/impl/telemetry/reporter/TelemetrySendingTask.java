@@ -16,19 +16,17 @@
  */
 package org.camunda.bpm.engine.impl.telemetry.reporter;
 
-import static org.camunda.bpm.engine.impl.telemetry.TelemetryRegistry.UNIQUE_TASK_WORKERS;
 import static org.camunda.bpm.engine.impl.util.ConnectUtil.METHOD_NAME_POST;
 import static org.camunda.bpm.engine.impl.util.ConnectUtil.PARAM_NAME_RESPONSE_STATUS_CODE;
 import static org.camunda.bpm.engine.impl.util.ConnectUtil.addRequestTimeoutConfiguration;
 import static org.camunda.bpm.engine.impl.util.ConnectUtil.assembleRequestParameters;
+import static org.camunda.bpm.engine.impl.util.StringUtil.hasText;
 import static org.camunda.bpm.engine.management.Metrics.ACTIVTY_INSTANCE_START;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_ELEMENTS;
 import static org.camunda.bpm.engine.management.Metrics.EXECUTED_DECISION_INSTANCES;
 import static org.camunda.bpm.engine.management.Metrics.ROOT_PROCESS_INSTANCE_START;
 
 import java.net.HttpURLConnection;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -37,11 +35,9 @@ import java.util.TimerTask;
 
 import javax.ws.rs.core.MediaType;
 
-import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineLogger;
 import org.camunda.bpm.engine.impl.cmd.IsTelemetryEnabledCmd;
-import org.camunda.bpm.engine.impl.history.HistoryLevel;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.metrics.Meter;
@@ -56,7 +52,6 @@ import org.camunda.bpm.engine.impl.telemetry.dto.Data;
 import org.camunda.bpm.engine.impl.telemetry.dto.Internals;
 import org.camunda.bpm.engine.impl.telemetry.dto.Metric;
 import org.camunda.bpm.engine.impl.telemetry.dto.Product;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.ExceptionUtil;
 import org.camunda.bpm.engine.impl.util.JsonUtil;
 import org.camunda.bpm.engine.impl.util.TelemetryUtil;
@@ -69,6 +64,7 @@ public class TelemetrySendingTask extends TimerTask {
   protected static final TelemetryLogger LOG = ProcessEngineLogger.TELEMETRY_LOGGER;
   protected static final Set<String> METRICS_TO_REPORT = new HashSet<>();
   protected static final String TELEMETRY_INIT_MESSAGE_SENT_NAME = "camunda.telemetry.initial.message.sent";
+  protected static final String UUID4_PATTERN = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-4[0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}";
 
   static {
     METRICS_TO_REPORT.add(ROOT_PROCESS_INSTANCE_START);
@@ -123,38 +119,25 @@ public class TelemetrySendingTask extends TimerTask {
 
     updateTelemetryFlag(true);
 
-    int triesLeft = telemetryRequestRetries + 1;
-    boolean requestSuccessful = false;
-    do {
+    performDataSend(false, () -> {
+      updateStaticData();
+      Internals dynamicData = resolveDynamicData();
+      Data mergedData = new Data(staticData);
+      mergedData.mergeInternals(dynamicData);
+
       try {
-        triesLeft--;
-
-        updateStaticData();
-        Internals dynamicData = resolveDynamicData();
-        Data mergedData = new Data(staticData);
-        mergedData.mergeInternals(dynamicData);
-
-        try {
-          sendData(mergedData, false);
-        } catch (Exception e) {
-          // so that we send it again the next time
-          restoreDynamicData(dynamicData);
-          throw e;
-        }
-
-        requestSuccessful = true;
+        sendData(mergedData, false);
       } catch (Exception e) {
-        LOG.exceptionWhileSendingTelemetryData(e, false);
+        // so that we send it again the next time
+        restoreDynamicData(dynamicData);
+        throw e;
       }
-    } while (!requestSuccessful && triesLeft > 0);
+    });
   }
 
   protected void sendInitialMessage() {
     try {
-      commandExecutor.execute(commandContext -> {
-          sendInitialMessage(commandContext);
-          return null;
-      });
+      commandExecutor.execute(new SendInitialMsgCmd());
     } catch (ProcessEngineException pex) {
       // the property might have been inserted already by another cluster node after we checked it, ignore that
       if (!ExceptionUtil.checkConstraintViolationException(pex)) {
@@ -174,25 +157,16 @@ public class TelemetrySendingTask extends TimerTask {
      */
     if (null == commandContext.getPropertyManager().findPropertyById(TELEMETRY_INIT_MESSAGE_SENT_NAME)) {
       // message has not been sent yet
-      int triesLeft = telemetryRequestRetries + 1;
-      boolean requestSuccessful = false;
-      do {
-        try {
-          triesLeft--;
+      performDataSend(true, () -> {
+        Data initData = new Data(staticData.getInstallation(), new Product(staticData.getProduct()));
+        Internals internals = new Internals();
+        internals.setTelemetryEnabled(new IsTelemetryEnabledCmd().execute(commandContext));
+        initData.getProduct().setInternals(internals);
 
-          Data initData = new Data(staticData.getInstallation(), new Product(staticData.getProduct()));
-          Internals internals = new Internals();
-          internals.setTelemetryEnabled(new IsTelemetryEnabledCmd().execute(commandContext));
-          initData.getProduct().setInternals(internals);
-
-          sendData(initData, true);
-          requestSuccessful = true;
-          sendInitialMessage = false;
-          commandContext.getPropertyManager().insert(new PropertyEntity(TELEMETRY_INIT_MESSAGE_SENT_NAME, "true"));
-        } catch (Exception e) {
-          LOG.exceptionWhileSendingTelemetryData(e, true);
-        }
-      } while (!requestSuccessful && triesLeft > 0);
+        sendData(initData, true);
+        sendInitialMessage = false;
+        commandContext.getPropertyManager().insert(new PropertyEntity(TELEMETRY_INIT_MESSAGE_SENT_NAME, "true"));
+      });
     } else {
       // message has already been sent by another node
       sendInitialMessage = false;
@@ -211,9 +185,9 @@ public class TelemetrySendingTask extends TimerTask {
       internals.setTelemetryEnabled(true);// this can only be true, otherwise we would not collect data to send
     }
 
-    // license key data is fed from the outside to the registry but needs to be constantly updated
+    // license key and Webapps data is fed from the outside to the registry but needs to be constantly updated
     internals.setLicenseKey(telemetryRegistry.getLicenseKey());
-
+    internals.setWebapps(telemetryRegistry.getWebapps());
   }
 
   protected boolean isTelemetryEnabled() {
@@ -319,8 +293,6 @@ public class TelemetrySendingTask extends TimerTask {
 
   protected Map<String, Metric> calculateMetrics() {
 
-    Date currentTime = ClockUtil.getCurrentTime();
-
     Map<String, Metric> metrics = new HashMap<>();
 
     if (metricsRegistry != null) {
@@ -332,48 +304,58 @@ public class TelemetrySendingTask extends TimerTask {
       }
     }
 
-    Long taskWorkers = commandExecutor.execute(c -> {
-      return calculateUniqueUserCount(c, c.getProcessEngineConfiguration().getHistoryLevel(), currentTime);
-    });
-    metrics.put(UNIQUE_TASK_WORKERS, new Metric(taskWorkers));
-
     return metrics;
-  }
-
-  protected long calculateMetricCount(ManagementService managementService,
-                                      Date startReportTime,
-                                      Date currentTime,
-                                      String metricName) {
-    return managementService.createMetricsQuery()
-        .name(metricName)
-        .startDate(startReportTime)
-        .endDate(currentTime)
-        .sum();
-  }
-
-  protected long calculateUniqueUserCount(CommandContext commandContext,
-                                          HistoryLevel historyLevel,
-                                          Date currentTime) {
-    if (historyLevel.equals(HistoryLevel.HISTORY_LEVEL_NONE)) {
-      return 0;
-    } else {
-      Date previousDay = previousDay(currentTime);
-      long workerCount = commandContext.getHistoricTaskInstanceManager()
-          .findUniqueTaskWorkerCount(previousDay, currentTime);
-      return workerCount;
-    }
-  }
-
-  protected Date previousDay(Date date) {
-    Calendar calendar = Calendar.getInstance();
-    calendar.setTime(date);
-    calendar.add(Calendar.DAY_OF_YEAR, -1);
-    Date result = calendar.getTime();
-    return result;
   }
 
   protected void updateTelemetryFlag(boolean enabled) {
     TelemetryUtil.updateCollectingTelemetryDataEnabled(telemetryRegistry, metricsRegistry, enabled);
+  }
+
+  protected class SendInitialMsgCmd implements org.camunda.bpm.engine.impl.interceptor.Command<Void> {
+    @Override
+    public Void execute(CommandContext commandContext) {
+      sendInitialMessage(commandContext);
+      return null;
+    }
+  }
+
+  protected void performDataSend(Boolean isInitialMessage, Runnable runnable) {
+    if (validateData(staticData)) {
+      int triesLeft = telemetryRequestRetries + 1;
+      boolean requestSuccessful = false;
+      do {
+        try {
+          triesLeft--;
+
+          runnable.run();
+
+          requestSuccessful = true;
+        } catch (Exception e) {
+          LOG.exceptionWhileSendingTelemetryData(e, isInitialMessage);
+        }
+      } while (!requestSuccessful && triesLeft > 0);
+    } else {
+      LOG.sendingTelemetryDataFails(staticData);
+    }
+  }
+
+  protected Boolean validateData(Data dataToSend) {
+    // validate product data
+    Product product = dataToSend.getProduct();
+    String installationId = dataToSend.getInstallation();
+    String edition = product.getEdition();
+    String version = product.getVersion();
+    String name = product.getName();
+
+    // ensure that data is not null or empty strings
+    boolean validProductData = hasText(name) && hasText(version) && hasText(edition) && hasText(installationId);
+
+    // validate installation id
+    if (validProductData) {
+      validProductData = validProductData && installationId.matches(UUID4_PATTERN);
+    }
+
+    return validProductData;
   }
 
 }

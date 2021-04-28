@@ -5,14 +5,14 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
     <relativePath>../../database</relativePath>
-    <version>7.14.0</version>
+    <version>7.15.0</version>
   </parent>
   
   <groupId>org.camunda.bpm.wildfly</groupId>
   <artifactId>camunda-wildfly</artifactId>
   <packaging>pom</packaging>
 
-  <name>camunda BPM - Wildfly</name>
+  <name>Camunda Platform - Wildfly</name>
 
   <dependencyManagement>
     <dependencies>
@@ -45,7 +45,7 @@
                   <message>
                     *****************************************************************************************************
                     *                                                                                                   *
-                    *                    You must use at least JDK 1.8 to compile Camunda Bpm Wildfly!!!                *
+                    *                You must use at least JDK 1.8 to compile Camunda Platform Wildfly!!!               *
                     *                                                                                                   *
                     *****************************************************************************************************
                   </message>

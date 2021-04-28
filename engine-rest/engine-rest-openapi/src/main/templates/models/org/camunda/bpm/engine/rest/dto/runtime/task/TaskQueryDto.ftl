@@ -364,6 +364,13 @@
                 `java.util.Date` or `org.joda.time.DateTime` object." />
   
     <@lib.property
+        name = "withoutDueDate"
+        type = "boolean"
+        defaultValue = "false"
+        desc = "Only include tasks which have no due date. Value may only be `true`, 
+                as `false` is the default behavior." />
+  
+    <@lib.property
         name = "followUpDate"
         type = "string"
         format = "date-time"
@@ -584,7 +591,8 @@
                 `gteq` - greater than or equal to;
                 `lt` - lower than;
                 `lteq` - lower than or equal to;
-                `like`.
+                `like`;
+                `notLike`.
                 `key` and `value` may not contain underscore or comma characters." />
   
     <@lib.property
@@ -651,7 +659,7 @@
                                   '"caseExecutionVariable"', '"caseInstanceVariable"' ] >
         <#assign sortParamsDto = "SortTaskQueryParametersDto" >
         <#include "/lib/commons/sort-props.ftl" >
-
+        <#assign sortParamsDto = "" >
     }
 
 </@lib.dto>

@@ -785,6 +785,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected MetricsReporterIdProvider metricsReporterIdProvider;
 
+  protected boolean isTaskMetricsEnabled = true;
+
   /**
    * the historic job log host name
    */
@@ -890,6 +892,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    * works in conjunction with removal-time-based cleanup strategy.
    */
   protected String historyCleanupJobLogTimeToLive;
+
+  protected String taskMetricsTimeToLive;
+  protected Integer parsedTaskMetricsTimeToLive;
 
   protected BatchWindowManager batchWindowManager = new DefaultBatchWindowManager();
 
@@ -1112,6 +1117,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initBatchOperationsHistoryTimeToLive();
 
     initHistoryCleanupJobLogTimeToLive();
+
+    initTaskMetricsTimeToLive();
   }
 
   protected void initHistoryCleanupStrategy() {
@@ -1246,6 +1253,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       ParseUtil.parseHistoryTimeToLive(historyCleanupJobLogTimeToLive);
     } catch (Exception e) {
       throw LOG.invalidPropertyValue("historyCleanupJobLogTimeToLive", historyCleanupJobLogTimeToLive, e);
+    }
+  }
+
+  protected void initTaskMetricsTimeToLive() {
+    try {
+      parsedTaskMetricsTimeToLive = ParseUtil.parseHistoryTimeToLive(taskMetricsTimeToLive);
+    } catch (Exception e) {
+      throw LOG.invalidPropertyValue("taskMetricsTimeToLive", taskMetricsTimeToLive, e);
     }
   }
 
@@ -2730,7 +2745,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     ProcessEngineDetails engineInfo = ParseUtil
-        .parseProcessEngineVersion(ProcessEngineConfigurationImpl.class.getPackage().getImplementationVersion(), true);
+        .parseProcessEngineVersion(true);
 
     Product product = new Product(PRODUCT_NAME, engineInfo.getVersion(), engineInfo.getEdition(), internals);
 
@@ -4188,6 +4203,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     return this;
   }
 
+  public boolean isTaskMetricsEnabled() {
+    return isTaskMetricsEnabled;
+  }
+
+  public ProcessEngineConfigurationImpl setTaskMetricsEnabled(boolean isTaskMetricsEnabled) {
+    this.isTaskMetricsEnabled = isTaskMetricsEnabled;
+    return this;
+  }
+
   public boolean isEnableScriptEngineCaching() {
     return enableScriptEngineCaching;
   }
@@ -4657,6 +4681,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public ProcessEngineConfigurationImpl setHistoryCleanupJobLogTimeToLive(String historyCleanupJobLogTimeToLive) {
     this.historyCleanupJobLogTimeToLive = historyCleanupJobLogTimeToLive;
+    return this;
+  }
+
+  public String getTaskMetricsTimeToLive() {
+    return taskMetricsTimeToLive;
+  }
+
+  public ProcessEngineConfigurationImpl setTaskMetricsTimeToLive(String taskMetricsTimeToLive) {
+    this.taskMetricsTimeToLive = taskMetricsTimeToLive;
+    return this;
+  }
+
+  public Integer getParsedTaskMetricsTimeToLive() {
+    return parsedTaskMetricsTimeToLive;
+  }
+
+  public ProcessEngineConfigurationImpl setParsedTaskMetricsTimeToLive(Integer parsedTaskMetricsTimeToLive) {
+    this.parsedTaskMetricsTimeToLive = parsedTaskMetricsTimeToLive;
     return this;
   }
 

@@ -28,6 +28,8 @@ import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.batch.Batch;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.exception.NullValueException;
+import org.camunda.bpm.engine.exception.NotFoundException;
+import org.camunda.bpm.engine.exception.NotValidException;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.migration.MigrationPlan;
 import org.camunda.bpm.engine.migration.MigrationPlanBuilder;
@@ -590,7 +592,9 @@ public interface RuntimeService {
    * @param deleteReason reason for deleting, which will be stored in the history. Can be null.
    *
    * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
+   *          when the processInstanceId is null.
+   * @throws NotFoundException
+   *          when no process instance is found with the given processInstanceId.
    * @throws AuthorizationException
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
@@ -726,7 +730,9 @@ public interface RuntimeService {
    * are notified with the {@link ExecutionListener#EVENTNAME_END} event.
    *
    * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
+   *          when the processInstanceId is null.
+   * @throws NotFoundException
+   *          when no process instance is found with the given processInstanceId.
    * @throws AuthorizationException
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
@@ -747,7 +753,9 @@ public interface RuntimeService {
    *
    *
    * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
+   *          when the processInstanceId is null.
+   * @throws NotFoundException
+   *          when no process instance is found with the given processInstanceId.
    * @throws AuthorizationException
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
@@ -769,7 +777,9 @@ public interface RuntimeService {
    *
    *
    * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
+   *          when a processInstanceId is null.
+   * @throws NotFoundException
+   *          when no process instance is found with a given processInstanceId.
    * @throws AuthorizationException
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
@@ -791,7 +801,9 @@ public interface RuntimeService {
    *
    *
    * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
+   *          when a processInstanceId is null.
+   * @throws NotFoundException
+   *          when no process instance is found with a given processInstanceId.
    * @throws AuthorizationException
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
@@ -803,7 +815,7 @@ public interface RuntimeService {
    * Delete existing runtime process instances.
    *
    * Deletion propagates upward as far as necessary.
-   * 
+   *
    * Does not fail if a process instance was not found.
    *
    * @param processInstanceIds ids of process instance to delete, cannot be null.
@@ -816,7 +828,7 @@ public interface RuntimeService {
    *
    *
    * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
+   *          when a processInstanceId is null.
    * @throws AuthorizationException
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
@@ -839,7 +851,9 @@ public interface RuntimeService {
    *
    *
    * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
+   *          when the processInstanceId is null.
+   * @throws NotFoundException
+   *          when no process instance is found with the given processInstanceId.
    * @throws AuthorizationException
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
@@ -862,19 +876,21 @@ public interface RuntimeService {
    *
    *
    * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
+   *          when the processInstanceId is null.
+   * @throws NotFoundException
+   *          when no process instance is found with the given processInstanceId.
    * @throws AuthorizationException
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void deleteProcessInstance(String processInstanceId, String deleteReason, boolean skipCustomListeners, boolean externallyTerminated, boolean skipIoMappings,
       boolean skipSubprocesses);
-  
+
   /**
    * Delete an existing runtime process instance.
    *
    * Deletion propagates upward as far as necessary.
-   * 
+   *
    * Does not fail if a process instance was not found.
    *
    * @param processInstanceId id of process instance to delete, cannot be null.
@@ -888,7 +904,7 @@ public interface RuntimeService {
    *
    *
    * @throws BadUserRequestException
-   *          when no process instance is found with the given id or id is null.
+   *          when processInstanceId is null.
    * @throws AuthorizationException
    *          if the user has no {@link Permissions#DELETE} permission on {@link Resources#PROCESS_INSTANCE}
    *          or no {@link Permissions#DELETE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
@@ -2296,6 +2312,37 @@ public interface RuntimeService {
    *          and no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
    */
   void resolveIncident(String incidentId);
+
+  /**
+   * Set an annotation to an incident.
+   *
+   * @throws NotValidException when incident id is {@code null}
+   * @throws BadUserRequestException when no incident could be found
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *
+   * @param incidentId of the incident that the annotation is updated at
+   * @param annotation that is set to the incident
+   *
+   * @since 7.15
+   */
+  void setAnnotationForIncidentById(String incidentId, String annotation);
+
+  /**
+   * Clear the annotation for an incident.
+   *
+   * @throws NotValidException when incident id is {@code null}
+   * @throws BadUserRequestException when no incident could be found
+   * @throws AuthorizationException
+   *          if the user has no {@link Permissions#UPDATE} permission on {@link Resources#PROCESS_INSTANCE}
+   *          and no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.
+   *
+   * @param incidentId of the incident that the annotation is cleared at
+   *
+   * @since 7.15
+   */
+  void clearAnnotationForIncidentById(String incidentId);
 
   /**
    * Define a complex condition evaluation using a fluent builder.

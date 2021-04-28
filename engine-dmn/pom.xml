@@ -5,7 +5,7 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
     <relativePath>../database</relativePath>
-    <version>7.14.0</version>
+    <version>7.15.0</version>
   </parent>
 
   <groupId>org.camunda.bpm.dmn</groupId>
@@ -46,12 +46,6 @@
         <artifactId>juel-spi</artifactId>
         <version>${version.juel}</version>
       </dependency>
-
-      <dependency>
-        <groupId>org.camunda.feel</groupId>
-        <artifactId>feel-engine</artifactId>
-        <version>${version.feel-scala}</version>
-      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -80,11 +74,6 @@
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <Export-Package>org.camunda.bpm.dmn*</Export-Package>
-          </instructions>
-        </configuration>
       </plugin>
     </plugins>
   </build>

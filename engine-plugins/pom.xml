@@ -5,13 +5,13 @@
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
     <relativePath>../database</relativePath>
-    <version>7.14.0</version>
+    <version>7.15.0</version>
   </parent>
 
   <artifactId>camunda-engine-plugins</artifactId>
   <packaging>pom</packaging>
 
-  <name>camunda BPM - engine plugins</name>
+  <name>Camunda Platform - engine plugins</name>
 
   <modules>
     <module>identity-ldap</module>

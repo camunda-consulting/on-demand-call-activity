@@ -1,14 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>camunda-engine-rest-core</artifactId>
-  <name>camunda BPM - engine - REST</name>
+  <name>Camunda Platform - engine - REST</name>
   <packaging>jar</packaging>
 
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-engine-rest-root</artifactId>
     <relativePath>../</relativePath>
-    <version>7.14.0</version>
+    <version>7.15.0</version>
   </parent>
 
   <properties>
@@ -29,6 +29,12 @@
       <groupId>commons-fileupload</groupId>
       <artifactId>commons-fileupload</artifactId>
     </dependency>
+    <!-- override managed version from commons-fileupload -->
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
+
 
     <dependency>
       <groupId>com.fasterxml.jackson.jaxrs</groupId>
@@ -88,17 +94,6 @@
       <scope>provided</scope>
     </dependency>
 
-    <!--
-      needed for offline shrinkwrap
-      see src/test/java/org/camunda/bpm/engine/rest/util/container/TomcatServerBootstrap.java
-    -->
-    <dependency>
-      <groupId>org.codehaus.jackson</groupId>
-      <artifactId>jackson-jaxrs</artifactId>
-      <version>1.6.5</version>
-      <scope>test</scope>
-    </dependency>
-    
     <!--
       needed for offline shrinkwrap (in particular CustomJacksonDateFormatTest), 
       BOMs must be installed before this module is built
@@ -186,7 +181,7 @@
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
       <!-- override version -->
-      <version>1.11</version>
+      <version>1.15</version>
       <scope>test</scope>
     </dependency>
 
@@ -542,6 +537,9 @@
     
     <profile>
       <id>resteasy3</id>
+      <properties>
+        <version.resteasy>${version.resteasy3}</version.resteasy>
+      </properties>
       <dependencies>
         <dependency>
           <groupId>org.jboss.spec.javax.ws.rs</groupId>

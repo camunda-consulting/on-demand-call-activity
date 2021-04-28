@@ -5,13 +5,13 @@
   <groupId>org.camunda.bpm.qa</groupId>
 
   <packaging>pom</packaging>
-  <name>camunda BPM - QA</name>
+  <name>Camunda Platform - QA</name>
 
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-database-settings</artifactId>
     <relativePath>../database</relativePath>
-    <version>7.14.0</version>
+    <version>7.15.0</version>
   </parent>
 
   <properties>

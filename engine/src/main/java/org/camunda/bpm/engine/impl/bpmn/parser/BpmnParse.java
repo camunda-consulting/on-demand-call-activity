@@ -876,8 +876,8 @@ public class BpmnParse extends Parse {
         parseExecutionListenersOnScope(startEventElement, startEventActivity);
       }
     } else {
-      if (parentElement.getTagName().equals("subProcess") ) {
-        addError("subProcess must define a startEvent element", parentElement);
+      if (Arrays.asList("process", "subProcess").contains(parentElement.getTagName())) {
+        addError(parentElement.getTagName() + " must define a startEvent element", parentElement);
       }
     }
     if (scope instanceof ProcessDefinitionEntity) {
@@ -2383,7 +2383,8 @@ public class BpmnParse extends Parse {
     ParameterValueProvider priorityProvider = parsePriority(serviceTaskElement, PROPERTYNAME_TASK_PRIORITY);
     Map<String, String> properties = parseCamundaExtensionProperties(serviceTaskElement);
     activity.getProperties().set(BpmnProperties.EXTENSION_PROPERTIES, properties);
-
+    List<CamundaErrorEventDefinition> camundaErrorEventDefinitions = parseCamundaErrorEventDefinitions(activity, serviceTaskElement);
+    activity.getProperties().set(BpmnProperties.CAMUNDA_ERROR_EVENT_DEFINITION, camundaErrorEventDefinitions);
     activity.setActivityBehavior(new ExternalTaskActivityBehavior(topicNameProvider, priorityProvider));
   }
 
@@ -2542,7 +2543,6 @@ public class BpmnParse extends Parse {
     for (BpmnParseListener parseListener : parseListeners) {
       parseListener.parseTask(taskElement, scope, activity);
     }
-//    createMessageJobDeclForAsyncActivity(activity, true);
     return activity;
   }
 
@@ -3132,6 +3132,29 @@ public class BpmnParse extends Parse {
 
     }
 
+  }
+
+  public List<CamundaErrorEventDefinition> parseCamundaErrorEventDefinitions(ActivityImpl activity, Element scopeElement) {
+    List<CamundaErrorEventDefinition> errorEventDefinitions = new ArrayList<>();
+    Element extensionElements = scopeElement.element("extensionElements");
+    if (extensionElements != null) {
+      List<Element> errorEventDefinitionElements = extensionElements.elements("errorEventDefinition");
+      for (Element errorEventDefinitionElement : errorEventDefinitionElements) {
+        String errorRef = errorEventDefinitionElement.attribute("errorRef");
+        Error error = null;
+        if (errorRef != null) {
+          String camundaExpression = errorEventDefinitionElement.attribute("expression");
+          error = errors.get(errorRef);
+          CamundaErrorEventDefinition definition = new CamundaErrorEventDefinition(activity.getId(), expressionManager.createExpression(camundaExpression));
+          definition.setErrorCode(error == null ? errorRef : error.getErrorCode());
+          setErrorCodeVariableOnErrorEventDefinition(errorEventDefinitionElement, definition);
+          setErrorMessageVariableOnErrorEventDefinition(errorEventDefinitionElement, definition);
+          
+          errorEventDefinitions.add(definition);
+        }
+      }
+    }
+    return errorEventDefinitions;
   }
 
   protected ActivityImpl getMultiInstanceScope(ActivityImpl activity) {

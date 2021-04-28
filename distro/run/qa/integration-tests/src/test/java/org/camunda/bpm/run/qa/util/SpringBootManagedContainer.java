@@ -79,7 +79,7 @@ public class SpringBootManagedContainer {
   }
 
   /**
-   * @return the home directory of Camunda BPM Run based on the
+   * @return the home directory of Camunda Platform Run based on the
    *         "camunda.run.home" system property.
    */
   public static String getRunHome() {
@@ -180,32 +180,26 @@ public class SpringBootManagedContainer {
 
   protected boolean isRunning() {
     try {
-      URLConnection conn = new URL(this.baseUrl).openConnection();
-      HttpURLConnection hconn = (HttpURLConnection) conn;
-      hconn.setAllowUserInteraction(false);
-      hconn.setDoInput(true);
-      hconn.setUseCaches(false);
-      hconn.setDoOutput(false);
-      hconn.setRequestMethod("OPTIONS");
-      hconn.setRequestProperty("User-Agent", "Camunda-Managed-SpringBoot-Container/1.0");
-      hconn.setRequestProperty("Accept", "text/plain");
-      hconn.connect();
-      processResponse(hconn);
+      //There might not be a resource at the base url, but at this point we just want to know that the server is up.
+      processOptionsRequests(this.baseUrl);
+      return true;
     } catch (Exception e) {
-      return false;
+        return false;
     }
-    return true;
   }
 
-  protected void processResponse(HttpURLConnection hconn) throws IOException {
-    int httpResponseCode = hconn.getResponseCode();
-    if (httpResponseCode >= 400 && httpResponseCode < 500) {
-      throw new RuntimeException(String.format("Unable to connect to server, it failed with responseCode (%s) and responseMessage (%s).", httpResponseCode,
-          hconn.getResponseMessage()));
-    } else if (httpResponseCode >= 300) {
-      throw new IllegalStateException(
-          String.format("The server request failed with responseCode (%s) and responseMessage (%s).", httpResponseCode, hconn.getResponseMessage()));
-    }
+  protected void processOptionsRequests(String urlToCall) throws IOException {
+    URLConnection conn = new URL(urlToCall).openConnection();
+    HttpURLConnection hconn = (HttpURLConnection) conn;
+    hconn.setAllowUserInteraction(false);
+    hconn.setDoInput(true);
+    hconn.setUseCaches(false);
+    hconn.setDoOutput(false);
+    hconn.setRequestMethod("OPTIONS");
+    hconn.setRequestProperty("User-Agent", "Camunda-Managed-SpringBoot-Container/1.0");
+    hconn.setRequestProperty("Accept", "text/plain");
+    hconn.connect();
+    hconn.disconnect();
   }
 
   // ---------------------------
@@ -216,8 +210,8 @@ public class SpringBootManagedContainer {
     try {
       Process p = null;
       Integer pid = null;
-      
-      // must kill a hierachy of processes: the script process (which corresponds to the pid value) 
+
+      // must kill a hierachy of processes: the script process (which corresponds to the pid value)
       // and the Java process it has spawned
       if (isUnixLike()) {
         pid = unixLikeProcessId(process);

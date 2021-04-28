@@ -1,3 +1,13 @@
+  <@lib.parameter name = "taskId"
+      location = "query"
+      type = "string"
+      desc = "Restrict to task with the given id." />
+
+  <@lib.parameter name = "taskIdIn"
+      location = "query"
+      type = "string"
+      desc = "Restrict to tasks with any of the given ids." />
+
   <@lib.parameter name = "processInstanceId"
       location = "query"
       type = "string"
@@ -353,6 +363,13 @@
               for more information on available functions. The expression must evaluate to a
               `java.util.Date` or `org.joda.time.DateTime` object." />
 
+  <@lib.parameter name = "withoutDueDate"
+      location = "query"
+      type = "boolean"
+      defaultValue = "false"
+      desc = "Only include tasks which have no due date. Value may only be `true`, 
+              as `false` is the default behavior." />
+
   <@lib.parameter name = "followUpDate"
       location = "query"
       type = "string"
@@ -573,7 +590,8 @@
               `gteq` - greater than or equal to;
               `lt` - lower than;
               `lteq` - lower than or equal to;
-              `like`.
+              `like`;
+              `notLike`.
               `key` and `value` may not contain underscore or comma characters." />
 
   <@lib.parameter name = "caseInstanceVariables"

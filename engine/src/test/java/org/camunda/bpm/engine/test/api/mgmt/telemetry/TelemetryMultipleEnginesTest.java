@@ -62,11 +62,13 @@ public class TelemetryMultipleEnginesTest {
 
   @ClassRule
   public static ProcessEngineBootstrapRule secondEngineRule = new ProcessEngineBootstrapRule(config ->
-      config.setProcessEngineBootstrapCommand(new NoInitMessageBootstrapEngineCommand()));
+      config.setTelemetryEndpoint(TELEMETRY_ENDPOINT)
+            .setProcessEngineBootstrapCommand(new NoInitMessageBootstrapEngineCommand()));
 
   @ClassRule
   public static ProcessEngineBootstrapRule defaultEngineRule = new ProcessEngineBootstrapRule(config ->
-  config.setProcessEngineBootstrapCommand(new NoInitMessageBootstrapEngineCommand()));
+      config.setTelemetryEndpoint(TELEMETRY_ENDPOINT)
+            .setProcessEngineBootstrapCommand(new NoInitMessageBootstrapEngineCommand()));
 
   protected ProcessEngine defaultEngine;
   protected ProcessEngine secondEngine;
@@ -133,11 +135,11 @@ public class TelemetryMultipleEnginesTest {
 
     LoggedRequest defaultRequest = requests.get(0);
     Data defaultRequestBody = gson.fromJson(defaultRequest.getBodyAsString(), Data.class);
-    assertReportedMetrics(defaultRequestBody, 0, 1, 0, 0);
+    assertReportedMetrics(defaultRequestBody, 0, 1, 0);
 
     LoggedRequest secondRequest = requests.get(1);
     Data secondRequestBody = gson.fromJson(secondRequest.getBodyAsString(), Data.class);
-    assertReportedMetrics(secondRequestBody, 1, 0, 0, 0);
+    assertReportedMetrics(secondRequestBody, 1, 0, 0);
   }
 
   @Test
@@ -204,14 +206,12 @@ public class TelemetryMultipleEnginesTest {
       Data data,
       int expectedRootInstances,
       int expectedDecisionInstances,
-      int expectedFlowNodeInstances,
-      int expectedTaskWorkers) {
+      int expectedFlowNodeInstances) {
     Internals internals = data.getProduct().getInternals();
 
     assertMetric(internals, Metrics.ROOT_PROCESS_INSTANCE_START, expectedRootInstances);
     assertMetric(internals, Metrics.EXECUTED_DECISION_INSTANCES, expectedDecisionInstances);
     assertMetric(internals, Metrics.ACTIVTY_INSTANCE_START, expectedFlowNodeInstances);
-    assertMetric(internals, "unique-task-workers", expectedTaskWorkers);
   }
 
   private void assertMetric(Internals internals, String name, int expectedCount) {

@@ -147,7 +147,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
   public void setJobDuedate(String jobId, Date newDuedate) {
     setJobDuedate(jobId, newDuedate, false);
   }
-  
+
   public void setJobDuedate(String jobId, Date newDuedate, boolean cascade) {
     commandExecutor.execute(new SetJobDuedateCmd(jobId, newDuedate, cascade));
   }
@@ -200,18 +200,8 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     commandExecutor.execute(new DeleteLicenseKeyCmd(true));
   }
 
-  public String databaseSchemaUpgrade(final Connection connection, final String catalog, final String schema) {
-    return commandExecutor.execute(new Command<String>() {
-      public String execute(CommandContext commandContext) {
-        commandContext.getAuthorizationManager().checkCamundaAdmin();
-        DbSqlSessionFactory dbSqlSessionFactory = (DbSqlSessionFactory) commandContext.getSessionFactories().get(DbSqlSession.class);
-        DbSqlSession dbSqlSession = dbSqlSessionFactory.openSession(connection, catalog, schema);
-        commandContext.getSessions().put(DbSqlSession.class, dbSqlSession);
-        dbSqlSession.dbSchemaUpdate();
-
-        return "";
-      }
-    });
+  public String databaseSchemaUpgrade(Connection connection, String catalog, String schema) {
+    return commandExecutor.execute(new DbSchemaUpgradeCmd(connection, catalog, schema));
   }
 
   /**
@@ -235,13 +225,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
   }
 
   public Set<String> getRegisteredDeployments() {
-    return commandExecutor.execute(new Command<Set<String>>() {
-      public Set<String> execute(CommandContext commandContext) {
-        commandContext.getAuthorizationManager().checkCamundaAdmin();
-        Set<String> registeredDeployments = Context.getProcessEngineConfiguration().getRegisteredDeployments();
-        return new HashSet<>(registeredDeployments);
-      }
-    });
+    return commandExecutor.execute(new GetRegisteredDeploymentsCmd());
   }
 
   public void registerDeploymentForJobExecutor(final String deploymentId) {
@@ -468,6 +452,16 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     commandExecutor.execute(new ReportDbMetricsCmd());
   }
 
+  @Override
+  public long getUniqueTaskWorkerCount(Date startTime, Date endTime) {
+    return commandExecutor.execute(new GetUniqueTaskWorkerCountCmd(startTime, endTime));
+  }
+
+  @Override
+  public void deleteTaskMetrics(Date timestamp) {
+    commandExecutor.execute(new DeleteTaskMetricsCmd(timestamp));
+  }
+
   public void setOverridingJobPriorityForJobDefinition(String jobDefinitionId, long priority) {
     commandExecutor.execute(new SetJobDefinitionPriorityCmd(jobDefinitionId, priority, false));
   }
@@ -510,6 +504,41 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
 
   public Boolean isTelemetryEnabled() {
     return commandExecutor.execute(new IsTelemetryEnabledCmd());
+  }
+
+  protected class DbSchemaUpgradeCmd implements Command<String> {
+
+    protected Connection connection;
+    protected String catalog;
+    protected String schema;
+
+    public DbSchemaUpgradeCmd(Connection connection, String catalog, String schema) {
+      this.connection = connection;
+      this.catalog = catalog;
+      this.schema = schema;
+    }
+
+    @Override
+    public String execute(CommandContext commandContext) {
+      commandContext.getAuthorizationManager().checkCamundaAdmin();
+      DbSqlSessionFactory dbSqlSessionFactory = (DbSqlSessionFactory) commandContext.getSessionFactories().get(DbSqlSession.class);
+      DbSqlSession dbSqlSession = dbSqlSessionFactory.openSession(connection, catalog, schema);
+      commandContext.getSessions().put(DbSqlSession.class, dbSqlSession);
+      dbSqlSession.dbSchemaUpdate();
+
+      return "";
+    }
+
+  }
+
+  protected class GetRegisteredDeploymentsCmd implements Command<Set<String>> {
+
+    @Override
+    public Set<String> execute(CommandContext commandContext) {
+      commandContext.getAuthorizationManager().checkCamundaAdmin();
+      Set<String> registeredDeployments = Context.getProcessEngineConfiguration().getRegisteredDeployments();
+      return new HashSet<>(registeredDeployments);
+    }
   }
 
 }

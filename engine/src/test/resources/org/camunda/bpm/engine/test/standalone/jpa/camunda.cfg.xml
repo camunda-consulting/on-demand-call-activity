@@ -23,11 +23,15 @@
     <!-- turn off metrics reporter -->
     <property name="dbMetricsReporterActivate" value="false" />
     <property name="telemetryReporterActivate" value="false" />
+<<<<<<< HEAD
     <property name="processEnginePlugins">
       <list>
         <bean class="org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.OnDemandCallActivityProcessEnginePlugin" />
       </list>
     </property>
+=======
+    <property name="taskMetricsEnabled" value="false" />
+>>>>>>> f69ef4479829b71d1e333868695b7d0dd14fb3aa
   </bean>
 
 </beans>

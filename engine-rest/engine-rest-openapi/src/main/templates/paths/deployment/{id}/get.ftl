@@ -3,6 +3,7 @@
   <@lib.endpointInfo
       id = "getDeployment"
       tag = "Deployment"
+      summary = "Get"
       desc = "Retrieves a deployment by id, according to the `Deployment` interface of the engine." />
 
   "parameters" : [
@@ -22,7 +23,6 @@
     <@lib.response
         code = "200"
         dto = "DeploymentDto"
-        array = true
         desc = "Request successful."
         examples = ['"example-1": {
                        "summary": "GET `/deployments/someDeploymentId`",

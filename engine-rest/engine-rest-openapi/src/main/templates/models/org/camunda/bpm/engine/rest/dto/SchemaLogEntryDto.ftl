@@ -9,7 +9,6 @@
         name = "timestamp"
         type = "string"
         format = "date-time"
-        nullable = false
         desc = "The date and time of the schema update." />
 
     <@lib.property
