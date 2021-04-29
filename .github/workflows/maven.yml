@@ -20,7 +20,7 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
-    - uses: actions/cache@v2
+    - uses: actions/cache@v2.1.5
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
@@ -31,10 +31,27 @@ jobs:
     - run: mkdir staging && cp engine-plugin-on-demand-call-activity/target/*.jar staging/engine-plugin-on-demand-call-activity.jar
     - run: cp asynchronous-service-task/target/*.jar staging/asynchronous-service-task.jar
     - run: cp abstract-delegate-execution/target/*.jar staging/abstract-delegate-execution.jar
-    - uses: actions/upload-artifact@v2.2.2
+    - run: echo "Deploying to production server on branch $GITHUB_REF"
+    - uses: actions/upload-artifact@v2.2.3
       with:
         name: library-jar-files.zip
         path: staging
+
+  publish:
+    needs: test
+    if: ${{ github.ref == 'refs/heads/master' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 1.8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - name: Publish to GitHub Packages Apache Maven
+        run: mvn -B deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.PUBLISH }}
+
 
   test:
     needs: build
@@ -47,6 +64,8 @@ jobs:
         - engine-test-suite-without-child-processes-7.13.0
         - engine-test-suite-with-child-processes-7.14.0
         - engine-test-suite-without-child-processes-7.14.0
+        - engine-test-suite-with-child-processes-7.15.0
+        - engine-test-suite-without-child-processes-7.15.0
       fail-fast: false
 
     runs-on: ubuntu-latest
@@ -65,10 +84,10 @@ jobs:
         java-version: 1.8
     - name: Enable snapshots in Maven settings
       if: endsWith(matrix.branch, 'SNAPSHOT')
-      uses: whelk-io/maven-settings-xml-action@v14
+      uses: whelk-io/maven-settings-xml-action@v15
       with:
         repositories: '[{ "id": "camunda-bpm-nexus", "name": "camunda-bpm-nexus", "url": "https://app.camunda.com/nexus/content/groups/public", "releases": { "enabled": "true" }, "snapshots": { "enabled": "true" } }]'
-    - uses: actions/cache@v2
+    - uses: actions/cache@v2.1.5
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-engine-maven-${{ hashFiles('**/pom.xml') }}
