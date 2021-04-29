@@ -3,7 +3,7 @@
 
   <groupId>org.camunda.bpm.extension.engine.delegate.abstract</groupId>
   <artifactId>abstract-delegate-execution</artifactId>
-  
+  <version>0.0.1-SNAPSHOT</version>
 
   <name>Abstract Delegate Execution</name>
   <description>An abstract base class for DelegateExecution implementations for execution a JavaDelegate.</description>
