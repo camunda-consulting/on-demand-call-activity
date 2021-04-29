@@ -1,8 +1,10 @@
 package org.camunda.bpm.extension.bpmn.servicetask.asynchronous;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -10,6 +12,9 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.impl.cfg.TransactionState;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.extension.engine.delegate.DelegateExecutionDTO;
@@ -40,12 +45,37 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
 
   private static final long serialVersionUID = 1L;
 
-  private final RuntimeService runtimeService;
+  private RuntimeService runtimeService;
+
+  private final CompletableFuture<Void> executionCommitFuture = new CompletableFuture<Void>();
+  private boolean transactionCommitted = false;
+
   
   public ThreadSaveExecution(final DelegateExecution execution) {
     super(execution);
     // Thorben said that RuntimeService is thread-safe
     runtimeService = execution.getProcessEngineServices().getRuntimeService();
+    CommandContext commandContext = Context.getCommandContext();
+    commandContext.getTransactionContext().addTransactionListener(TransactionState.COMMITTED, c -> {
+      executionCommitFuture.complete(null);
+    });
+    commandContext.getTransactionContext().addTransactionListener(TransactionState.ROLLED_BACK, c -> {
+      executionCommitFuture.cancel(false);
+    });
+  }
+
+  protected RuntimeService getRuntimeServiceWhenCommitted() {
+    if (!isTransactionCommitted()) {
+        try {
+          executionCommitFuture.get();
+        } catch (CancellationException e) {
+          throw new ExecutionRolledBackException(e);
+        } catch (InterruptedException | ExecutionException e) {
+          throw new RuntimeException(e);
+        }
+        setTransactionCommitted(true);
+    }
+    return getRuntimeService();
   }
 
   /**
@@ -57,15 +87,14 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
    * and committed to the database.
    */
   public void complete() {
-    // TODO catch and retry on exceptions indicating that the transaction was not yet committed 
     try {
-      getRuntimeService().signal(getId(), getVariables());
+      getRuntimeServiceWhenCommitted().signal(getId(), getVariables());
     } catch (PvmException e) {
       if (e.getMessage().equals("cannot signal execution " + getId() + ": it has no current activity")) {
         Execution execution = getRuntimeService().createExecutionQuery()
           .activityId(getCurrentActivityId())
           .singleResult();
-        getRuntimeService().signal(execution.getId(), getVariables());
+        getRuntimeServiceWhenCommitted().signal(execution.getId(), getVariables());
       } else {
         throw e;
       }
@@ -91,7 +120,7 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
    *          and no {@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.</li>
    */
   public void signalEventReceived(String signalName) {
-    getRuntimeService().signalEventReceived(signalName);
+    getRuntimeServiceWhenCommitted().signalEventReceived(signalName);
   }
   
   /**
@@ -113,7 +142,7 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
    */
   public Object getVariableFromExecution(final String executionId, final String variableName) {
     // TODO write test case for this
-    return getRuntimeService().getVariable(executionId, variableName);
+    return getRuntimeServiceWhenCommitted().getVariable(executionId, variableName);
   }
 
   /**
@@ -133,7 +162,7 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
    */
   public void setVariableInExecution(final String executionId, final String variableName, Object value) {
     // TODO write test case for this
-    getRuntimeService().setVariable(executionId, variableName, value);
+    getRuntimeServiceWhenCommitted().setVariable(executionId, variableName, value);
   }
 
   /**
@@ -218,6 +247,14 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
   @Override
   public void removeVariables(Collection<String> variableNames) {
     throw new UnsupportedOperationException();
+  }
+
+  public boolean isTransactionCommitted() {
+    return transactionCommitted;
+  }
+
+  protected void setTransactionCommitted(boolean transactionCommitted) {
+    this.transactionCommitted = transactionCommitted;
   }
 
   /**

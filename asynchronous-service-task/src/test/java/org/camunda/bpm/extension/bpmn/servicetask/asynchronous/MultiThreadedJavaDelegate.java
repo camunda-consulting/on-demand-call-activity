@@ -1,7 +1,5 @@
 package org.camunda.bpm.extension.bpmn.servicetask.asynchronous;
 
-import static org.camunda.bpm.extension.bpmn.servicetask.asynchronous.CompletableFutureJava8Compatibility.delayedExecutor;
-
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -34,6 +32,9 @@ public class MultiThreadedJavaDelegate extends AbstractAsynchronousServiceTask {
           execution.signalEventReceived("Signal_AsyncServiceTaskInvoked");
         }
         execution.setVariable("isSuccess", true);
+      } catch (ExecutionRolledBackException e) {
+        // TODO maybe undo any side effects
+        return;
       } catch (Exception exception) {
         // you MUST catch any exception and handle it
 
