@@ -48,7 +48,7 @@ jobs:
         with:
           java-version: 1.8
       - name: Publish to GitHub Packages Apache Maven
-        run: mvn -B deploy
+        run: mvn -B deploy -Dversion=${{github.run_id}}
         env:
           GITHUB_TOKEN: ${{ secrets.PUBLISH }}
 
