@@ -1,5 +1,7 @@
 package org.camunda.bpm.extension.bpmn.servicetask.asynchronous;
 
+import static org.camunda.bpm.extension.bpmn.servicetask.asynchronous.CompletableFutureJava8Compatibility.delayedExecutor;
+
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
