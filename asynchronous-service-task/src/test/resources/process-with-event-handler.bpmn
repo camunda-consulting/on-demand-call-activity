@@ -35,16 +35,16 @@
     </bpmn:sequenceFlow>
     <bpmn:sequenceFlow id="SequenceFlow_1atxxsq" sourceRef="AsynchronousServiceTask" targetRef="Gateway_0ltg8qf" />
     <bpmn:sequenceFlow id="SequenceFlow1" sourceRef="StartEventProcessStarted" targetRef="AsynchronousServiceTask" />
-    <bpmn:subProcess id="Activity_01fi3nd" triggeredByEvent="true">
+    <bpmn:subProcess id="EventBasedSubProcess" triggeredByEvent="true">
       <bpmn:endEvent id="Event_1h7sfnn" name="Signal handling completed">
         <bpmn:incoming>Flow_10jyrk6</bpmn:incoming>
       </bpmn:endEvent>
-      <bpmn:sequenceFlow id="Flow_10jyrk6" sourceRef="Event_009arpc" targetRef="Event_1h7sfnn" />
-      <bpmn:startEvent id="Event_009arpc" name="Asyncchronous Service Task invoked" camunda:asyncBefore="true" isInterrupting="false">
+      <bpmn:sequenceFlow id="Flow_10jyrk6" sourceRef="SignalEvent" targetRef="Event_1h7sfnn" />
+      <bpmn:startEvent id="SignalEvent" name="Asyncchronous Service Task invoked" camunda:asyncBefore="true" isInterrupting="false">
         <bpmn:outgoing>Flow_10jyrk6</bpmn:outgoing>
         <bpmn:signalEventDefinition id="SignalEventDefinition_1c78hdu" signalRef="Signal_1ei9kj3" />
       </bpmn:startEvent>
-      <bpmn:association id="Association_1ckyd1e" sourceRef="Event_009arpc" targetRef="TextAnnotation_0p63uwl" />
+      <bpmn:association id="Association_1ckyd1e" sourceRef="SignalEvent" targetRef="TextAnnotation_0p63uwl" />
     </bpmn:subProcess>
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
@@ -104,7 +104,7 @@
           <dc:Bounds x="404" y="245" width="72" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_01fi3nd_di" bpmnElement="Activity_01fi3nd" isExpanded="true">
+      <bpmndi:BPMNShape id="Activity_01fi3nd_di" bpmnElement="EventBasedSubProcess" isExpanded="true">
         <dc:Bounds x="270" y="390" width="210" height="120" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_10jyrk6_di" bpmnElement="Flow_10jyrk6">
@@ -117,7 +117,7 @@
           <dc:Bounds x="403" y="455" width="76" height="27" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Event_1ce0hy9_di" bpmnElement="Event_009arpc">
+      <bpmndi:BPMNShape id="Event_1ce0hy9_di" bpmnElement="SignalEvent">
         <dc:Bounds x="292" y="412" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="272" y="455" width="76" height="40" />

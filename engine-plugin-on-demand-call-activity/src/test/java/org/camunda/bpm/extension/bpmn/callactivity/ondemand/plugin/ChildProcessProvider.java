@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 public class ChildProcessProvider extends AbstractChildProcessProvider {
 
     public static int invocationCount = 0;
+    public static CompletableFuture<Void> runAsyncFuture; // only needed for faster unit tests
 
     /**
      * If this method returns null execute will be invoked
@@ -51,25 +52,15 @@ public class ChildProcessProvider extends AbstractChildProcessProvider {
 
     @Override
     public void execute(OnDemandCallActivityExecution execution) {
-
-      long delay = 250L;
-    	
-      // When connected to postgres db, send signal fails with exception as it takes time to commit the execution. works fine with delay of 5000L  
-      Boolean badUserRequestException = execution.hasVariable("badUserRequestException") && (Boolean) execution.getVariable("badUserRequestException");
-      if(badUserRequestException) {
-    	  delay = 50L;
-      }
     	
       // TODO handle exceptions during request creation? Only needed during reactive REST calls
       
-      // Publish a task to a scheduled executor. This method returns after the task has
+      // Publish a task for execution by another thread. This method returns after the task has
       // been put into the executor. The actual service implementation (lambda) will not yet
       // be invoked:
       logger.info("ChildProcessProvider execute : {}", Thread.currentThread().getId());
-      CompletableFuture.runAsync(() -> { // simulates the sending of a non-blocking REST request
+      runAsyncFuture = CompletableFuture.runAsync(() -> { // simulates the sending of a non-blocking REST request
           // the code inside this lambda runs in a separate thread outside the TX
-          // this will not work: execution.setVariable("foo", "bar");
-          // THE EXECUTION IS NOT THREAD-SAFE
           try {
         	  logger.info("ChildProcessProvider try : {}", Thread.currentThread().getId());
         	  Object setParentVar = execution.getVariableFromExecution(execution.getId(), "setParentVar");
@@ -111,7 +102,7 @@ public class ChildProcessProvider extends AbstractChildProcessProvider {
 //                  }
           }
           //INCIDENT AND BPMN ERROR
-      }, delayedExecutor(delay, TimeUnit.MILLISECONDS));
+      });
       logger.info("ChildProcessProvider execute finished: {}", Thread.currentThread().getId());
 
     }

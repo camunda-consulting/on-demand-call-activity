@@ -1,7 +1,6 @@
 package org.camunda.bpm.extension.bpmn.servicetask.asynchronous;
 
 import org.apache.ibatis.logging.LogFactory;
-import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.extension.process_test_coverage.junit.rules.TestCoverageProcessEngineRuleBuilder;
@@ -15,7 +14,6 @@ import static org.camunda.bpm.extension.bpmn.servicetask.asynchronous.ProcessCon
 import static org.camunda.bpm.engine.test.assertions.ProcessEngineTests.*;
 import static org.junit.Assert.*;
 
-import java.util.List;
 
 /**
  * Test case starting an in-memory database-backed Process Engine.
@@ -39,8 +37,7 @@ public class InMemoryH2Test {
   @Deployment(resources = "process.bpmn")
   public void testHappyPath() throws InterruptedException {
     ProcessInstance processInstance = processEngine().getRuntimeService().startProcessInstanceByKey(PROCESS_DEFINITION_KEY);
-    assertThat(processInstance).isWaitingAt("AsynchronousServiceTask");
-	Thread.sleep(1000L);
+    MultiThreadedJavaDelegate.runAsyncFuture.join();
     assertThat(processInstance).isEnded().hasPassed("EndEventProcessEnded");
   }
   
@@ -52,8 +49,7 @@ public class InMemoryH2Test {
         .createProcessInstanceByKey(PROCESS_DEFINITION_KEY)
         .setVariable("triggerBpmnSignal", true)
         .execute();
-    assertThat(processInstance).isWaitingAt("AsynchronousServiceTask");
-    Thread.sleep(1000L);
+    MultiThreadedJavaDelegate.runAsyncFuture.join();
     assertThat(processInstance).isEnded();
     assertEquals(1, processInstanceQuery().processDefinitionKey("ProcessStartedBySignal").count());
     execute(jobQuery().singleResult());

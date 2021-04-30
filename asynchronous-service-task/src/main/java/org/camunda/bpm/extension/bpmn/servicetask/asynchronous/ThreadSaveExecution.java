@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -67,11 +66,9 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
   protected RuntimeService getRuntimeServiceWhenCommitted() {
     if (!isTransactionCommitted()) {
         try {
-          executionCommitFuture.get();
+          executionCommitFuture.join();
         } catch (CancellationException e) {
           throw new ExecutionRolledBackException(e);
-        } catch (InterruptedException | ExecutionException e) {
-          throw new RuntimeException(e);
         }
         setTransactionCommitted(true);
     }
@@ -92,7 +89,7 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
     } catch (PvmException e) {
       if (e.getMessage().equals("cannot signal execution " + getId() + ": it has no current activity")) {
         Execution execution = getRuntimeService().createExecutionQuery()
-          .activityId(getCurrentActivityId())
+          .activityId(getCurrentActivityId()) // FIXME test with multiple instances running in parallel; maybe getActivityInstanceId() was meant here
           .singleResult();
         getRuntimeServiceWhenCommitted().signal(execution.getId(), getVariables());
       } else {

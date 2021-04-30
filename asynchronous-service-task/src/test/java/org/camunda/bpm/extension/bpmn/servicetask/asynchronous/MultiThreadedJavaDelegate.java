@@ -1,9 +1,6 @@
 package org.camunda.bpm.extension.bpmn.servicetask.asynchronous;
 
-import static org.camunda.bpm.extension.bpmn.servicetask.asynchronous.CompletableFutureJava8Compatibility.delayedExecutor;
-
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Sample implementation of {@link AbstractAsynchronousServiceTask} to test and
@@ -13,6 +10,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class MultiThreadedJavaDelegate extends AbstractAsynchronousServiceTask {
 
+  public static CompletableFuture<Void> runAsyncFuture; // only needed for faster unit tests
+
   @Override
   public void execute(ThreadSaveExecution execution) {
     // Schedule a lambda to run asynchronously in a separate thread
@@ -20,7 +19,7 @@ public class MultiThreadedJavaDelegate extends AbstractAsynchronousServiceTask {
     // This way the database connection is not blocked during the execution of
     // the following code and larger thread pool sizes can be used to
     // parallelize execution of code with a long i/o wait time, e.g. REST calls
-    CompletableFuture.runAsync(() -> {
+    runAsyncFuture = CompletableFuture.runAsync(() -> {
 
       // variables can be created and modified using
       execution.setVariable("foo", "bar");
@@ -48,11 +47,14 @@ public class MultiThreadedJavaDelegate extends AbstractAsynchronousServiceTask {
         execution.setVariable("isSuccess", false);
       }
       
-      // complete() must be called in a separate thread and
-      // with enough delay to let the engine commit the TX, e.g. 250ms
+      // complete() must be called in a separate thread
       // Variables will be automatically submitted. 
-      execution.complete();
-    }, delayedExecutor(500L, TimeUnit.MILLISECONDS));
+      try {
+        execution.complete();
+      } catch (ExecutionRolledBackException e) {
+        // TODO maybe undo any side effects
+      } 
+    });
   }
 
 }
