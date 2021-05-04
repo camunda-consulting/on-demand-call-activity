@@ -6,6 +6,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Map;
 
+import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.Expression;
@@ -13,6 +14,7 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.CallActivityBehavior;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,6 +82,9 @@ public class OnDemandCallActivityBehavior extends CallActivityBehavior {
         message.setExecutionId(execution.getId());
         message.setExclusive(true);
         message.setJobHandlerType(ScopelessAsyncContinuationJobHandler.TYPE);
+        RepositoryService repositoryService = execution.getProcessEngineServices().getRepositoryService();
+        ProcessDefinition definition = repositoryService.getProcessDefinition(execution.getProcessDefinitionId());
+        message.setProcessDefinitionKey(definition.getKey());
         // FIXME: eigenen Job-Handler bauen, der PvmAtomicOperation.ACTIVITY_EXECUTE anstößt. Dann steigst du wieder am richtigen Punkt in die Ausführung ein.
         message.setExceptionMessage(exception.getMessage());
         message.setExceptionStacktrace(getExceptionStacktrace(exception));
