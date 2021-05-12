@@ -289,7 +289,7 @@ public class OnDemandCallActivityProcessEnginePluginTest {
     public void testWithoutCallActivityBadUserRequestException() {
         ProcessInstance processInstance = processEngine().getRuntimeService()
                 .startProcessInstanceByKey(PROCESS_DEFINITION_KEY, withVariables("retProcess", false
-                        , "doThrowException", false));
+                        , "doThrowException", false, "badUserRequestException", true));
         assertThat(processInstance).calledProcessInstance("process-child").isNull();
         ChildProcessProvider.runAsyncFuture.join();
         assertThat(processInstance).isEnded();

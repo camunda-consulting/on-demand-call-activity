@@ -1,6 +1,9 @@
 package org.camunda.bpm.extension.bpmn.servicetask.asynchronous;
 
+import static org.camunda.bpm.extension.bpmn.servicetask.asynchronous.CompletableFutureJava8Compatibility.delayedExecutor;
+
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Sample implementation of {@link AbstractAsynchronousServiceTask} to test and
@@ -14,6 +17,9 @@ public class MultiThreadedJavaDelegate extends AbstractAsynchronousServiceTask {
 
   @Override
   public void execute(ThreadSaveExecution execution) {
+    // for testing we simulate a long-running operation, e.g. a slow REST call
+    long durationOfAsyncTask = 250L; // milliseconds
+
     // Schedule a lambda to run asynchronously in a separate thread
     // and outside any database transaction.
     // This way the database connection is not blocked during the execution of
@@ -54,7 +60,7 @@ public class MultiThreadedJavaDelegate extends AbstractAsynchronousServiceTask {
       } catch (ExecutionRolledBackException e) {
         // TODO maybe undo any side effects
       } 
-    });
+    }, delayedExecutor(durationOfAsyncTask, TimeUnit.MILLISECONDS));
   }
 
 }

@@ -52,7 +52,15 @@ public class ChildProcessProvider extends AbstractChildProcessProvider {
 
     @Override
     public void execute(OnDemandCallActivityExecution execution) {
+      // for testing we simulate a long-running operation, e.g. a slow REST call
+      long durationOfAsyncTask = 250L; // milliseconds
     	
+      // When connected to postgres db, send signal fails with exception as it takes time to commit the execution. works fine with delay of 5000L  
+      Boolean badUserRequestException = execution.hasVariable("badUserRequestException") && (Boolean) execution.getVariable("badUserRequestException");
+      if(badUserRequestException) {
+    	  durationOfAsyncTask = 0L;
+      }
+
       // TODO handle exceptions during request creation? Only needed during reactive REST calls
       
       // Publish a task for execution by another thread. This method returns after the task has
@@ -102,7 +110,7 @@ public class ChildProcessProvider extends AbstractChildProcessProvider {
 //                  }
           }
           //INCIDENT AND BPMN ERROR
-      });
+      }, delayedExecutor(durationOfAsyncTask, TimeUnit.MILLISECONDS));
       logger.info("ChildProcessProvider execute finished: {}", Thread.currentThread().getId());
 
     }
