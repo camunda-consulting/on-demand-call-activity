@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.test.mock.Mocks;
+import org.camunda.bpm.extension.bpmn.servicetask.asynchronous.ExecutionRolledBackException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +55,7 @@ public class ChildProcessProvider extends AbstractChildProcessProvider {
     public void execute(OnDemandCallActivityExecution execution) {
       // for testing we simulate a long-running operation, e.g. a slow REST call
       long durationOfAsyncTask = 250L; // milliseconds
-    	
+
       // When connected to postgres db, send signal fails with exception as it takes time to commit the execution. works fine with delay of 5000L  
       Boolean badUserRequestException = execution.hasVariable("badUserRequestException") && (Boolean) execution.getVariable("badUserRequestException");
       if(badUserRequestException) {
@@ -86,13 +87,21 @@ public class ChildProcessProvider extends AbstractChildProcessProvider {
 
               execution.setVariable("outputVar", "someValue");
               Mocks.register("childProcessProvider", this);
-              execution.complete();
-              logger.info("Signal Sent : {}", execution.getCurrentActivityId()); 
+              try {
+                execution.complete();
+                logger.info("Signal Sent : {}", execution.getCurrentActivityId()); 
+              } catch (ExecutionRolledBackException e) {
+                // TODO maybe undo any side effects
+              }
           } catch (Exception exception) {
             exception.printStackTrace();
             execution.setVariable("firstTryHasFailed", true); // TODO make variable name more unique and delete after use
-            execution.handleFailure(exception);
-            // sketch for self healing
+            try {
+              execution.handleFailure(exception);
+            } catch (ExecutionRolledBackException e) {
+              // TODO maybe undo any side effects
+            }
+          // sketch for self healing
 //                  try {
 //                    // synchronously call self-healing µs
 //                    if (isIgnore) {
