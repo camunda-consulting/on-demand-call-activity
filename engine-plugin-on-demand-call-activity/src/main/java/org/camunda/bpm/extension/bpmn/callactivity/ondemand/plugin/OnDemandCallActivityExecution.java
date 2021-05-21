@@ -38,7 +38,7 @@ public class OnDemandCallActivityExecution extends ThreadSaveExecution implement
    * @param exception the {@link Exception} that was caught by the thread.
    */
   public void handleFailure(final Exception exception) {
-    runtimeService.signal(getId(), null, exception, getVariables());
+    getRuntimeServiceWhenCommitted().signal(getId(), null, exception, getVariables());
   }
 
 }

@@ -6,6 +6,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.test.mock.Mocks;
+import org.camunda.bpm.extension.bpmn.servicetask.asynchronous.ExecutionRolledBackException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +20,7 @@ import org.slf4j.LoggerFactory;
 public class ChildProcessProvider extends AbstractChildProcessProvider {
 
     public static int invocationCount = 0;
+    public static CompletableFuture<Void> runAsyncFuture; // only needed for faster unit tests
 
     /**
      * If this method returns null execute will be invoked
@@ -50,18 +53,25 @@ public class ChildProcessProvider extends AbstractChildProcessProvider {
 
     @Override
     public void execute(OnDemandCallActivityExecution execution) {
+      // for testing we simulate a long-running operation, e.g. a slow REST call
+      long durationOfAsyncTask = 250L; // milliseconds
 
+      // When connected to postgres db, send signal fails with exception as it takes time to commit the execution. works fine with delay of 5000L  
+      Boolean badUserRequestException = execution.hasVariable("badUserRequestException") && (Boolean) execution.getVariable("badUserRequestException");
+      if(badUserRequestException) {
+    	  durationOfAsyncTask = 0L;
+      }
 
       // TODO handle exceptions during request creation? Only needed during reactive REST calls
       
-      // Publish a task to a scheduled executor. This method returns after the task has
+      // Publish a task for execution by another thread. This method returns after the task has
       // been put into the executor. The actual service implementation (lambda) will not yet
       // be invoked:
-      CompletableFuture.runAsync(() -> { // simulates the sending of a non-blocking REST request
+      logger.info("ChildProcessProvider execute : {}", Thread.currentThread().getId());
+      runAsyncFuture = CompletableFuture.runAsync(() -> { // simulates the sending of a non-blocking REST request
           // the code inside this lambda runs in a separate thread outside the TX
-          // this will not work: execution.setVariable("foo", "bar");
-          // THE EXECUTION IS NOT THREAD-SAFE
           try {
+        	  logger.info("ChildProcessProvider try : {}", Thread.currentThread().getId());
         	  Object setParentVar = execution.getVariableFromExecution(execution.getId(), "setParentVar");
         	  if (setParentVar != null && (Boolean) setParentVar) {
         		execution.setVariableInExecution(execution.getId(), "parentVar", "aParentVar");
@@ -76,12 +86,22 @@ public class ChildProcessProvider extends AbstractChildProcessProvider {
               logger.info("Executing async block...");
 
               execution.setVariable("outputVar", "someValue");
-              execution.complete();
+              Mocks.register("childProcessProvider", this);
+              try {
+                execution.complete();
+                logger.info("Signal Sent : {}", execution.getCurrentActivityId()); 
+              } catch (ExecutionRolledBackException e) {
+                // TODO maybe undo any side effects
+              }
           } catch (Exception exception) {
             exception.printStackTrace();
             execution.setVariable("firstTryHasFailed", true); // TODO make variable name more unique and delete after use
-            execution.handleFailure(exception);
-            // sketch for self healing
+            try {
+              execution.handleFailure(exception);
+            } catch (ExecutionRolledBackException e) {
+              // TODO maybe undo any side effects
+            }
+          // sketch for self healing
 //                  try {
 //                    // synchronously call self-healing µs
 //                    if (isIgnore) {
@@ -99,7 +119,8 @@ public class ChildProcessProvider extends AbstractChildProcessProvider {
 //                  }
           }
           //INCIDENT AND BPMN ERROR
-      }, delayedExecutor(250L, TimeUnit.MILLISECONDS));
+      }, delayedExecutor(durationOfAsyncTask, TimeUnit.MILLISECONDS));
+      logger.info("ChildProcessProvider execute finished: {}", Thread.currentThread().getId());
 
     }
 }

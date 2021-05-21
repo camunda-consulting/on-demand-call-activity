@@ -33,8 +33,6 @@ public class OnDemandCallActivityProcessEnginePluginTest {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    private final Long sleepTime = 3000L;
-
     static {
         LogFactory.useSlf4jLogging(); // MyBatis
     }
@@ -71,7 +69,7 @@ public class OnDemandCallActivityProcessEnginePluginTest {
                 .startProcessInstanceByKey(PROCESS_DEFINITION_KEY, withVariables("retProcess", false
                         , "doThrowException", false));
         assertThat(processInstance).calledProcessInstance("process-child").isNull();
-        Thread.sleep(sleepTime);
+        ChildProcessProvider.runAsyncFuture.join();
         assertThat(processInstance).isEnded();
         assertThat(processInstance).job().isNull();
         assertEquals(1, ChildProcessProvider.invocationCount);
@@ -83,7 +81,7 @@ public class OnDemandCallActivityProcessEnginePluginTest {
                 .startProcessInstanceByKey(PROCESS_DEFINITION_KEY,
                         withVariables("retProcess", false, "doThrowException", true));
         assertThat(processInstance).calledProcessInstance("process-child").isNull();
-        Thread.sleep(sleepTime);
+        ChildProcessProvider.runAsyncFuture.join();
         assertThat(processInstance).isNotEnded();
         logger.info(job().toString());
         assertEquals(1, ChildProcessProvider.invocationCount);
@@ -97,7 +95,7 @@ public class OnDemandCallActivityProcessEnginePluginTest {
         assertEquals(1, ChildProcessProvider.invocationCount);
         assertThat(processInstance).calledProcessInstance("process-child").isNull();
         //CHECK IF THE FIRST RETRY JOB WAS CREATED AND THEN EXECUTED
-        Thread.sleep(sleepTime);
+        ChildProcessProvider.runAsyncFuture.join();
         assertThat(processInstance).isNotEnded();
         logger.info(job().toString());
         execute(job());
@@ -119,7 +117,7 @@ public class OnDemandCallActivityProcessEnginePluginTest {
         assertEquals(1, ChildProcessProvider.invocationCount);
         assertThat(processInstance).calledProcessInstance("process-child").isNull();
         //CHECK IF THE FIRST RETRY JOB WAS CREATED AND THEN EXECUTED
-        Thread.sleep(sleepTime);
+        ChildProcessProvider.runAsyncFuture.join();
         assertThat(processInstance).isNotEnded();
         logger.info(job().toString());
         execute(job());
@@ -141,7 +139,7 @@ public class OnDemandCallActivityProcessEnginePluginTest {
         assertThat(processInstance).calledProcessInstance("process-child").isNull();
         assertEquals(1, ChildProcessProvider.invocationCount);
         //CHECK IF THE FIRST RETRY JOB WAS CREATED AND THEN EXECUTED
-        Thread.sleep(sleepTime);
+        ChildProcessProvider.runAsyncFuture.join();
         assertThat(processInstance).isNotEnded();
         logger.info(job().toString());
         execute(job());
@@ -168,7 +166,7 @@ public class OnDemandCallActivityProcessEnginePluginTest {
         assertEquals(1, ChildProcessProvider.invocationCount);
         assertThat(processInstance).calledProcessInstance("process-child").isNull();
         //CHECK IF THE FIRST RETRY JOB WAS CREATED AND THEN EXECUTED
-        Thread.sleep(sleepTime);
+        ChildProcessProvider.runAsyncFuture.join();
         assertThat(processInstance).isNotEnded();
         logger.info(job().toString());
         execute(job());
@@ -246,7 +244,7 @@ public class OnDemandCallActivityProcessEnginePluginTest {
                                 "doThrowException", false,
                                 "inputVar", "anInputVariable"));
         assertThat(processInstance).calledProcessInstance("process-child").isNull();
-        Thread.sleep(sleepTime);
+        ChildProcessProvider.runAsyncFuture.join();
         assertThat(processInstance).hasPassed("EndEventProcessEnded");
         assertThat(processInstance).isEnded();
         assertThat(processInstance).variables().containsEntry("inputVar", "anInputVariable");
@@ -262,7 +260,7 @@ public class OnDemandCallActivityProcessEnginePluginTest {
 				PROCESS_DEFINITION_KEY,
 				withVariables("retProcess", false, "doThrowException", false, "setParentVar", true));
 		assertThat(processInstance).calledProcessInstance("process-child").isNull();
-		Thread.sleep(sleepTime);
+        ChildProcessProvider.runAsyncFuture.join();
 		assertThat(processInstance).hasPassed("EndEvent_InParentProcess");
 		assertThat(processInstance).isEnded();
 		assertThat(processInstance).variables().containsEntry("parentVar", "aParentVar");
@@ -270,7 +268,7 @@ public class OnDemandCallActivityProcessEnginePluginTest {
 	}
     
     // TODO: test all operations that should normally work with a call activity (see engine test suite)
-
+    
     @Test
     public void testUserTaskForComparison() {
       BpmnModelInstance modelInstance = Bpmn.createExecutableProcess("user-task-process")
@@ -285,5 +283,17 @@ public class OnDemandCallActivityProcessEnginePluginTest {
       assertThat(processInstance).isActive();
       claim(task(), "falko");
       assertEquals(0, ChildProcessProvider.invocationCount);
-   }
+    }
+    
+    @Test
+    public void testWithoutCallActivityBadUserRequestException() {
+        ProcessInstance processInstance = processEngine().getRuntimeService()
+                .startProcessInstanceByKey(PROCESS_DEFINITION_KEY, withVariables("retProcess", false
+                        , "doThrowException", false, "badUserRequestException", true));
+        assertThat(processInstance).calledProcessInstance("process-child").isNull();
+        ChildProcessProvider.runAsyncFuture.join();
+        assertThat(processInstance).isEnded();
+        assertThat(processInstance).job().isNull();
+        assertEquals(1, ChildProcessProvider.invocationCount);
+    }
 }
