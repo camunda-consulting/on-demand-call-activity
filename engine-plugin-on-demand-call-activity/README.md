@@ -25,19 +25,14 @@ For using it in production you have to [integrate the plugin into your Camunda B
 Built and tested against Camunda BPM version 7.11.0.
 
 ## Known Limitations
+- Migration
+- Multi Tenancy
+- Process Instance Modification
+- History Cleanup
+- data mapping in simple case, i.e. REST call without child process (needed? mapping class? Call Activity mapping? generic I/O mapping with local variable scope?
+BPMN Error thrown from Service Call, but it is possible from the child process, so if a simple service call should result in a BPMN error, it could retry and call a child process that throws the error
 
 ## Improvements Backlog
 
 ## License
 [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
-
-<!-- HTML snippet for index page
-  <tr>
-    <td><img src="snippets/engine-plugin-on-demand-call-activity/src/main/resources/process.png" width="100"></td>
-    <td><a href="snippets/engine-plugin-on-demand-call-activity">On-demand Call Activity Plugin</a></td>
-    <td>A Plugin for [Camunda BPM](http://docs.camunda.org) that allows to skip the invocation of a sub-process.</td>
-  </tr>
--->
-<!-- Tweet 
-    New @CamundaBPM example: On-demand Call Activity Plugin - A Plugin for [Camunda BPM](http://docs.camunda.org) that allows to skip the invocation of a sub-process. https://github.com/camunda/camunda-consulting/tree/master/snippets/engine-plugin-on-demand-call-activity
--->
