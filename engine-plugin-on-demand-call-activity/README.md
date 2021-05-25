@@ -30,7 +30,7 @@ Built and tested against Camunda BPM version 7.11.0.
 - Process Instance Modification
 - History Cleanup
 - data mapping in simple case, i.e. REST call without child process (needed? mapping class? Call Activity mapping? generic I/O mapping with local variable scope?
-BPMN Error thrown from Service Call, but it is possible from the child process, so if a simple service call should result in a BPMN error, it could retry and call a child process that throws the error
+- BPMN Error thrown from Service Call, but it is possible from the child process, so if a simple service call should result in a BPMN error, it could retry and call a child process that throws the error
 
 ## Improvements Backlog
 
