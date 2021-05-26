@@ -3,6 +3,7 @@ package org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin;
 import org.apache.ibatis.logging.LogFactory;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.camunda.bpm.engine.test.mock.Mocks;
@@ -83,7 +84,7 @@ public class OnDemandCallActivityProcessEnginePluginTest {
         assertThat(processInstance).calledProcessInstance("process-child").isNull();
         ChildProcessProvider.runAsyncFuture.join();
         assertThat(processInstance).isNotEnded();
-        logger.info(job().toString());
+        assertJobHasProcessDefinition(job());
         assertEquals(1, ChildProcessProvider.invocationCount);
     }
 
@@ -97,8 +98,9 @@ public class OnDemandCallActivityProcessEnginePluginTest {
         //CHECK IF THE FIRST RETRY JOB WAS CREATED AND THEN EXECUTED
         ChildProcessProvider.runAsyncFuture.join();
         assertThat(processInstance).isNotEnded();
-        logger.info(job().toString());
-        execute(job());
+        Job job = job();
+        assertJobHasProcessDefinition(job);
+        execute(job);
 
         assertThatChildProcessIsInHistory(processInstance, 1);
         
@@ -119,8 +121,9 @@ public class OnDemandCallActivityProcessEnginePluginTest {
         //CHECK IF THE FIRST RETRY JOB WAS CREATED AND THEN EXECUTED
         ChildProcessProvider.runAsyncFuture.join();
         assertThat(processInstance).isNotEnded();
-        logger.info(job().toString());
-        execute(job());
+        Job job = job();
+        assertJobHasProcessDefinition(job);
+        execute(job);
 
         assertThatChildProcessIsInHistory(processInstance, 2);
 
@@ -141,14 +144,17 @@ public class OnDemandCallActivityProcessEnginePluginTest {
         //CHECK IF THE FIRST RETRY JOB WAS CREATED AND THEN EXECUTED
         ChildProcessProvider.runAsyncFuture.join();
         assertThat(processInstance).isNotEnded();
-        logger.info(job().toString());
-        execute(job());
+        Job job1 = job();
+        assertJobHasProcessDefinition(job1);
+        execute(job1);
 
         assertThat(processInstance).calledProcessInstance("process-child-async").isActive();
 
         assertThatChildProcessIsInHistory(processInstance, 1);
         
-        execute(jobQuery().singleResult());
+        Job job2 = jobQuery().singleResult();
+        assertJobHasProcessDefinition(job2);
+        execute(job2);
         
         assertThat(processInstance).hasPassed("EndEvent_InParentProcess");
         assertThat(processInstance).isEnded();
@@ -168,14 +174,17 @@ public class OnDemandCallActivityProcessEnginePluginTest {
         //CHECK IF THE FIRST RETRY JOB WAS CREATED AND THEN EXECUTED
         ChildProcessProvider.runAsyncFuture.join();
         assertThat(processInstance).isNotEnded();
-        logger.info(job().toString());
-        execute(job());
+        Job job1 = job();
+        assertJobHasProcessDefinition(job1);
+        execute(job1);
 
         assertThat(processInstance).calledProcessInstance("process-child-async").isActive();
 
         assertThatChildProcessIsInHistory(processInstance, 1);
 
-        execute(jobQuery().singleResult());
+        Job job2 = jobQuery().singleResult();
+        assertJobHasProcessDefinition(job2);
+        execute(job2);
         assertEquals(2, ChildProcessProvider.invocationCount);
 
         assertThatChildProcessIsInHistory(processInstance, 2);
@@ -184,6 +193,12 @@ public class OnDemandCallActivityProcessEnginePluginTest {
         // this can not work because queries runtime:
         // assertThat(processInstance).calledProcessInstance("process-child").isEnded();
         assertEquals(2, ChildProcessProvider.invocationCount);
+    }
+
+    private void assertJobHasProcessDefinition(Job job) {
+        logger.debug(job.toString());
+        assertNotNull(job.getProcessDefinitionId());
+        assertNotNull(job.getProcessDefinitionKey());
     }
 
     private void assertThatChildProcessIsInHistory(ProcessInstance processInstance, int numberOfChildren) {
