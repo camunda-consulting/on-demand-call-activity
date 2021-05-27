@@ -87,7 +87,7 @@ jobs:
         java-version: '8'
     - name: Enable snapshots in Maven settings
       if: endsWith(matrix.branch, 'SNAPSHOT')
-      uses: whelk-io/maven-settings-xml-action@v15
+      uses: whelk-io/maven-settings-xml-action@v16
       with:
         repositories: '[{ "id": "camunda-bpm-nexus", "name": "camunda-bpm-nexus", "url": "https://app.camunda.com/nexus/content/groups/public", "releases": { "enabled": "true" }, "snapshots": { "enabled": "true" } }]'
     - uses: actions/cache@v2.1.5
