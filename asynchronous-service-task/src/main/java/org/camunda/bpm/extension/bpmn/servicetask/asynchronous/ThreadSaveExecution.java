@@ -149,7 +149,10 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
    * Returns null when no variable value is found with the given name or when the value is set to null.
    *
    * This method blocks until the open transaction that created this execution
-   * is committed to the database.
+   * is committed to the database but only when accessing a variable from
+   * the current execution or it's parent execution within the same process
+   * instance. The target execution must be committed already. If the target
+   * execution is part of an open transaction race conditions must be expected.
    *
    * @param executionId id of process instance or execution, cannot be null.
    * @param variableName name of variable, cannot be null.
@@ -165,7 +168,13 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
    */
   public Object getVariableFromExecution(final String executionId, final String variableName) {
     // TODO write test case for this
-    return getRuntimeServiceWhenCommitted().getVariable(executionId, variableName);
+    RuntimeService runtimeService;
+    if (executionId == getId() || executionId == getParentId()) {
+      runtimeService = getRuntimeServiceWhenCommitted();
+    } else {
+      runtimeService = getRuntimeService();
+    }
+    return runtimeService.getVariable(executionId, variableName);
   }
 
   /**
