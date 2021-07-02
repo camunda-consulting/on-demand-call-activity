@@ -63,6 +63,15 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
     });
   }
 
+  /**
+   * Provides the {@link RuntimeService} once it is safe to use again on this
+   * execution.
+   *
+   * This method blocks until the open transaction that created this execution
+   * is committed to the database.
+   *
+   * @return {@link RuntimeService}
+   */
   protected RuntimeService getRuntimeServiceWhenCommitted() {
     if (!isTransactionCommitted()) {
         try {
@@ -82,6 +91,12 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
    *
    * The invocation of this method requires the execution to be in a wait state
    * and committed to the database.
+   *
+   * This method blocks until the open transaction that created this execution
+   * is committed to the database.
+   *
+   * @throws ExecutionRolledBackException
+   *          if the transaction that created this execution has been rolled back.
    */
   public void complete() {
     try {
@@ -107,6 +122,9 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
    *
    * <strong>NOTE:</strong> Notification and instantiation happen synchronously.
    *
+   * This method blocks until the open transaction that created this execution
+   * is committed to the database.
+   *
    * @param signalName
    *          the name of the signal event
    *
@@ -115,6 +133,9 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
    *          or no {@link Permissions#UPDATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.</li>
    *          <li>if start a new process instance and the user has no {@link Permissions#CREATE} permission on {@link Resources#PROCESS_INSTANCE}
    *          and no {@link Permissions#CREATE_INSTANCE} permission on {@link Resources#PROCESS_DEFINITION}.</li>
+
+   * @throws ExecutionRolledBackException
+   *          if the transaction that created this execution has been rolled back.
    */
   public void signalEventReceived(String signalName) {
     getRuntimeServiceWhenCommitted().signalEventReceived(signalName);
@@ -127,6 +148,9 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
    * Searching for the variable is done in all scopes that are visible to the given execution (including parent scopes).
    * Returns null when no variable value is found with the given name or when the value is set to null.
    *
+   * This method blocks until the open transaction that created this execution
+   * is committed to the database.
+   *
    * @param executionId id of process instance or execution, cannot be null.
    * @param variableName name of variable, cannot be null.
    *
@@ -136,6 +160,8 @@ public class ThreadSaveExecution extends DelegateExecutionDTO implements Delegat
    *          when no execution is found for the given executionId.
    * @throws AuthorizationException
    *          when permission are missing. See {@link RuntimeService#getVariable(String, String)}.
+   * @throws ExecutionRolledBackException
+   *          if the transaction that created this execution has been rolled back.
    */
   public Object getVariableFromExecution(final String executionId, final String variableName) {
     // TODO write test case for this
