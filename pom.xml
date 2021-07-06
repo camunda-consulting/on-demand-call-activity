@@ -13,6 +13,16 @@
     <module>abstract-delegate-execution</module>
   </modules>
 
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.7</version>
+      </plugin>
+    </plugins>
+  </build>
+
   <distributionManagement>
     <snapshotRepository>
       <id>github</id>
