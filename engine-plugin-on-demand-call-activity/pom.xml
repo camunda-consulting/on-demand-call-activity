@@ -114,7 +114,7 @@
       <!--  java util logging => slf4j -->
       <groupId>org.slf4j</groupId>
       <artifactId>jul-to-slf4j</artifactId>
-      <version>1.7.31</version>
+      <version>1.7.32</version>
       <scope>test</scope>
     </dependency>
 
