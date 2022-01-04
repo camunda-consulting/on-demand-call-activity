@@ -46,7 +46,7 @@ public abstract class AbstractChildProcessProvider {
    * This method should be invoked by the calledElement expression of a Call Activity
    */
   public String getChildProcessDefinitionKey(DelegateExecution execution) throws Exception {
-    logger.info("Running childProcessProvider...");
+    logger.debug("Running childProcessProvider...");
     
     String childProcess = decideOnChildProcess(execution);
     if (childProcess == null || childProcess.isEmpty()) {
