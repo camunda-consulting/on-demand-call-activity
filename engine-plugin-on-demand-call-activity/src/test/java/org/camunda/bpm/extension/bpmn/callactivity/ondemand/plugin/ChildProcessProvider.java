@@ -123,4 +123,12 @@ public class ChildProcessProvider extends AbstractChildProcessProvider {
       logger.info("ChildProcessProvider execute finished: {}", Thread.currentThread().getId());
 
     }
+
+	@Override
+	public void updateOnDemandCallActivityExecutionVariables(DelegateExecution execution,
+			OnDemandCallActivityExecution onDemandCallActivityExecution)
+	{
+		logger.info(
+				"ChildProcessProvider need to implement updateOnDemandCallActivityExecutionVariables to explicitly copy additional variables from current execution to onDemandCallActivityExecution");
+	}
 }
