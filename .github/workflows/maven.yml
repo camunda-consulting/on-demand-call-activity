@@ -89,7 +89,7 @@ jobs:
       if: endsWith(matrix.branch, 'SNAPSHOT')
       uses: whelk-io/maven-settings-xml-action@v18
       with:
-        repositories: '[{ "id": "camunda-bpm-nexus", "name": "camunda-bpm-nexus", "url": "https://app.camunda.com/nexus/content/groups/public", "releases": { "enabled": "true" }, "snapshots": { "enabled": "true" } }]'
+        repositories: '[{ "id": "camunda-bpm-nexus", "name": "camunda-bpm-nexus", "url": "https://artifacts.camunda.com/artifactory/public/", "releases": { "enabled": "true" }, "snapshots": { "enabled": "true" } }]'
     - uses: actions/cache@v2.1.6
       with:
         path: ~/.m2/repository
