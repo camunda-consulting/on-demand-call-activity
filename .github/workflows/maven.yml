@@ -21,7 +21,7 @@ jobs:
       with:
         distribution: 'zulu' 
         java-version: '8'
-    - uses: actions/cache@v2.1.6
+    - uses: actions/cache@v3.0.4
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
@@ -90,7 +90,7 @@ jobs:
       uses: whelk-io/maven-settings-xml-action@v18
       with:
         repositories: '[{ "id": "camunda-bpm-nexus", "name": "camunda-bpm-nexus", "url": "https://app.camunda.com/nexus/content/groups/public", "releases": { "enabled": "true" }, "snapshots": { "enabled": "true" } }]'
-    - uses: actions/cache@v2.1.6
+    - uses: actions/cache@v3.0.4
       with:
         path: ~/.m2/repository
         key: ${{ runner.os }}-engine-maven-${{ hashFiles('**/pom.xml') }}
