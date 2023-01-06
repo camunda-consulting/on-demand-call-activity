@@ -33,7 +33,7 @@ jobs:
     - run: cp asynchronous-service-task/target/*.jar staging/asynchronous-service-task.jar
     - run: cp abstract-delegate-execution/target/*.jar staging/abstract-delegate-execution.jar
     - run: echo "Deploying to production server on branch $GITHUB_REF"
-    - uses: actions/upload-artifact@v2.2.4
+    - uses: actions/upload-artifact@v3.1.2
       with:
         name: library-jar-files.zip
         path: staging
