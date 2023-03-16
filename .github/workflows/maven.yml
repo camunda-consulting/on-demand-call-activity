@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2.3.4
+    - uses: actions/checkout@v3.4.0
     - name: Set up JDK 1.8
       uses: actions/setup-java@v2
       with:
@@ -43,7 +43,7 @@ jobs:
     if: ${{ github.ref == 'refs/heads/master' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v3.4.0
       - name: Set up JDK 1.8
         uses: actions/setup-java@v2
         with:
@@ -77,7 +77,7 @@ jobs:
       uses: zcong1993/setup-timezone@v1.1.1
       with:
         timezone: Europe/Berlin
-    - uses: actions/checkout@v2.3.4
+    - uses: actions/checkout@v3.4.0
       with:
         ref: ${{ matrix.branch }}
     - name: Set up JDK 1.8
