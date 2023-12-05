@@ -11,10 +11,10 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.core.variable.CoreVariableInstance;
 import org.camunda.bpm.engine.impl.core.variable.event.VariableEvent;
 import org.camunda.bpm.engine.impl.core.variable.scope.AbstractVariableScope;
-import org.camunda.bpm.engine.impl.javax.el.ELContext;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.variable.impl.VariableMapImpl;
 import org.camunda.bpm.engine.variable.value.TypedValue;
+import org.camunda.bpm.impl.juel.jakarta.el.ELContext;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.camunda.bpm.model.bpmn.instance.FlowElement;
 
@@ -272,11 +272,11 @@ public class AbstractDelegateExecution extends SimpleVariableScope implements De
   public void setCachedElContext(ELContext cachedElContext) {
     super.setCachedElContext(cachedElContext);
   }
-  
+ /*
   /**
    * @throws UnsupportedOperationException
    */
-  @Deprecated
+  /* @Deprecated
   @Override
   public void setVariableLocal(String variableName, TypedValue value, AbstractVariableScope sourceActivityExecution) {
     super.setVariableLocal(variableName, value, sourceActivityExecution);
@@ -285,9 +285,9 @@ public class AbstractDelegateExecution extends SimpleVariableScope implements De
   /**
    * @throws UnsupportedOperationException
    */
-  @Deprecated
+  /*@Deprecated
   @Override
   public void setVariableLocalTransient(String variableName, Object value) {
     super.setVariableLocalTransient(variableName, value);
-  }
+  }*/
 }
