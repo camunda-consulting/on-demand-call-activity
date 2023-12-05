@@ -21,6 +21,7 @@
         <bean class="org.camunda.bpm.extension.bpmn.callactivity.ondemand.plugin.OnDemandCallActivityProcessEnginePlugin" />
       </list>
     </property>
+    <property name="historyTimeToLive" value="P1D"/>
   </bean>
 
 </beans>

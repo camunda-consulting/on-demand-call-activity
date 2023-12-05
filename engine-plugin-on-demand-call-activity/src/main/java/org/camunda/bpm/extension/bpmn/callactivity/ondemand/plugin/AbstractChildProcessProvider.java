@@ -50,12 +50,16 @@ public abstract class AbstractChildProcessProvider {
     
     String childProcess = decideOnChildProcess(execution);
     if (childProcess == null || childProcess.isEmpty()) {
-      execute(new OnDemandCallActivityExecution(execution));
+      OnDemandCallActivityExecution onDemandCallActivityExecution = new OnDemandCallActivityExecution(execution);
+      updateOnDemandCallActivityExecutionVariables(execution, onDemandCallActivityExecution);
+      execute(onDemandCallActivityExecution);
       execution.setVariableLocal(getAsyncServiceCallVarName(execution), true);
       return null;
     } else {
       return childProcess;
     }
   }
+
+    public abstract void updateOnDemandCallActivityExecutionVariables(DelegateExecution execution, OnDemandCallActivityExecution onDemandCallActivityExecution);
 
 }
