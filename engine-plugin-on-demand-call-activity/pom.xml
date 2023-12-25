@@ -98,7 +98,7 @@
       <!-- use logback as logger -->
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.2.4</version>
+      <version>1.4.11</version>
       <scope>test</scope>
     </dependency>
 
